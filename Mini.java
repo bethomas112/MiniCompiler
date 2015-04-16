@@ -91,9 +91,9 @@ public class Mini
 
          tc.translate();
       }
-      catch (org.antlr.runtime.RecognitionException e)
+      catch (org.antlr.runtime.RecognitionException | TypeChecker.TypeException e)
       {
-         error(e.toString());
+         error(e.getMessage());
       }
    }
 
