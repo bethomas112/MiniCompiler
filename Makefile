@@ -1,10 +1,9 @@
-FILES=Mini.java
-
+FILES=Mini.java MiniType.java IInstruction.java Register.java
 
 Mini.class : antlr.generated ${FILES}
 	javac *.java
 
-antlr.generated: antlr.generated.mini antlr.generated.json antlr.generated.type
+antlr.generated: antlr.generated.mini antlr.generated.json antlr.generated.type antlr.generated.iloc
 	touch antlr.generated
 
 antlr.generated.mini : Mini.g
@@ -19,5 +18,9 @@ antlr.generated.type : TypeChecker.g
 	java org.antlr.Tool TypeChecker.g
 	touch antlr.generated.type
 
+antlr.generated.iloc : ILOCGenerator.g
+	java org.antlr.Tool ILOCGenerator.g
+	touch antlr.generated.iloc
+
 clean:
-	\rm *generated* MiniParser.java MiniLexer.java ToJSON.java Mini.tokens ToJSON.tokens *.class
+	\rm *generated* MiniParser.java MiniLexer.java ToJSON.java Mini.tokens ToJSON.tokens *.class TypeChecker.tokens ILOCGenerator.tokens

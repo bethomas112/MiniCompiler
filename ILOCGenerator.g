@@ -1,4 +1,4 @@
-tree grammar ILOCBuilder;
+tree grammar ILOCGenerator;
 
 options
 {
@@ -18,7 +18,7 @@ options
 
 @members
 {
-   public static CFG {
+   public static class CFG {
       public EntryBlock entry;
       public ExitBlock exit;
       public HashMap<String, Register> locals;
@@ -43,29 +43,31 @@ options
    }
 
    public static class EntryBlock extends BasicBlock {
-      public abstract List<IInstruction> getILOC() {
+      public List<IInstruction> getILOC() {
          return new ArrayList<>();
       }
    }
 
    public static class ExitBlock extends BasicBlock {
-      public abstract List<IInstruction> getILOC() {
+      public List<IInstruction> getILOC() {
          return new ArrayList<>();
       }
-   }   
+   }
+
+   private HashMap<String, MiniType> structTypes = new HashMap<>();
 }
 
 
 translate
-   returns [MiniType miniType = null]
    :  ^(PROGRAM t=types d=declarations[] f=functions)
          {
-            
+            for (MiniType type : structTypes.values()) {
+               System.out.println(type);
+            }
          }
    ;
 
 types
-   returns []
    @init {  }
    :  ^(TYPES (t=type_decl {  })*)
       {  }
@@ -73,53 +75,52 @@ types
    ;
 
 type_decl
-   returns []
-   @init {  }
+   @init { MiniType.StructType structType = new MiniType.StructType(); }
    :  ^(ast=STRUCT 
          id=ID 
             { 
-               
+               structType.name = "Struct " + $id.text;
+               structTypes.put($id.text, structType);               
             } 
-         n=nested_decl[])
+         n=nested_decl[structType])
       {
         
       }
    ;
 
-nested_decl []
-   returns []
+nested_decl [MiniType.StructType structType]
    @init{  }
    :  (f=field_decl[structType] {  })+
-      {  }
    ;
 
-field_decl [StructType structType]
+field_decl [MiniType.StructType structType]
    returns [MiniType miniType = null]
    :  ^(DECL ^(TYPE t=type) id=ID)
       {
-         
+         structType.fieldsOrdered.add($id.text);
+         structType.fields.put($id.text, $t.miniType);
+         $miniType = structType;
       }
    ;
 
 type
    returns [MiniType miniType = null]
-   :  INT {  }
-   |  BOOL {  }
+   :  INT { $miniType = MiniType.INT; }
+   |  BOOL { $miniType = MiniType.BOOL; }
    |  ^(STRUCT id=ID) 
       { 
-         
+         $miniType = structTypes.get($id.text);
       }
    ;
 
-declarations[HashMap<String, MiniType> typeEnv]
-   returns [MiniType miniType = null]
+declarations[]
    @init {}
-   :  ^(DECLS (d=decl_list[typeEnv])*)
+   :  ^(DECLS (d=decl_list[])*)
       {  }
    |  {  }
    ;
 
-decl_list[HashMap<String, MiniType> typeEnv]
+decl_list[]
    :  ^(DECLLIST ^(TYPE t=type)
          (id=ID
             {
@@ -147,13 +148,13 @@ function
             {
                
             }
-         p=parameters[proto, typeEnv] 
+         p=parameters[] 
          r=return_type 
             {
                
             }
-         d=declarations[typeEnv]
-         s=statement_list[proto, typeEnv])
+         d=declarations[]
+         s=statement_list[])
       {
          
       }
@@ -181,28 +182,28 @@ return_type
 
 rtype
    returns []
-   :  t=type { $miniType = $t.miniType; }
+   :  t=type {  }
    |  VOID {  }
    ;
 
 statement[]
    returns []
-   :  (s=block[proto, typeEnv]
-      |  s=assignment[typeEnv]
-      |  s=print[typeEnv]
-      |  s=read[typeEnv]
-      |  s=conditional[proto, typeEnv]
-      |  s=loop[proto, typeEnv]
-      |  s=delete[typeEnv]
-      |  s=return_stmt[proto, typeEnv]
-      |  s=invocation_stmt[typeEnv]
+   :  (s=block[]
+      |  s=assignment[]
+      |  s=print[]
+      |  s=read[]
+      |  s=conditional[]
+      |  s=loop[]
+      |  s=delete[]
+      |  s=return_stmt[]
+      |  s=invocation_stmt[]
       )
       {  }
    ;
 
 block[]
    returns []
-   :  ^(BLOCK s=statement_list[proto, typeEnv])
+   :  ^(BLOCK s=statement_list[])
       {
          
       }
@@ -217,71 +218,71 @@ statement_list[]
       {  }
    ;
 
-assignment[HashMap<String, MiniType> typeEnv]
+assignment[]
    returns [boolean hasReturn = false]
-   :  ^(ast=ASSIGN e=expression[typeEnv] l=lvalue[typeEnv])
+   :  ^(ast=ASSIGN e=expression[] l=lvalue[])
       {
          
       }
    ;
 
-print[HashMap<String, MiniType> typeEnv]
+print[]
    returns [boolean hasReturn = false]
    @init {  }
-   :  ^(ast=PRINT e=expression[typeEnv] (ENDL {  })?)
+   :  ^(ast=PRINT e=expression[] (ENDL {  })?)
       {
          
       }
    ;
 
-read[HashMap<String, MiniType> typeEnv]
+read[]
    returns [boolean hasReturn = false]
-   :  ^(ast=READ l=lvalue[typeEnv])
+   :  ^(ast=READ l=lvalue[])
       {
          
       }
    ;
 
-conditional[FunctionPrototype proto, HashMap<String, MiniType> typeEnv]
+conditional[]
    returns [boolean hasReturn = false]
-   :  ^(ast=IF g=expression[typeEnv] t=block[proto, typeEnv] (e=block[proto, typeEnv])?)
+   :  ^(ast=IF g=expression[] t=block[] (e=block[])?)
       {
          
       }
    ;
 
-loop[FunctionPrototype proto, HashMap<String, MiniType> typeEnv]
+loop[]
    returns [boolean hasReturn = false]
-   :  ^(ast=WHILE e=expression[typeEnv] b=block[proto, typeEnv] expression[typeEnv])
+   :  ^(ast=WHILE e=expression[] b=block[] expression[])
       {
          
       }
    ;
 
-delete[HashMap<String, MiniType> typeEnv]
+delete[]
    returns [boolean hasReturn = false]
-   :  ^(ast=DELETE e=expression[typeEnv])
+   :  ^(ast=DELETE e=expression[])
       {
          
       }
    ;
 
-return_stmt[FunctionPrototype proto, HashMap<String, MiniType> typeEnv]
+return_stmt[]
    returns [boolean hasReturn = true]
-   :  ^(ast=RETURN (e=expression[typeEnv])?)
+   :  ^(ast=RETURN (e=expression[])?)
       {
          
       }
    ;
 
-invocation_stmt[HashMap<String, MiniType> typeEnv]
+invocation_stmt[]
    returns [boolean hasReturn = false]
-   @init { FunctionPrototype proto = null; int argIdx = 0; }
+   @init { int argIdx = 0; }
    :  ^(INVOKE id=ID 
          { 
            
          } 
-         ^(ARGS (e=expression[typeEnv] 
+         ^(ARGS (e=expression[] 
             {  
                
             })*))
@@ -289,50 +290,50 @@ invocation_stmt[HashMap<String, MiniType> typeEnv]
       }
    ;
 
-lvalue[HashMap<String, MiniType> typeEnv]
-   returns [MiniType miniType]
+lvalue[]
+   returns []
    :  id=ID
       {
          
       }
-   |  ^(ast=DOT l=lvalue[typeEnv] id=ID)
+   |  ^(ast=DOT l=lvalue[] id=ID)
       {
          
       }
    ;
 
-expression[HashMap<String, MiniType> typeEnv]
-   returns [MiniType miniType = null]
+expression[]
+   returns []
    :  ^((ast=AND | ast=OR)
-         lft=expression[typeEnv] rht=expression[typeEnv])
+         lft=expression[] rht=expression[])
       {
          
       }
    //Comparisons
    |  ^((ast=EQ | ast=LT | ast=GT | ast=NE | ast=LE | ast=GE)
-         lft=expression[typeEnv] rht=expression[typeEnv])
+         lft=expression[] rht=expression[])
       {
          
       }
    //Arithmetic
    |  ^((ast=PLUS | ast=MINUS | ast=TIMES | ast=DIVIDE)
-         lft=expression[typeEnv] rht=expression[typeEnv])
+         lft=expression[] rht=expression[])
       {
          
       }
-   |  ^(ast=NOT e=expression[typeEnv])
+   |  ^(ast=NOT e=expression[])
       {
          
       }
-   |  ^(ast=NEG e=expression[typeEnv])
+   |  ^(ast=NEG e=expression[])
       {
          
       }
-   |  ^(ast=DOT e=expression[typeEnv] id=ID)
+   |  ^(ast=DOT e=expression[] id=ID)
       {
          
       }
-   |  e=invocation_exp[typeEnv] 
+   |  e=invocation_exp[] 
       {
          
       }
@@ -362,14 +363,14 @@ expression[HashMap<String, MiniType> typeEnv]
       }
    ;
 
-invocation_exp[HashMap<String, MiniType> typeEnv]
-   returns [MiniType miniType = null]
-   @init { FunctionPrototype proto = null; int argIdx = 0; }
+invocation_exp[]
+   returns []
+   @init { int argIdx = 0; }
    :  ^(INVOKE id=ID
          { 
             
          }
-      ^(ARGS (e=expression[typeEnv] 
+      ^(ARGS (e=expression[] 
          {  
             
          })*))

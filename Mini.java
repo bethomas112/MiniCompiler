@@ -27,16 +27,19 @@ public class Mini
       else if (!parser.hasErrors())
       {
          typeCheck(tree, tokens);
-         //JsonValue json = translate(tree, tokens);
-         //System.out.println(json);
+         if (_dumpIL) {
+            generateILOC(tree, tokens);
+         }
       }
    }
 
    private static final String DISPLAYAST = "-displayAST";
+   private static final String DUMPILOC = "-dumpIL";
 
    private static String _inputFile = null;
    private static boolean _displayAST = false;
-
+   private static boolean _dumpIL = false;
+   
    private static void parseParameters(String [] args)
    {
       for (int i = 0; i < args.length; i++)
@@ -44,6 +47,10 @@ public class Mini
          if (args[i].equals(DISPLAYAST))
          {
             _displayAST = true;
+         }
+         else if (args[i].equals(DUMPILOC))
+         {
+            _dumpIL = true;
          }
          else if (args[i].charAt(0) == '-')
          {
@@ -92,6 +99,21 @@ public class Mini
          tc.translate();
       }
       catch (org.antlr.runtime.RecognitionException | TypeChecker.TypeException e)
+      {
+         error(e.getMessage());
+      }
+   }
+
+   private static void generateILOC(CommonTree tree, CommonTokenStream tokens) {
+      try
+      {
+         CommonTreeNodeStream nodes = new CommonTreeNodeStream(tree);
+         nodes.setTokenStream(tokens);
+         ILOCGenerator igen = new ILOCGenerator(nodes);
+
+         igen.translate();
+      }
+      catch (org.antlr.runtime.RecognitionException e)
       {
          error(e.getMessage());
       }
