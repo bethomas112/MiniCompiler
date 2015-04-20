@@ -19,51 +19,46 @@ options
 @members
 {
    public static class CFG {
-      public EntryBlock entry;
-      public ExitBlock exit;
+      public BasicBlock entryBlock;
+      public BasicBlock exitBlock;
       public HashMap<String, Register> locals;
       public HashMap<String, Integer> params;
 
       public CFG() {
          this.locals = new HashMap<>();
-         this.entry = new EntryBlock();
-         this.exit = new ExitBlock();
+         this.params = new HashMap<>();
+
       }
    }
 
-   public abstract static class BasicBlock {
+   public static class BasicBlock {
       public List<BasicBlock> prev;
       public List<BasicBlock> next;
+      public String label;
       public BasicBlock() {
          prev = new ArrayList<>();
          next = new ArrayList<>();
       }
 
-      public abstract List<IInstruction> getILOC();
+      public List<IInstruction> getILOC() { 
+         return new ArrayList<>(); 
+      };
    }
 
-   public static class EntryBlock extends BasicBlock {
-      public List<IInstruction> getILOC() {
-         return new ArrayList<>();
-      }
-   }
-
-   public static class ExitBlock extends BasicBlock {
-      public List<IInstruction> getILOC() {
-         return new ArrayList<>();
-      }
+   private static int labelCount = 0;
+   private static String getNextLabel() {
+      return "L" + labelCount++;
    }
 
    private HashMap<String, MiniType> structTypes = new HashMap<>();
+   private List<CFG> cfgs = new ArrayList<>();   
 }
 
 
 translate
-   :  ^(PROGRAM t=types d=declarations[] f=functions)
+   :  ^(PROGRAM t=types d=declarations[null] f=functions)
          {
-            for (MiniType type : structTypes.values()) {
-               System.out.println(type);
-            }
+         
          }
    ;
 
@@ -113,18 +108,20 @@ type
       }
    ;
 
-declarations[]
+declarations[CFG cfg]
    @init {}
-   :  ^(DECLS (d=decl_list[])*)
+   :  ^(DECLS (d=decl_list[cfg])*)
       {  }
    |  {  }
    ;
 
-decl_list[]
+decl_list[CFG cfg]
    :  ^(DECLLIST ^(TYPE t=type)
          (id=ID
             {
-               
+               if (cfg != null) {
+                  cfg.locals.put($id.text, Register.newRegister());
+               }
             }
          )+
       )
@@ -134,100 +131,111 @@ functions
    returns []
    @init{  }
    :  ^(FUNCS (f=function {  })*)
-      {  }
+      { 
+         for (CFG cfg : cfgs) {
+            System.out.println(cfg.entryBlock.label);
+            System.out.println(cfg.locals);
+            System.out.println(cfg.params);
+         } 
+      }
    |  {  }
    ;
 
 function
    @init 
    { 
-      
+      CFG cfg = new CFG();
+      Register.resetRegisters();
    }
    :  ^(ast=FUN 
-         id=ID 
-            {
-               
-            }
-         p=parameters[] 
-         r=return_type 
-            {
-               
-            }
-         d=declarations[]
-         s=statement_list[])
+         id=ID          
+         p=parameters[cfg] 
+         {
+            cfg.entryBlock = $p.entryBlock;
+            cfg.entryBlock.label = $id.text;
+         } 
+         r=return_type
+         d=declarations[cfg]
+         s=statement_list[cfg, cfg.entryBlock])
       {
-         
+         cfg.exitBlock = $s.resultBlock;
+         cfgs.add(cfg);
       }
    ;
 
-parameters[]
-   returns []
-   @init{  }
-   :  ^(PARAMS (p=param_decl[] { })*)
-      {  }
+parameters[CFG cfg]
+   returns [BasicBlock entryBlock = null]
+   @init{ int paramNum = 0; }
+   :  ^(PARAMS (p=param_decl[] 
+      { 
+         cfg.params.put($p.paramId, paramNum++);
+         cfg.locals.put($p.paramId, Register.newRegister());         
+         //TODO: Generate code for setting up params.
+      })*)
+      { 
+         $entryBlock = new BasicBlock(); 
+      }
    ;
 
 param_decl[]
-   returns []
+   returns [String paramId = null]
    :  ^(DECL ^(TYPE t=type) id=ID)
       {
-         
+         $paramId = $id.text;
       }
    ;
 
 return_type
-   returns []
    :  ^(RETTYPE (r=rtype)) {  }
    ;
 
 rtype
-   returns []
    :  t=type {  }
    |  VOID {  }
    ;
 
-statement[]
-   returns []
-   :  (s=block[]
-      |  s=assignment[]
-      |  s=print[]
-      |  s=read[]
-      |  s=conditional[]
-      |  s=loop[]
-      |  s=delete[]
-      |  s=return_stmt[]
-      |  s=invocation_stmt[]
+statement[CFG cfg, BasicBlock block]
+   returns [BasicBlock resultBlock = null]
+   :  (s=block[cfg, block]
+      |  s=assignment[cfg, block]
+      |  s=print[cfg, block]
+      |  s=read[cfg, block]
+      |  s=conditional[cfg, block]
+      |  s=loop[cfg, block]
+      |  s=delete[cfg, block]
+      |  s=return_stmt[cfg, block]
+      |  s=invocation_stmt[cfg, block]
       )
-      {  }
+      { $resultBlock = $s.resultBlock; }
    ;
 
-block[]
-   returns []
-   :  ^(BLOCK s=statement_list[])
+block[CFG cfg, BasicBlock block]
+   returns [BasicBlock resultBlock = null]
+   :  ^(BLOCK s=statement_list[cfg, block])
       {
-         
+         $resultBlock = $s.resultBlock;
       }
    ;
 
-statement_list[]
-   returns []
-   @init{  }
-   :  ^(STMTS (s=statement[] {         
-         
+statement_list[CFG cfg, BasicBlock block]
+   returns [BasicBlock resultBlock = null]
+   @init{ BasicBlock currentBlock = block; }
+   :  ^(STMTS (s=statement[cfg, currentBlock] {         
+         currentBlock = $s.resultBlock;
       })*)
-      {  }
+      { $resultBlock = currentBlock; }
    ;
 
-assignment[]
-   returns [boolean hasReturn = false]
+assignment[CFG cfg, BasicBlock block]
+   returns [BasicBlock resultBlock = null]
    :  ^(ast=ASSIGN e=expression[] l=lvalue[])
       {
          
       }
    ;
 
-print[]
-   returns [boolean hasReturn = false]
+print[CFG cfg, BasicBlock block]
+   returns [BasicBlock resultBlock = null]
    @init {  }
    :  ^(ast=PRINT e=expression[] (ENDL {  })?)
       {
@@ -235,48 +243,48 @@ print[]
       }
    ;
 
-read[]
-   returns [boolean hasReturn = false]
+read[CFG cfg, BasicBlock block]
+   returns [BasicBlock resultBlock = null]
    :  ^(ast=READ l=lvalue[])
       {
          
       }
    ;
 
-conditional[]
-   returns [boolean hasReturn = false]
-   :  ^(ast=IF g=expression[] t=block[] (e=block[])?)
+conditional[CFG cfg, BasicBlock block]
+   returns [BasicBlock resultBlock = null]
+   :  ^(ast=IF g=expression[] t=block[cfg, block] (e=block[cfg, block])?)
       {
          
       }
    ;
 
-loop[]
-   returns [boolean hasReturn = false]
-   :  ^(ast=WHILE e=expression[] b=block[] expression[])
+loop[CFG cfg, BasicBlock block]
+   returns [BasicBlock resultBlock = null]
+   :  ^(ast=WHILE e=expression[] b=block[cfg, block] expression[])
       {
          
       }
    ;
 
-delete[]
-   returns [boolean hasReturn = false]
+delete[CFG cfg, BasicBlock block]
+   returns [BasicBlock resultBlock = null]
    :  ^(ast=DELETE e=expression[])
       {
          
       }
    ;
 
-return_stmt[]
-   returns [boolean hasReturn = true]
+return_stmt[CFG cfg, BasicBlock block]
+   returns [BasicBlock resultBlock = null]
    :  ^(ast=RETURN (e=expression[])?)
       {
          
       }
    ;
 
-invocation_stmt[]
-   returns [boolean hasReturn = false]
+invocation_stmt[CFG cfg, BasicBlock block]
+   returns [BasicBlock resultBlock = null]
    @init { int argIdx = 0; }
    :  ^(INVOKE id=ID 
          { 
