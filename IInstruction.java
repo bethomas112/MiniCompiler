@@ -33,7 +33,7 @@ public abstract class IInstruction {
       }
       
       public List<Register> getDestRegisters() {
-         return new ArrayList<>(dest);
+         return Arrays.asList(dest);
       }  
    }
 
@@ -42,7 +42,7 @@ public abstract class IInstruction {
       public abstract String getText();
    
       public List<Register> getSourceRegisters() {
-         return new ArrayList<>(source);
+         return Arrays.asList(source);
       }
       
       public List<Register> getDestRegisters() {
