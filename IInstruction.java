@@ -254,7 +254,7 @@ public abstract class IInstruction {
    /* Allocation */
 
    public static class NEW extends IInstruction {
-      public StructType struct;
+      public MiniType.StructType struct;
       public Register dest;
 
       public String getText() {
