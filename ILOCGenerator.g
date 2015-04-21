@@ -11,8 +11,11 @@ options
 */
 @header
 {
+   import java.util.List;
+   import java.util.LinkedList;
    import java.util.ArrayList;
    import java.util.HashMap;
+   import java.util.HashSet;
    import javax.json.*;
 }
 
@@ -27,7 +30,25 @@ options
       public CFG() {
          this.locals = new HashMap<>();
          this.params = new HashMap<>();
+      }
 
+      public List<BasicBlock> bfsBlocks() {
+         HashSet<BasicBlock> visited = new HashSet<>();
+         LinkedList<BasicBlock> queue = new LinkedList<>();
+         List<BasicBlock> result = new ArrayList<>();
+
+         queue.add(entryBlock);
+         while(!queue.isEmpty()) {
+            BasicBlock block = queue.poll();
+            if (!visited.contains(block)) {
+               result.add(block);
+               visited.add(block);
+               for (BasicBlock nextBlock : block.next) {               
+                  queue.add(nextBlock);     
+               }
+            }
+         }
+         return result;
       }
    }
 
@@ -133,9 +154,15 @@ functions
    :  ^(FUNCS (f=function {  })*)
       { 
          for (CFG cfg : cfgs) {
-            System.out.println(cfg.entryBlock.label);
-            System.out.println(cfg.locals);
-            System.out.println(cfg.params);
+            List<BasicBlock> blocks = cfg.bfsBlocks();
+            for (BasicBlock block : blocks) {
+               StringBuilder sb = new StringBuilder();
+               sb.append(block.label + " -> ");
+               for (BasicBlock nextBlock : block.next) {
+                  sb.append(nextBlock.label + ", ");
+               }
+               System.out.println(sb.toString());
+            }
          } 
       }
    |  {  }
@@ -146,6 +173,9 @@ function
    { 
       CFG cfg = new CFG();
       Register.resetRegisters();
+      BasicBlock exitBlock = new BasicBlock();
+      exitBlock.label = getNextLabel();
+      cfg.exitBlock = exitBlock;
    }
    :  ^(ast=FUN 
          id=ID          
@@ -158,7 +188,6 @@ function
          d=declarations[cfg]
          s=statement_list[cfg, cfg.entryBlock])
       {
-         cfg.exitBlock = $s.resultBlock;
          cfgs.add(cfg);
       }
    ;
@@ -228,58 +257,101 @@ statement_list[CFG cfg, BasicBlock block]
 
 assignment[CFG cfg, BasicBlock block]
    returns [BasicBlock resultBlock = null]
-   :  ^(ast=ASSIGN e=expression[] l=lvalue[])
+   :  ^(ast=ASSIGN e=expression[cfg, block] l=lvalue[cfg, block])
       {
-         
+         $resultBlock = block;
       }
    ;
 
 print[CFG cfg, BasicBlock block]
    returns [BasicBlock resultBlock = null]
    @init {  }
-   :  ^(ast=PRINT e=expression[] (ENDL {  })?)
+   :  ^(ast=PRINT e=expression[cfg, block] (ENDL {  })?)
       {
-         
+         $resultBlock = block;
       }
    ;
 
 read[CFG cfg, BasicBlock block]
    returns [BasicBlock resultBlock = null]
-   :  ^(ast=READ l=lvalue[])
+   :  ^(ast=READ l=lvalue[cfg, block])
       {
-         
+         $resultBlock = block;
       }
    ;
 
 conditional[CFG cfg, BasicBlock block]
    returns [BasicBlock resultBlock = null]
-   :  ^(ast=IF g=expression[] t=block[cfg, block] (e=block[cfg, block])?)
+   @init 
+   {
+      BasicBlock guardBlock = new BasicBlock();
+      guardBlock.label = getNextLabel();
+      BasicBlock thenBlock = new BasicBlock();
+      thenBlock.label = getNextLabel();
+      BasicBlock elseBlock = new BasicBlock();
+      elseBlock.label = getNextLabel();      
+      BasicBlock afterBlock = new BasicBlock();
+      afterBlock.label = getNextLabel();
+      boolean hasElseBlock = false;
+   }
+   :  ^(ast=IF g=expression[cfg, guardBlock] t=block[cfg, thenBlock] (e=block[cfg, elseBlock]
+         {
+            hasElseBlock = true;
+         }
+      )?)      
       {
+         block.next.add(guardBlock);
+         guardBlock.next.add(thenBlock);
          
+         if ($t.resultBlock != null) {
+            $t.resultBlock.next.add(afterBlock);
+         }
+         if (hasElseBlock) {
+            guardBlock.next.add(elseBlock);   
+            if ($e.resultBlock != null) {
+               $e.resultBlock.next.add(afterBlock);
+            }
+         }
+         $resultBlock = afterBlock;
       }
    ;
 
 loop[CFG cfg, BasicBlock block]
    returns [BasicBlock resultBlock = null]
-   :  ^(ast=WHILE e=expression[] b=block[cfg, block] expression[])
+   @init 
+   {
+      BasicBlock guardBlock = new BasicBlock();
+      guardBlock.label = getNextLabel();
+      BasicBlock afterBlock = new BasicBlock();
+      afterBlock.label = getNextLabel();
+      BasicBlock bodyBlock = new BasicBlock();
+      bodyBlock.label = getNextLabel();
+   }
+   :  ^(ast=WHILE e=expression[cfg, guardBlock] b=block[cfg, bodyBlock] expression[cfg, new BasicBlock()])
       {
-         
+         block.next.add(guardBlock);
+         guardBlock.next.add(bodyBlock);
+         guardBlock.next.add(afterBlock);
+         if ($b.resultBlock != null) {
+            $b.resultBlock.next.add(guardBlock);
+         }
+         $resultBlock = afterBlock;
       }
    ;
 
 delete[CFG cfg, BasicBlock block]
    returns [BasicBlock resultBlock = null]
-   :  ^(ast=DELETE e=expression[])
+   :  ^(ast=DELETE e=expression[cfg, block])
       {
-         
+         $resultBlock = block;
       }
    ;
 
 return_stmt[CFG cfg, BasicBlock block]
    returns [BasicBlock resultBlock = null]
-   :  ^(ast=RETURN (e=expression[])?)
+   :  ^(ast=RETURN (e=expression[cfg, block])?)
       {
-         
+         block.next.add(cfg.exitBlock);
       }
    ;
 
@@ -290,58 +362,59 @@ invocation_stmt[CFG cfg, BasicBlock block]
          { 
            
          } 
-         ^(ARGS (e=expression[] 
+         ^(ARGS (e=expression[cfg, block] 
             {  
                
             })*))
       {
+         $resultBlock = block;
       }
    ;
 
-lvalue[]
+lvalue[CFG cfg, BasicBlock block]
    returns []
    :  id=ID
       {
          
       }
-   |  ^(ast=DOT l=lvalue[] id=ID)
+   |  ^(ast=DOT l=lvalue[cfg, block] id=ID)
       {
          
       }
    ;
 
-expression[]
-   returns []
+expression[CFG cfg, BasicBlock block]
+   returns [Register resultRegister = null]
    :  ^((ast=AND | ast=OR)
-         lft=expression[] rht=expression[])
+         lft=expression[cfg, block] rht=expression[cfg, block])
       {
          
       }
    //Comparisons
    |  ^((ast=EQ | ast=LT | ast=GT | ast=NE | ast=LE | ast=GE)
-         lft=expression[] rht=expression[])
+         lft=expression[cfg, block] rht=expression[cfg, block])
       {
          
       }
    //Arithmetic
    |  ^((ast=PLUS | ast=MINUS | ast=TIMES | ast=DIVIDE)
-         lft=expression[] rht=expression[])
+         lft=expression[cfg, block] rht=expression[cfg, block])
       {
          
       }
-   |  ^(ast=NOT e=expression[])
+   |  ^(ast=NOT e=expression[cfg, block])
       {
          
       }
-   |  ^(ast=NEG e=expression[])
+   |  ^(ast=NEG e=expression[cfg, block])
       {
          
       }
-   |  ^(ast=DOT e=expression[] id=ID)
+   |  ^(ast=DOT e=expression[cfg, block] id=ID)
       {
          
       }
-   |  e=invocation_exp[] 
+   |  e=invocation_exp[cfg, block] 
       {
          
       }
@@ -371,14 +444,14 @@ expression[]
       }
    ;
 
-invocation_exp[]
-   returns []
+invocation_exp[CFG cfg, BasicBlock block]
+   returns [Register resultRegister = null]
    @init { int argIdx = 0; }
    :  ^(INVOKE id=ID
          { 
             
          }
-      ^(ARGS (e=expression[] 
+      ^(ARGS (e=expression[cfg, block] 
          {  
             
          })*))
