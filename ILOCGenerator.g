@@ -203,6 +203,7 @@ functions
 function
    @init 
    { 
+      boolean hasStatements = false;
       CFG cfg = new CFG();
       Register.resetRegisters();
       BasicBlock exitBlock = new BasicBlock();
@@ -219,8 +220,23 @@ function
          } 
          r=return_type
          d=declarations[cfg]
-         s=statement_list[cfg, cfg.entryBlock])
+         s=statement_list[cfg, cfg.entryBlock] 
+         {
+            hasStatements = true;
+         })
       {
+         if (!hasStatements) {
+            cfg.entryBlock.next.add(exitBlock);
+            IInstruction.JUMPI jumpi = new IInstruction.JUMPI();
+            jumpi.label = exitBlock.label;
+            cfg.entryBlock.addInstruction(jumpi);
+         }
+         else if ($s.resultBlock != null && $s.resultBlock.next.isEmpty()) {
+            $s.resultBlock.next.add(exitBlock);
+            IInstruction.JUMPI jumpi = new IInstruction.JUMPI();
+            jumpi.label = exitBlock.label;
+            $s.resultBlock.addInstruction(jumpi);
+         }
          cfgs.add(cfg);
       }
    ;
@@ -501,7 +517,11 @@ return_stmt[CFG cfg, BasicBlock block]
 
 invocation_stmt[CFG cfg, BasicBlock block]
    returns [BasicBlock resultBlock = null]
-   @init { int argIdx = 0; }
+   @init 
+   { 
+      int argIdx = 0; 
+      List<IInstruction> instructions = new ArrayList<IInstruction>();
+   }
    :  ^(INVOKE id=ID 
          { 
            
@@ -511,10 +531,14 @@ invocation_stmt[CFG cfg, BasicBlock block]
             IInstruction.STOREOUTARGUMENT storeoutargument = new IInstruction.STOREOUTARGUMENT();
             storeoutargument.source = $e.resultRegister;
             storeoutargument.argIdx = argIdx;
-            block.addInstruction(storeoutargument);
+            instructions.add(storeoutargument);
             argIdx++;
          })*))
       {
+         for (IInstruction instruction : instructions) {
+            block.addInstruction(instruction);
+         }
+         
          IInstruction.CALL call = new IInstruction.CALL();
          call.label = $id.text;
          block.addInstruction(call);
@@ -779,7 +803,11 @@ expression[CFG cfg, BasicBlock block]
 
 invocation_exp[CFG cfg, BasicBlock block]
    returns [Register resultRegister = null]
-   @init { int argIdx = 0; }
+   @init 
+   { 
+      int argIdx = 0; 
+      List<IInstruction> instructions = new ArrayList<IInstruction>();
+   }
    :  ^(INVOKE id=ID
          { 
             
@@ -789,10 +817,13 @@ invocation_exp[CFG cfg, BasicBlock block]
             IInstruction.STOREOUTARGUMENT storeoutargument = new IInstruction.STOREOUTARGUMENT();
             storeoutargument.source = $e.resultRegister;
             storeoutargument.argIdx = argIdx;
-            block.addInstruction(storeoutargument);
+            instructions.add(storeoutargument);
             argIdx++;
          })*))
       {
+         for (IInstruction instruction : instructions) {
+            block.addInstruction(instruction);
+         }
          IInstruction.CALL call = new IInstruction.CALL();
          call.label = $id.text;
          block.addInstruction(call);

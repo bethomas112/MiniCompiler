@@ -23,4 +23,4 @@ antlr.generated.iloc : ILOCGenerator.g
 	touch antlr.generated.iloc
 
 clean:
-	\rm *generated* MiniParser.java MiniLexer.java ToJSON.java Mini.tokens ToJSON.tokens *.class TypeChecker.tokens ILOCGenerator.tokens
+	\rm *generated* MiniParser.java MiniLexer.java ToJSON.java Mini.tokens ToJSON.tokens TypeChecker.java ILOCGenerator.java *.class TypeChecker.tokens ILOCGenerator.tokens 

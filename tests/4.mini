@@ -40,6 +40,7 @@ fun f(int i, struct B j) struct A
 }
 fun bar(struct B j, int i) void
 {
+   
 }
 
 fun main() int

@@ -1,10 +1,66 @@
+g:
+	loadinargument i, 0, r0
+	loadinargument j, 1, r1
+	loadi 3, r5
+	storeret r5
+	jumpi L0
+L0:
+	ret
+foo:
+	loadinargument n, 0, r0
+L2:
+	loadi 0, r1
+	comp r0, r1
+	loadi 0, r2
+	movle 1, r2
+	compi r2, 1
+	cbreq L3, L4
+L3:
+	loadi 1, r3
+	storeret r3
+	jumpi L1
+L4:
+	loadi 1, r4
+	sub r0, r4, r5
+	storeoutargument r5, 0
+	call foo
+	loadret r6
+	mult r0, r6, r7
+	storeret r7
+	jumpi L1
+L1:
+	ret
+f:
+	loadinargument i, 0, r0
+	loadinargument j, 1, r1
+	loadi 7, r5
+	loadglobal b, r6
+	loadai r6, a, r7
+	loadai r7, a, r8
+	loadai r8, a, r9
+	storeai r5, r9, i
+	loadglobal b, r10
+	loadai r10, a, r11
+	loadai r11, a, r12
+	loadai r12, a, r13
+	loadai r13, a, r14
+	storeret r14
+	jumpi L6
+L6:
+	ret
+bar:
+	loadinargument j, 0, r0
+	loadinargument i, 1, r1
+	jumpi L7
+L7:
+	ret
 main:
 	loadi 2, r6
 	mov r6, r1
 L9:
 	loadi 1, r7
-	storeoutargument r7, 0
 	loadi 0, r8
+	storeoutargument r7, 0
 	storeoutargument r8, 1
 	call g
 	loadret r9
@@ -20,8 +76,8 @@ L10:
 L12:
 L13:
 	loadi 1, r12
-	storeoutargument r12, 0
 	loadi 0, r13
+	storeoutargument r12, 0
 	storeoutargument r13, 1
 	call g
 	loadret r14
@@ -49,37 +105,37 @@ L19:
 	jumpi L17
 L18:
 	loadi 1, r21
-	storeoutargument r21, 0
 	new B, [a], r22
+	storeoutargument r21, 0
 	storeoutargument r22, 1
 	call g
 	loadret r23
-	storeoutargument r23, 0
 	new B, [a], r24
+	storeoutargument r23, 0
 	storeoutargument r24, 1
 	call f
 	loadi 1, r25
 	println r25
 	new B, [a], r26
-	storeoutargument r26, 0
 	loadi 1, r27
-	storeoutargument r27, 0
 	new B, [a], r28
+	storeoutargument r27, 0
 	storeoutargument r28, 1
 	call g
 	loadret r29
+	storeoutargument r26, 0
 	storeoutargument r29, 1
 	call bar
 	loadi 2, r30
 	println r30
 	loadi 1, r31
-	storeoutargument r31, 0
 	new B, [a], r32
+	storeoutargument r31, 0
 	storeoutargument r32, 1
 	call g
 	loadret r33
-	storeoutargument r33, 0
 	new B, [a], r34
+	storeoutargument r33, 0
 	storeoutargument r34, 1
 	call f
 	loadret r35
