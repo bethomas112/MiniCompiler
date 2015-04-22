@@ -303,7 +303,7 @@ public abstract class IInstruction {
       public String label;
 
       public String getText() {
-         return "cbrge " + label;
+         return "jumpi " + label;
       }
    }
 

@@ -20,8 +20,9 @@ fun main() int
    bool d;
    int e;
    
-   d = a();
-   e = b();
-   e = c();
+   e = 5;
+   d = a(e, true);
+   b(1, 2, 3);
+   c();
    return e;
 }

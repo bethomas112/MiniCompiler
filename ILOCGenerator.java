@@ -1,10 +1,11 @@
-// $ANTLR 3.5.2 ILOCGenerator.g 2015-04-21 22:39:50
+// $ANTLR 3.5.2 ILOCGenerator.g 2015-04-22 00:51:00
 
    import java.util.List;
    import java.util.LinkedList;
    import java.util.ArrayList;
    import java.util.HashMap;
    import java.util.HashSet;
+   import java.io.*;
    import javax.json.*;
 
 
@@ -101,7 +102,7 @@ public class ILOCGenerator extends TreeParser {
 	@Override public String[] getTokenNames() { return ILOCGenerator.tokenNames; }
 	@Override public String getGrammarFileName() { return "ILOCGenerator.g"; }
 
-
+	   
 	   public static class CFG {
 	      public BasicBlock entryBlock;
 	      public BasicBlock exitBlock;
@@ -169,16 +170,20 @@ public class ILOCGenerator extends TreeParser {
 	   }
 
 	   private HashMap<String, MiniType> structTypes = new HashMap<>();
-	   private List<CFG> cfgs = new ArrayList<>();   
+	   private List<CFG> cfgs = new ArrayList<>();
+	   private File outputFile;
+	   public void setOutputFile(File file) {
+	      this.outputFile = file;
+	   } 
 
 
 
 	// $ANTLR start "translate"
-	// ILOCGenerator.g:95:1: translate : ^( PROGRAM t= types d= declarations[null] f= functions ) ;
+	// ILOCGenerator.g:100:1: translate : ^( PROGRAM t= types d= declarations[null] f= functions ) ;
 	public final void translate() throws RecognitionException {
 		try {
-			// ILOCGenerator.g:96:4: ( ^( PROGRAM t= types d= declarations[null] f= functions ) )
-			// ILOCGenerator.g:96:7: ^( PROGRAM t= types d= declarations[null] f= functions )
+			// ILOCGenerator.g:101:4: ( ^( PROGRAM t= types d= declarations[null] f= functions ) )
+			// ILOCGenerator.g:101:7: ^( PROGRAM t= types d= declarations[null] f= functions )
 			{
 			match(input,PROGRAM,FOLLOW_PROGRAM_in_translate53); 
 			if ( input.LA(1)==Token.DOWN ) {
@@ -217,11 +222,11 @@ public class ILOCGenerator extends TreeParser {
 
 
 	// $ANTLR start "types"
-	// ILOCGenerator.g:102:1: types : ( ^( TYPES (t= type_decl )* ) |);
+	// ILOCGenerator.g:107:1: types : ( ^( TYPES (t= type_decl )* ) |);
 	public final void types() throws RecognitionException {
 		  
 		try {
-			// ILOCGenerator.g:104:4: ( ^( TYPES (t= type_decl )* ) |)
+			// ILOCGenerator.g:109:4: ( ^( TYPES (t= type_decl )* ) |)
 			int alt2=2;
 			int LA2_0 = input.LA(1);
 			if ( (LA2_0==TYPES) ) {
@@ -239,12 +244,12 @@ public class ILOCGenerator extends TreeParser {
 
 			switch (alt2) {
 				case 1 :
-					// ILOCGenerator.g:104:7: ^( TYPES (t= type_decl )* )
+					// ILOCGenerator.g:109:7: ^( TYPES (t= type_decl )* )
 					{
 					match(input,TYPES,FOLLOW_TYPES_in_types103); 
 					if ( input.LA(1)==Token.DOWN ) {
 						match(input, Token.DOWN, null); 
-						// ILOCGenerator.g:104:15: (t= type_decl )*
+						// ILOCGenerator.g:109:15: (t= type_decl )*
 						loop1:
 						while (true) {
 							int alt1=2;
@@ -255,7 +260,7 @@ public class ILOCGenerator extends TreeParser {
 
 							switch (alt1) {
 							case 1 :
-								// ILOCGenerator.g:104:16: t= type_decl
+								// ILOCGenerator.g:109:16: t= type_decl
 								{
 								pushFollow(FOLLOW_type_decl_in_types108);
 								type_decl();
@@ -277,7 +282,7 @@ public class ILOCGenerator extends TreeParser {
 					}
 					break;
 				case 2 :
-					// ILOCGenerator.g:106:7: 
+					// ILOCGenerator.g:111:7: 
 					{
 					  
 					}
@@ -298,15 +303,15 @@ public class ILOCGenerator extends TreeParser {
 
 
 	// $ANTLR start "type_decl"
-	// ILOCGenerator.g:109:1: type_decl : ^(ast= STRUCT id= ID n= nested_decl[structType] ) ;
+	// ILOCGenerator.g:114:1: type_decl : ^(ast= STRUCT id= ID n= nested_decl[structType] ) ;
 	public final void type_decl() throws RecognitionException {
 		CommonTree ast=null;
 		CommonTree id=null;
 
 		 MiniType.StructType structType = new MiniType.StructType(); 
 		try {
-			// ILOCGenerator.g:111:4: ( ^(ast= STRUCT id= ID n= nested_decl[structType] ) )
-			// ILOCGenerator.g:111:7: ^(ast= STRUCT id= ID n= nested_decl[structType] )
+			// ILOCGenerator.g:116:4: ( ^(ast= STRUCT id= ID n= nested_decl[structType] ) )
+			// ILOCGenerator.g:116:7: ^(ast= STRUCT id= ID n= nested_decl[structType] )
 			{
 			ast=(CommonTree)match(input,STRUCT,FOLLOW_STRUCT_in_type_decl156); 
 			match(input, Token.DOWN, null); 
@@ -340,16 +345,16 @@ public class ILOCGenerator extends TreeParser {
 
 
 	// $ANTLR start "nested_decl"
-	// ILOCGenerator.g:123:1: nested_decl[MiniType.StructType structType] : (f= field_decl[structType] )+ ;
+	// ILOCGenerator.g:128:1: nested_decl[MiniType.StructType structType] : (f= field_decl[structType] )+ ;
 	public final void nested_decl(MiniType.StructType structType) throws RecognitionException {
 		MiniType f =null;
 
 		  
 		try {
-			// ILOCGenerator.g:125:4: ( (f= field_decl[structType] )+ )
-			// ILOCGenerator.g:125:7: (f= field_decl[structType] )+
+			// ILOCGenerator.g:130:4: ( (f= field_decl[structType] )+ )
+			// ILOCGenerator.g:130:7: (f= field_decl[structType] )+
 			{
-			// ILOCGenerator.g:125:7: (f= field_decl[structType] )+
+			// ILOCGenerator.g:130:7: (f= field_decl[structType] )+
 			int cnt3=0;
 			loop3:
 			while (true) {
@@ -361,7 +366,7 @@ public class ILOCGenerator extends TreeParser {
 
 				switch (alt3) {
 				case 1 :
-					// ILOCGenerator.g:125:8: f= field_decl[structType]
+					// ILOCGenerator.g:130:8: f= field_decl[structType]
 					{
 					pushFollow(FOLLOW_field_decl_in_nested_decl237);
 					f=field_decl(structType);
@@ -395,7 +400,7 @@ public class ILOCGenerator extends TreeParser {
 
 
 	// $ANTLR start "field_decl"
-	// ILOCGenerator.g:128:1: field_decl[MiniType.StructType structType] returns [MiniType miniType = null] : ^( DECL ^( TYPE t= type ) id= ID ) ;
+	// ILOCGenerator.g:133:1: field_decl[MiniType.StructType structType] returns [MiniType miniType = null] : ^( DECL ^( TYPE t= type ) id= ID ) ;
 	public final MiniType field_decl(MiniType.StructType structType) throws RecognitionException {
 		MiniType miniType =  null;
 
@@ -404,8 +409,8 @@ public class ILOCGenerator extends TreeParser {
 		MiniType t =null;
 
 		try {
-			// ILOCGenerator.g:130:4: ( ^( DECL ^( TYPE t= type ) id= ID ) )
-			// ILOCGenerator.g:130:7: ^( DECL ^( TYPE t= type ) id= ID )
+			// ILOCGenerator.g:135:4: ( ^( DECL ^( TYPE t= type ) id= ID ) )
+			// ILOCGenerator.g:135:7: ^( DECL ^( TYPE t= type ) id= ID )
 			{
 			match(input,DECL,FOLLOW_DECL_in_field_decl268); 
 			match(input, Token.DOWN, null); 
@@ -442,7 +447,7 @@ public class ILOCGenerator extends TreeParser {
 
 
 	// $ANTLR start "type"
-	// ILOCGenerator.g:138:1: type returns [MiniType miniType = null] : ( INT | BOOL | ^( STRUCT id= ID ) );
+	// ILOCGenerator.g:143:1: type returns [MiniType miniType = null] : ( INT | BOOL | ^( STRUCT id= ID ) );
 	public final MiniType type() throws RecognitionException {
 		MiniType miniType =  null;
 
@@ -450,7 +455,7 @@ public class ILOCGenerator extends TreeParser {
 		CommonTree id=null;
 
 		try {
-			// ILOCGenerator.g:140:4: ( INT | BOOL | ^( STRUCT id= ID ) )
+			// ILOCGenerator.g:145:4: ( INT | BOOL | ^( STRUCT id= ID ) )
 			int alt4=3;
 			switch ( input.LA(1) ) {
 			case INT:
@@ -475,21 +480,21 @@ public class ILOCGenerator extends TreeParser {
 			}
 			switch (alt4) {
 				case 1 :
-					// ILOCGenerator.g:140:7: INT
+					// ILOCGenerator.g:145:7: INT
 					{
 					match(input,INT,FOLLOW_INT_in_type312); 
 					 miniType = MiniType.INT; 
 					}
 					break;
 				case 2 :
-					// ILOCGenerator.g:141:7: BOOL
+					// ILOCGenerator.g:146:7: BOOL
 					{
 					match(input,BOOL,FOLLOW_BOOL_in_type322); 
 					 miniType = MiniType.BOOL; 
 					}
 					break;
 				case 3 :
-					// ILOCGenerator.g:142:7: ^( STRUCT id= ID )
+					// ILOCGenerator.g:147:7: ^( STRUCT id= ID )
 					{
 					match(input,STRUCT,FOLLOW_STRUCT_in_type333); 
 					match(input, Token.DOWN, null); 
@@ -518,10 +523,10 @@ public class ILOCGenerator extends TreeParser {
 
 
 	// $ANTLR start "declarations"
-	// ILOCGenerator.g:148:1: declarations[CFG cfg] : ( ^( DECLS (d= decl_list[cfg] )* ) |);
+	// ILOCGenerator.g:153:1: declarations[CFG cfg] : ( ^( DECLS (d= decl_list[cfg] )* ) |);
 	public final void declarations(CFG cfg) throws RecognitionException {
 		try {
-			// ILOCGenerator.g:150:4: ( ^( DECLS (d= decl_list[cfg] )* ) |)
+			// ILOCGenerator.g:155:4: ( ^( DECLS (d= decl_list[cfg] )* ) |)
 			int alt6=2;
 			int LA6_0 = input.LA(1);
 			if ( (LA6_0==DECLS) ) {
@@ -539,12 +544,12 @@ public class ILOCGenerator extends TreeParser {
 
 			switch (alt6) {
 				case 1 :
-					// ILOCGenerator.g:150:7: ^( DECLS (d= decl_list[cfg] )* )
+					// ILOCGenerator.g:155:7: ^( DECLS (d= decl_list[cfg] )* )
 					{
 					match(input,DECLS,FOLLOW_DECLS_in_declarations373); 
 					if ( input.LA(1)==Token.DOWN ) {
 						match(input, Token.DOWN, null); 
-						// ILOCGenerator.g:150:15: (d= decl_list[cfg] )*
+						// ILOCGenerator.g:155:15: (d= decl_list[cfg] )*
 						loop5:
 						while (true) {
 							int alt5=2;
@@ -555,7 +560,7 @@ public class ILOCGenerator extends TreeParser {
 
 							switch (alt5) {
 							case 1 :
-								// ILOCGenerator.g:150:16: d= decl_list[cfg]
+								// ILOCGenerator.g:155:16: d= decl_list[cfg]
 								{
 								pushFollow(FOLLOW_decl_list_in_declarations378);
 								decl_list(cfg);
@@ -576,7 +581,7 @@ public class ILOCGenerator extends TreeParser {
 					}
 					break;
 				case 2 :
-					// ILOCGenerator.g:152:7: 
+					// ILOCGenerator.g:157:7: 
 					{
 					  
 					}
@@ -597,14 +602,14 @@ public class ILOCGenerator extends TreeParser {
 
 
 	// $ANTLR start "decl_list"
-	// ILOCGenerator.g:155:1: decl_list[CFG cfg] : ^( DECLLIST ^( TYPE t= type ) (id= ID )+ ) ;
+	// ILOCGenerator.g:160:1: decl_list[CFG cfg] : ^( DECLLIST ^( TYPE t= type ) (id= ID )+ ) ;
 	public final void decl_list(CFG cfg) throws RecognitionException {
 		CommonTree id=null;
 		MiniType t =null;
 
 		try {
-			// ILOCGenerator.g:156:4: ( ^( DECLLIST ^( TYPE t= type ) (id= ID )+ ) )
-			// ILOCGenerator.g:156:7: ^( DECLLIST ^( TYPE t= type ) (id= ID )+ )
+			// ILOCGenerator.g:161:4: ( ^( DECLLIST ^( TYPE t= type ) (id= ID )+ ) )
+			// ILOCGenerator.g:161:7: ^( DECLLIST ^( TYPE t= type ) (id= ID )+ )
 			{
 			match(input,DECLLIST,FOLLOW_DECLLIST_in_decl_list416); 
 			match(input, Token.DOWN, null); 
@@ -616,7 +621,7 @@ public class ILOCGenerator extends TreeParser {
 
 			match(input, Token.UP, null); 
 
-			// ILOCGenerator.g:157:10: (id= ID )+
+			// ILOCGenerator.g:162:10: (id= ID )+
 			int cnt7=0;
 			loop7:
 			while (true) {
@@ -628,7 +633,7 @@ public class ILOCGenerator extends TreeParser {
 
 				switch (alt7) {
 				case 1 :
-					// ILOCGenerator.g:157:11: id= ID
+					// ILOCGenerator.g:162:11: id= ID
 					{
 					id=(CommonTree)match(input,ID,FOLLOW_ID_in_decl_list438); 
 
@@ -665,11 +670,11 @@ public class ILOCGenerator extends TreeParser {
 
 
 	// $ANTLR start "functions"
-	// ILOCGenerator.g:167:1: functions returns [] : ( ^( FUNCS (f= function )* ) |);
+	// ILOCGenerator.g:172:1: functions returns [] : ( ^( FUNCS (f= function )* ) |);
 	public final void functions() throws RecognitionException {
 		  
 		try {
-			// ILOCGenerator.g:170:4: ( ^( FUNCS (f= function )* ) |)
+			// ILOCGenerator.g:175:4: ( ^( FUNCS (f= function )* ) |)
 			int alt9=2;
 			int LA9_0 = input.LA(1);
 			if ( (LA9_0==FUNCS) ) {
@@ -687,12 +692,12 @@ public class ILOCGenerator extends TreeParser {
 
 			switch (alt9) {
 				case 1 :
-					// ILOCGenerator.g:170:7: ^( FUNCS (f= function )* )
+					// ILOCGenerator.g:175:7: ^( FUNCS (f= function )* )
 					{
 					match(input,FUNCS,FOLLOW_FUNCS_in_functions503); 
 					if ( input.LA(1)==Token.DOWN ) {
 						match(input, Token.DOWN, null); 
-						// ILOCGenerator.g:170:15: (f= function )*
+						// ILOCGenerator.g:175:15: (f= function )*
 						loop8:
 						while (true) {
 							int alt8=2;
@@ -703,7 +708,7 @@ public class ILOCGenerator extends TreeParser {
 
 							switch (alt8) {
 							case 1 :
-								// ILOCGenerator.g:170:16: f= function
+								// ILOCGenerator.g:175:16: f= function
 								{
 								pushFollow(FOLLOW_function_in_functions508);
 								function();
@@ -722,23 +727,33 @@ public class ILOCGenerator extends TreeParser {
 					}
 
 					 
+					         StringBuilder sb = new StringBuilder();
 					         for (CFG cfg : cfgs) {
 					            List<BasicBlock> blocks = cfg.bfsBlocks();
-					            for (BasicBlock block : blocks) {
-					               StringBuilder sb = new StringBuilder();
-					               // sb.append(block.label + " -> ");
-					               // for (BasicBlock nextBlock : block.next) {
-					               //    sb.append(nextBlock.label + ", ");
-					               // }
-					               sb.append(block);
-					               System.out.print(sb.toString());
-					            }
+					            
+					            for (BasicBlock block : blocks) {            
+					               sb.append(block);               
+					            }           
 					         } 
+					         if (outputFile != null) {
+					            try {
+					               FileWriter writer = new FileWriter(outputFile);
+					               writer.write(sb.toString());
+					               writer.close();
+
+					            }
+					            catch (IOException e) {
+					               System.err.println("Error writing .il file: " + e);
+					            }
+					         }
+					         else {
+					            System.out.print(sb.toString());   
+					         }
 					      
 					}
 					break;
 				case 2 :
-					// ILOCGenerator.g:185:7: 
+					// ILOCGenerator.g:200:7: 
 					{
 					  
 					}
@@ -759,7 +774,7 @@ public class ILOCGenerator extends TreeParser {
 
 
 	// $ANTLR start "function"
-	// ILOCGenerator.g:188:1: function : ^(ast= FUN id= ID p= parameters[cfg] r= return_type d= declarations[cfg] s= statement_list[cfg, cfg.entryBlock] ) ;
+	// ILOCGenerator.g:203:1: function : ^(ast= FUN id= ID p= parameters[cfg] r= return_type d= declarations[cfg] s= statement_list[cfg, cfg.entryBlock] ) ;
 	public final void function() throws RecognitionException {
 		CommonTree ast=null;
 		CommonTree id=null;
@@ -775,8 +790,8 @@ public class ILOCGenerator extends TreeParser {
 		      exitBlock.addInstruction(new IInstruction.RET());
 		   
 		try {
-			// ILOCGenerator.g:198:4: ( ^(ast= FUN id= ID p= parameters[cfg] r= return_type d= declarations[cfg] s= statement_list[cfg, cfg.entryBlock] ) )
-			// ILOCGenerator.g:198:7: ^(ast= FUN id= ID p= parameters[cfg] r= return_type d= declarations[cfg] s= statement_list[cfg, cfg.entryBlock] )
+			// ILOCGenerator.g:213:4: ( ^(ast= FUN id= ID p= parameters[cfg] r= return_type d= declarations[cfg] s= statement_list[cfg, cfg.entryBlock] ) )
+			// ILOCGenerator.g:213:7: ^(ast= FUN id= ID p= parameters[cfg] r= return_type d= declarations[cfg] s= statement_list[cfg, cfg.entryBlock] )
 			{
 			ast=(CommonTree)match(input,FUN,FOLLOW_FUN_in_function560); 
 			match(input, Token.DOWN, null); 
@@ -822,7 +837,7 @@ public class ILOCGenerator extends TreeParser {
 
 
 	// $ANTLR start "parameters"
-	// ILOCGenerator.g:213:1: parameters[CFG cfg] returns [BasicBlock entryBlock = null] : ^( PARAMS (p= param_decl[] )* ) ;
+	// ILOCGenerator.g:228:1: parameters[CFG cfg] returns [BasicBlock entryBlock = null] : ^( PARAMS (p= param_decl[] )* ) ;
 	public final BasicBlock parameters(CFG cfg) throws RecognitionException {
 		BasicBlock entryBlock =  null;
 
@@ -834,13 +849,13 @@ public class ILOCGenerator extends TreeParser {
 		      BasicBlock block = new BasicBlock();
 		   
 		try {
-			// ILOCGenerator.g:220:4: ( ^( PARAMS (p= param_decl[] )* ) )
-			// ILOCGenerator.g:220:7: ^( PARAMS (p= param_decl[] )* )
+			// ILOCGenerator.g:235:4: ( ^( PARAMS (p= param_decl[] )* ) )
+			// ILOCGenerator.g:235:7: ^( PARAMS (p= param_decl[] )* )
 			{
 			match(input,PARAMS,FOLLOW_PARAMS_in_parameters697); 
 			if ( input.LA(1)==Token.DOWN ) {
 				match(input, Token.DOWN, null); 
-				// ILOCGenerator.g:220:16: (p= param_decl[] )*
+				// ILOCGenerator.g:235:16: (p= param_decl[] )*
 				loop10:
 				while (true) {
 					int alt10=2;
@@ -851,7 +866,7 @@ public class ILOCGenerator extends TreeParser {
 
 					switch (alt10) {
 					case 1 :
-						// ILOCGenerator.g:220:17: p= param_decl[]
+						// ILOCGenerator.g:235:17: p= param_decl[]
 						{
 						pushFollow(FOLLOW_param_decl_in_parameters702);
 						p=param_decl();
@@ -900,7 +915,7 @@ public class ILOCGenerator extends TreeParser {
 
 
 	// $ANTLR start "param_decl"
-	// ILOCGenerator.g:238:1: param_decl[] returns [String paramId = null] : ^( DECL ^( TYPE t= type ) id= ID ) ;
+	// ILOCGenerator.g:253:1: param_decl[] returns [String paramId = null] : ^( DECL ^( TYPE t= type ) id= ID ) ;
 	public final String param_decl() throws RecognitionException {
 		String paramId =  null;
 
@@ -909,8 +924,8 @@ public class ILOCGenerator extends TreeParser {
 		MiniType t =null;
 
 		try {
-			// ILOCGenerator.g:240:4: ( ^( DECL ^( TYPE t= type ) id= ID ) )
-			// ILOCGenerator.g:240:7: ^( DECL ^( TYPE t= type ) id= ID )
+			// ILOCGenerator.g:255:4: ( ^( DECL ^( TYPE t= type ) id= ID ) )
+			// ILOCGenerator.g:255:7: ^( DECL ^( TYPE t= type ) id= ID )
 			{
 			match(input,DECL,FOLLOW_DECL_in_param_decl748); 
 			match(input, Token.DOWN, null); 
@@ -945,16 +960,16 @@ public class ILOCGenerator extends TreeParser {
 
 
 	// $ANTLR start "return_type"
-	// ILOCGenerator.g:246:1: return_type : ^( RETTYPE (r= rtype ) ) ;
+	// ILOCGenerator.g:261:1: return_type : ^( RETTYPE (r= rtype ) ) ;
 	public final void return_type() throws RecognitionException {
 		try {
-			// ILOCGenerator.g:247:4: ( ^( RETTYPE (r= rtype ) ) )
-			// ILOCGenerator.g:247:7: ^( RETTYPE (r= rtype ) )
+			// ILOCGenerator.g:262:4: ( ^( RETTYPE (r= rtype ) ) )
+			// ILOCGenerator.g:262:7: ^( RETTYPE (r= rtype ) )
 			{
 			match(input,RETTYPE,FOLLOW_RETTYPE_in_return_type786); 
 			match(input, Token.DOWN, null); 
-			// ILOCGenerator.g:247:17: (r= rtype )
-			// ILOCGenerator.g:247:18: r= rtype
+			// ILOCGenerator.g:262:17: (r= rtype )
+			// ILOCGenerator.g:262:18: r= rtype
 			{
 			pushFollow(FOLLOW_rtype_in_return_type791);
 			rtype();
@@ -981,12 +996,12 @@ public class ILOCGenerator extends TreeParser {
 
 
 	// $ANTLR start "rtype"
-	// ILOCGenerator.g:250:1: rtype : (t= type | VOID );
+	// ILOCGenerator.g:265:1: rtype : (t= type | VOID );
 	public final void rtype() throws RecognitionException {
 		MiniType t =null;
 
 		try {
-			// ILOCGenerator.g:251:4: (t= type | VOID )
+			// ILOCGenerator.g:266:4: (t= type | VOID )
 			int alt11=2;
 			int LA11_0 = input.LA(1);
 			if ( (LA11_0==BOOL||LA11_0==INT||LA11_0==STRUCT) ) {
@@ -1004,7 +1019,7 @@ public class ILOCGenerator extends TreeParser {
 
 			switch (alt11) {
 				case 1 :
-					// ILOCGenerator.g:251:7: t= type
+					// ILOCGenerator.g:266:7: t= type
 					{
 					pushFollow(FOLLOW_type_in_rtype813);
 					t=type();
@@ -1014,7 +1029,7 @@ public class ILOCGenerator extends TreeParser {
 					}
 					break;
 				case 2 :
-					// ILOCGenerator.g:252:7: VOID
+					// ILOCGenerator.g:267:7: VOID
 					{
 					match(input,VOID,FOLLOW_VOID_in_rtype823); 
 					  
@@ -1036,7 +1051,7 @@ public class ILOCGenerator extends TreeParser {
 
 
 	// $ANTLR start "statement"
-	// ILOCGenerator.g:255:1: statement[CFG cfg, BasicBlock block] returns [BasicBlock resultBlock = null] : (s= block[cfg, block] |s= assignment[cfg, block] |s= print[cfg, block] |s= read[cfg, block] |s= conditional[cfg, block] |s= loop[cfg, block] |s= delete[cfg, block] |s= return_stmt[cfg, block] |s= invocation_stmt[cfg, block] ) ;
+	// ILOCGenerator.g:270:1: statement[CFG cfg, BasicBlock block] returns [BasicBlock resultBlock = null] : (s= block[cfg, block] |s= assignment[cfg, block] |s= print[cfg, block] |s= read[cfg, block] |s= conditional[cfg, block] |s= loop[cfg, block] |s= delete[cfg, block] |s= return_stmt[cfg, block] |s= invocation_stmt[cfg, block] ) ;
 	public final BasicBlock statement(CFG cfg, BasicBlock block) throws RecognitionException {
 		BasicBlock resultBlock =  null;
 
@@ -1044,10 +1059,10 @@ public class ILOCGenerator extends TreeParser {
 		BasicBlock s =null;
 
 		try {
-			// ILOCGenerator.g:257:4: ( (s= block[cfg, block] |s= assignment[cfg, block] |s= print[cfg, block] |s= read[cfg, block] |s= conditional[cfg, block] |s= loop[cfg, block] |s= delete[cfg, block] |s= return_stmt[cfg, block] |s= invocation_stmt[cfg, block] ) )
-			// ILOCGenerator.g:257:7: (s= block[cfg, block] |s= assignment[cfg, block] |s= print[cfg, block] |s= read[cfg, block] |s= conditional[cfg, block] |s= loop[cfg, block] |s= delete[cfg, block] |s= return_stmt[cfg, block] |s= invocation_stmt[cfg, block] )
+			// ILOCGenerator.g:272:4: ( (s= block[cfg, block] |s= assignment[cfg, block] |s= print[cfg, block] |s= read[cfg, block] |s= conditional[cfg, block] |s= loop[cfg, block] |s= delete[cfg, block] |s= return_stmt[cfg, block] |s= invocation_stmt[cfg, block] ) )
+			// ILOCGenerator.g:272:7: (s= block[cfg, block] |s= assignment[cfg, block] |s= print[cfg, block] |s= read[cfg, block] |s= conditional[cfg, block] |s= loop[cfg, block] |s= delete[cfg, block] |s= return_stmt[cfg, block] |s= invocation_stmt[cfg, block] )
 			{
-			// ILOCGenerator.g:257:7: (s= block[cfg, block] |s= assignment[cfg, block] |s= print[cfg, block] |s= read[cfg, block] |s= conditional[cfg, block] |s= loop[cfg, block] |s= delete[cfg, block] |s= return_stmt[cfg, block] |s= invocation_stmt[cfg, block] )
+			// ILOCGenerator.g:272:7: (s= block[cfg, block] |s= assignment[cfg, block] |s= print[cfg, block] |s= read[cfg, block] |s= conditional[cfg, block] |s= loop[cfg, block] |s= delete[cfg, block] |s= return_stmt[cfg, block] |s= invocation_stmt[cfg, block] )
 			int alt12=9;
 			switch ( input.LA(1) ) {
 			case BLOCK:
@@ -1102,7 +1117,7 @@ public class ILOCGenerator extends TreeParser {
 			}
 			switch (alt12) {
 				case 1 :
-					// ILOCGenerator.g:257:8: s= block[cfg, block]
+					// ILOCGenerator.g:272:8: s= block[cfg, block]
 					{
 					pushFollow(FOLLOW_block_in_statement852);
 					s=block(cfg, block);
@@ -1111,7 +1126,7 @@ public class ILOCGenerator extends TreeParser {
 					}
 					break;
 				case 2 :
-					// ILOCGenerator.g:258:10: s= assignment[cfg, block]
+					// ILOCGenerator.g:273:10: s= assignment[cfg, block]
 					{
 					pushFollow(FOLLOW_assignment_in_statement866);
 					s=assignment(cfg, block);
@@ -1120,7 +1135,7 @@ public class ILOCGenerator extends TreeParser {
 					}
 					break;
 				case 3 :
-					// ILOCGenerator.g:259:10: s= print[cfg, block]
+					// ILOCGenerator.g:274:10: s= print[cfg, block]
 					{
 					pushFollow(FOLLOW_print_in_statement880);
 					s=print(cfg, block);
@@ -1129,7 +1144,7 @@ public class ILOCGenerator extends TreeParser {
 					}
 					break;
 				case 4 :
-					// ILOCGenerator.g:260:10: s= read[cfg, block]
+					// ILOCGenerator.g:275:10: s= read[cfg, block]
 					{
 					pushFollow(FOLLOW_read_in_statement894);
 					s=read(cfg, block);
@@ -1138,7 +1153,7 @@ public class ILOCGenerator extends TreeParser {
 					}
 					break;
 				case 5 :
-					// ILOCGenerator.g:261:10: s= conditional[cfg, block]
+					// ILOCGenerator.g:276:10: s= conditional[cfg, block]
 					{
 					pushFollow(FOLLOW_conditional_in_statement908);
 					s=conditional(cfg, block);
@@ -1147,7 +1162,7 @@ public class ILOCGenerator extends TreeParser {
 					}
 					break;
 				case 6 :
-					// ILOCGenerator.g:262:10: s= loop[cfg, block]
+					// ILOCGenerator.g:277:10: s= loop[cfg, block]
 					{
 					pushFollow(FOLLOW_loop_in_statement922);
 					s=loop(cfg, block);
@@ -1156,7 +1171,7 @@ public class ILOCGenerator extends TreeParser {
 					}
 					break;
 				case 7 :
-					// ILOCGenerator.g:263:10: s= delete[cfg, block]
+					// ILOCGenerator.g:278:10: s= delete[cfg, block]
 					{
 					pushFollow(FOLLOW_delete_in_statement936);
 					s=delete(cfg, block);
@@ -1165,7 +1180,7 @@ public class ILOCGenerator extends TreeParser {
 					}
 					break;
 				case 8 :
-					// ILOCGenerator.g:264:10: s= return_stmt[cfg, block]
+					// ILOCGenerator.g:279:10: s= return_stmt[cfg, block]
 					{
 					pushFollow(FOLLOW_return_stmt_in_statement950);
 					s=return_stmt(cfg, block);
@@ -1174,7 +1189,7 @@ public class ILOCGenerator extends TreeParser {
 					}
 					break;
 				case 9 :
-					// ILOCGenerator.g:265:10: s= invocation_stmt[cfg, block]
+					// ILOCGenerator.g:280:10: s= invocation_stmt[cfg, block]
 					{
 					pushFollow(FOLLOW_invocation_stmt_in_statement964);
 					s=invocation_stmt(cfg, block);
@@ -1203,7 +1218,7 @@ public class ILOCGenerator extends TreeParser {
 
 
 	// $ANTLR start "block"
-	// ILOCGenerator.g:270:1: block[CFG cfg, BasicBlock block] returns [BasicBlock resultBlock = null] : ^( BLOCK s= statement_list[cfg, block] ) ;
+	// ILOCGenerator.g:285:1: block[CFG cfg, BasicBlock block] returns [BasicBlock resultBlock = null] : ^( BLOCK s= statement_list[cfg, block] ) ;
 	public final BasicBlock block(CFG cfg, BasicBlock block) throws RecognitionException {
 		BasicBlock resultBlock =  null;
 
@@ -1211,8 +1226,8 @@ public class ILOCGenerator extends TreeParser {
 		BasicBlock s =null;
 
 		try {
-			// ILOCGenerator.g:272:4: ( ^( BLOCK s= statement_list[cfg, block] ) )
-			// ILOCGenerator.g:272:7: ^( BLOCK s= statement_list[cfg, block] )
+			// ILOCGenerator.g:287:4: ( ^( BLOCK s= statement_list[cfg, block] ) )
+			// ILOCGenerator.g:287:7: ^( BLOCK s= statement_list[cfg, block] )
 			{
 			match(input,BLOCK,FOLLOW_BLOCK_in_block1006); 
 			match(input, Token.DOWN, null); 
@@ -1242,7 +1257,7 @@ public class ILOCGenerator extends TreeParser {
 
 
 	// $ANTLR start "statement_list"
-	// ILOCGenerator.g:278:1: statement_list[CFG cfg, BasicBlock block] returns [BasicBlock resultBlock = null] : ^( STMTS (s= statement[cfg, currentBlock] )* ) ;
+	// ILOCGenerator.g:293:1: statement_list[CFG cfg, BasicBlock block] returns [BasicBlock resultBlock = null] : ^( STMTS (s= statement[cfg, currentBlock] )* ) ;
 	public final BasicBlock statement_list(CFG cfg, BasicBlock block) throws RecognitionException {
 		BasicBlock resultBlock =  null;
 
@@ -1251,13 +1266,13 @@ public class ILOCGenerator extends TreeParser {
 
 		 BasicBlock currentBlock = block; 
 		try {
-			// ILOCGenerator.g:281:4: ( ^( STMTS (s= statement[cfg, currentBlock] )* ) )
-			// ILOCGenerator.g:281:7: ^( STMTS (s= statement[cfg, currentBlock] )* )
+			// ILOCGenerator.g:296:4: ( ^( STMTS (s= statement[cfg, currentBlock] )* ) )
+			// ILOCGenerator.g:296:7: ^( STMTS (s= statement[cfg, currentBlock] )* )
 			{
 			match(input,STMTS,FOLLOW_STMTS_in_statement_list1052); 
 			if ( input.LA(1)==Token.DOWN ) {
 				match(input, Token.DOWN, null); 
-				// ILOCGenerator.g:281:15: (s= statement[cfg, currentBlock] )*
+				// ILOCGenerator.g:296:15: (s= statement[cfg, currentBlock] )*
 				loop13:
 				while (true) {
 					int alt13=2;
@@ -1268,7 +1283,7 @@ public class ILOCGenerator extends TreeParser {
 
 					switch (alt13) {
 					case 1 :
-						// ILOCGenerator.g:281:16: s= statement[cfg, currentBlock]
+						// ILOCGenerator.g:296:16: s= statement[cfg, currentBlock]
 						{
 						pushFollow(FOLLOW_statement_in_statement_list1057);
 						s=statement(cfg, currentBlock);
@@ -1306,7 +1321,7 @@ public class ILOCGenerator extends TreeParser {
 
 
 	// $ANTLR start "assignment"
-	// ILOCGenerator.g:287:1: assignment[CFG cfg, BasicBlock block] returns [BasicBlock resultBlock = null] : ^(ast= ASSIGN e= expression[cfg, block] l= lvalue[cfg, block, false] ) ;
+	// ILOCGenerator.g:302:1: assignment[CFG cfg, BasicBlock block] returns [BasicBlock resultBlock = null] : ^(ast= ASSIGN e= expression[cfg, block] l= lvalue[cfg, block, false] ) ;
 	public final BasicBlock assignment(CFG cfg, BasicBlock block) throws RecognitionException {
 		BasicBlock resultBlock =  null;
 
@@ -1316,8 +1331,8 @@ public class ILOCGenerator extends TreeParser {
 		TreeRuleReturnScope l =null;
 
 		try {
-			// ILOCGenerator.g:289:4: ( ^(ast= ASSIGN e= expression[cfg, block] l= lvalue[cfg, block, false] ) )
-			// ILOCGenerator.g:289:7: ^(ast= ASSIGN e= expression[cfg, block] l= lvalue[cfg, block, false] )
+			// ILOCGenerator.g:304:4: ( ^(ast= ASSIGN e= expression[cfg, block] l= lvalue[cfg, block, false] ) )
+			// ILOCGenerator.g:304:7: ^(ast= ASSIGN e= expression[cfg, block] l= lvalue[cfg, block, false] )
 			{
 			ast=(CommonTree)match(input,ASSIGN,FOLLOW_ASSIGN_in_assignment1098); 
 			match(input, Token.DOWN, null); 
@@ -1370,7 +1385,7 @@ public class ILOCGenerator extends TreeParser {
 
 
 	// $ANTLR start "print"
-	// ILOCGenerator.g:314:1: print[CFG cfg, BasicBlock block] returns [BasicBlock resultBlock = null] : ^(ast= PRINT e= expression[cfg, block] ( ENDL )? ) ;
+	// ILOCGenerator.g:329:1: print[CFG cfg, BasicBlock block] returns [BasicBlock resultBlock = null] : ^(ast= PRINT e= expression[cfg, block] ( ENDL )? ) ;
 	public final BasicBlock print(CFG cfg, BasicBlock block) throws RecognitionException {
 		BasicBlock resultBlock =  null;
 
@@ -1380,8 +1395,8 @@ public class ILOCGenerator extends TreeParser {
 
 		  
 		try {
-			// ILOCGenerator.g:317:4: ( ^(ast= PRINT e= expression[cfg, block] ( ENDL )? ) )
-			// ILOCGenerator.g:317:7: ^(ast= PRINT e= expression[cfg, block] ( ENDL )? )
+			// ILOCGenerator.g:332:4: ( ^(ast= PRINT e= expression[cfg, block] ( ENDL )? ) )
+			// ILOCGenerator.g:332:7: ^(ast= PRINT e= expression[cfg, block] ( ENDL )? )
 			{
 			ast=(CommonTree)match(input,PRINT,FOLLOW_PRINT_in_print1152); 
 			match(input, Token.DOWN, null); 
@@ -1389,7 +1404,7 @@ public class ILOCGenerator extends TreeParser {
 			e=expression(cfg, block);
 			state._fsp--;
 
-			// ILOCGenerator.g:317:44: ( ENDL )?
+			// ILOCGenerator.g:332:44: ( ENDL )?
 			int alt14=2;
 			int LA14_0 = input.LA(1);
 			if ( (LA14_0==ENDL) ) {
@@ -1397,7 +1412,7 @@ public class ILOCGenerator extends TreeParser {
 			}
 			switch (alt14) {
 				case 1 :
-					// ILOCGenerator.g:317:45: ENDL
+					// ILOCGenerator.g:332:45: ENDL
 					{
 					match(input,ENDL,FOLLOW_ENDL_in_print1160); 
 					  
@@ -1431,7 +1446,7 @@ public class ILOCGenerator extends TreeParser {
 
 
 	// $ANTLR start "read"
-	// ILOCGenerator.g:326:1: read[CFG cfg, BasicBlock block] returns [BasicBlock resultBlock = null] : ^(ast= READ l= lvalue[cfg, block, false] ) ;
+	// ILOCGenerator.g:341:1: read[CFG cfg, BasicBlock block] returns [BasicBlock resultBlock = null] : ^(ast= READ l= lvalue[cfg, block, false] ) ;
 	public final BasicBlock read(CFG cfg, BasicBlock block) throws RecognitionException {
 		BasicBlock resultBlock =  null;
 
@@ -1440,8 +1455,8 @@ public class ILOCGenerator extends TreeParser {
 		TreeRuleReturnScope l =null;
 
 		try {
-			// ILOCGenerator.g:328:4: ( ^(ast= READ l= lvalue[cfg, block, false] ) )
-			// ILOCGenerator.g:328:7: ^(ast= READ l= lvalue[cfg, block, false] )
+			// ILOCGenerator.g:343:4: ( ^(ast= READ l= lvalue[cfg, block, false] ) )
+			// ILOCGenerator.g:343:7: ^(ast= READ l= lvalue[cfg, block, false] )
 			{
 			ast=(CommonTree)match(input,READ,FOLLOW_READ_in_read1200); 
 			match(input, Token.DOWN, null); 
@@ -1503,7 +1518,7 @@ public class ILOCGenerator extends TreeParser {
 
 
 	// $ANTLR start "conditional"
-	// ILOCGenerator.g:366:1: conditional[CFG cfg, BasicBlock block] returns [BasicBlock resultBlock = null] : ^(ast= IF g= expression[cfg, guardBlock] t= block[cfg, thenBlock] (e= block[cfg, elseBlock] )? ) ;
+	// ILOCGenerator.g:381:1: conditional[CFG cfg, BasicBlock block] returns [BasicBlock resultBlock = null] : ^(ast= IF g= expression[cfg, guardBlock] t= block[cfg, thenBlock] (e= block[cfg, elseBlock] )? ) ;
 	public final BasicBlock conditional(CFG cfg, BasicBlock block) throws RecognitionException {
 		BasicBlock resultBlock =  null;
 
@@ -1519,14 +1534,14 @@ public class ILOCGenerator extends TreeParser {
 		      BasicBlock thenBlock = new BasicBlock();
 		      thenBlock.label = getNextLabel();
 		      BasicBlock elseBlock = new BasicBlock();
-		      elseBlock.label = getNextLabel();      
+		      elseBlock.label = getNextLabel();
 		      BasicBlock afterBlock = new BasicBlock();
 		      afterBlock.label = getNextLabel();
 		      boolean hasElseBlock = false;
 		   
 		try {
-			// ILOCGenerator.g:380:4: ( ^(ast= IF g= expression[cfg, guardBlock] t= block[cfg, thenBlock] (e= block[cfg, elseBlock] )? ) )
-			// ILOCGenerator.g:380:7: ^(ast= IF g= expression[cfg, guardBlock] t= block[cfg, thenBlock] (e= block[cfg, elseBlock] )? )
+			// ILOCGenerator.g:395:4: ( ^(ast= IF g= expression[cfg, guardBlock] t= block[cfg, thenBlock] (e= block[cfg, elseBlock] )? ) )
+			// ILOCGenerator.g:395:7: ^(ast= IF g= expression[cfg, guardBlock] t= block[cfg, thenBlock] (e= block[cfg, elseBlock] )? )
 			{
 			ast=(CommonTree)match(input,IF,FOLLOW_IF_in_conditional1253); 
 			match(input, Token.DOWN, null); 
@@ -1538,7 +1553,7 @@ public class ILOCGenerator extends TreeParser {
 			t=block(cfg, thenBlock);
 			state._fsp--;
 
-			// ILOCGenerator.g:380:70: (e= block[cfg, elseBlock] )?
+			// ILOCGenerator.g:395:70: (e= block[cfg, elseBlock] )?
 			int alt15=2;
 			int LA15_0 = input.LA(1);
 			if ( (LA15_0==BLOCK) ) {
@@ -1546,7 +1561,7 @@ public class ILOCGenerator extends TreeParser {
 			}
 			switch (alt15) {
 				case 1 :
-					// ILOCGenerator.g:380:71: e= block[cfg, elseBlock]
+					// ILOCGenerator.g:395:71: e= block[cfg, elseBlock]
 					{
 					pushFollow(FOLLOW_block_in_conditional1268);
 					e=block(cfg, elseBlock);
@@ -1566,13 +1581,30 @@ public class ILOCGenerator extends TreeParser {
 			         block.next.add(guardBlock);
 			         guardBlock.next.add(thenBlock);
 			         
+			         IInstruction.COMPI compi = new IInstruction.COMPI();
+			         compi.source = g;
+			         compi.immediate = 1;
+			         guardBlock.addInstruction(compi);
+
+			         IInstruction.CBREQ cbreq = new IInstruction.CBREQ();
+			         cbreq.labelA = thenBlock.label;
+			         cbreq.labelB = hasElseBlock ? elseBlock.label : afterBlock.label;
+			         guardBlock.addInstruction(cbreq);
 			         if (t != null) {
 			            t.next.add(afterBlock);
+			            
+			            IInstruction.JUMPI jumpi = new IInstruction.JUMPI();
+			            jumpi.label = afterBlock.label;
+			            t.addInstruction(jumpi);
 			         }
 			         if (hasElseBlock) {
 			            guardBlock.next.add(elseBlock);   
 			            if (e != null) {
 			               e.next.add(afterBlock);
+
+			               IInstruction.JUMPI jumpi = new IInstruction.JUMPI();
+			               jumpi.label = afterBlock.label;
+			               e.addInstruction(jumpi);
 			            }
 			         }
 			         resultBlock = afterBlock;
@@ -1594,7 +1626,7 @@ public class ILOCGenerator extends TreeParser {
 
 
 	// $ANTLR start "loop"
-	// ILOCGenerator.g:402:1: loop[CFG cfg, BasicBlock block] returns [BasicBlock resultBlock = null] : ^(ast= WHILE e= expression[cfg, guardBlock] b= block[cfg, bodyBlock] expression[cfg, new BasicBlock()] ) ;
+	// ILOCGenerator.g:434:1: loop[CFG cfg, BasicBlock block] returns [BasicBlock resultBlock = null] : ^(ast= WHILE e= expression[cfg, guardBlock] b= block[cfg, bodyBlock] expression[cfg, new BasicBlock()] ) ;
 	public final BasicBlock loop(CFG cfg, BasicBlock block) throws RecognitionException {
 		BasicBlock resultBlock =  null;
 
@@ -1612,8 +1644,8 @@ public class ILOCGenerator extends TreeParser {
 		      bodyBlock.label = getNextLabel();
 		   
 		try {
-			// ILOCGenerator.g:413:4: ( ^(ast= WHILE e= expression[cfg, guardBlock] b= block[cfg, bodyBlock] expression[cfg, new BasicBlock()] ) )
-			// ILOCGenerator.g:413:7: ^(ast= WHILE e= expression[cfg, guardBlock] b= block[cfg, bodyBlock] expression[cfg, new BasicBlock()] )
+			// ILOCGenerator.g:445:4: ( ^(ast= WHILE e= expression[cfg, guardBlock] b= block[cfg, bodyBlock] expression[cfg, new BasicBlock()] ) )
+			// ILOCGenerator.g:445:7: ^(ast= WHILE e= expression[cfg, guardBlock] b= block[cfg, bodyBlock] expression[cfg, new BasicBlock()] )
 			{
 			ast=(CommonTree)match(input,WHILE,FOLLOW_WHILE_in_loop1343); 
 			match(input, Token.DOWN, null); 
@@ -1635,8 +1667,22 @@ public class ILOCGenerator extends TreeParser {
 			         block.next.add(guardBlock);
 			         guardBlock.next.add(bodyBlock);
 			         guardBlock.next.add(afterBlock);
+
+			         IInstruction.COMPI compi = new IInstruction.COMPI();
+			         compi.source = e;
+			         compi.immediate = 1;
+			         guardBlock.addInstruction(compi);
+
+			         IInstruction.CBREQ cbreq = new IInstruction.CBREQ();
+			         cbreq.labelA = bodyBlock.label;
+			         cbreq.labelB = afterBlock.label;
+			         guardBlock.addInstruction(cbreq);
 			         if (b != null) {
 			            b.next.add(guardBlock);
+
+			            IInstruction.JUMPI jumpi = new IInstruction.JUMPI();
+			            jumpi.label = guardBlock.label;
+			            b.addInstruction(jumpi);
 			         }
 			         resultBlock = afterBlock;
 			      
@@ -1657,7 +1703,7 @@ public class ILOCGenerator extends TreeParser {
 
 
 	// $ANTLR start "delete"
-	// ILOCGenerator.g:425:1: delete[CFG cfg, BasicBlock block] returns [BasicBlock resultBlock = null] : ^(ast= DELETE e= expression[cfg, block] ) ;
+	// ILOCGenerator.g:471:1: delete[CFG cfg, BasicBlock block] returns [BasicBlock resultBlock = null] : ^(ast= DELETE e= expression[cfg, block] ) ;
 	public final BasicBlock delete(CFG cfg, BasicBlock block) throws RecognitionException {
 		BasicBlock resultBlock =  null;
 
@@ -1666,8 +1712,8 @@ public class ILOCGenerator extends TreeParser {
 		Register e =null;
 
 		try {
-			// ILOCGenerator.g:427:4: ( ^(ast= DELETE e= expression[cfg, block] ) )
-			// ILOCGenerator.g:427:7: ^(ast= DELETE e= expression[cfg, block] )
+			// ILOCGenerator.g:473:4: ( ^(ast= DELETE e= expression[cfg, block] ) )
+			// ILOCGenerator.g:473:7: ^(ast= DELETE e= expression[cfg, block] )
 			{
 			ast=(CommonTree)match(input,DELETE,FOLLOW_DELETE_in_delete1392); 
 			match(input, Token.DOWN, null); 
@@ -1678,6 +1724,9 @@ public class ILOCGenerator extends TreeParser {
 			match(input, Token.UP, null); 
 
 
+			         IInstruction.DEL del = new IInstruction.DEL();
+			         del.source = e;
+			         block.addInstruction(del);
 			         resultBlock = block;
 			      
 			}
@@ -1697,7 +1746,7 @@ public class ILOCGenerator extends TreeParser {
 
 
 	// $ANTLR start "return_stmt"
-	// ILOCGenerator.g:433:1: return_stmt[CFG cfg, BasicBlock block] returns [BasicBlock resultBlock = null] : ^(ast= RETURN (e= expression[cfg, block] )? ) ;
+	// ILOCGenerator.g:482:1: return_stmt[CFG cfg, BasicBlock block] returns [BasicBlock resultBlock = null] : ^(ast= RETURN (e= expression[cfg, block] )? ) ;
 	public final BasicBlock return_stmt(CFG cfg, BasicBlock block) throws RecognitionException {
 		BasicBlock resultBlock =  null;
 
@@ -1705,14 +1754,17 @@ public class ILOCGenerator extends TreeParser {
 		CommonTree ast=null;
 		Register e =null;
 
+
+		      boolean hasExpression = false;
+		   
 		try {
-			// ILOCGenerator.g:435:4: ( ^(ast= RETURN (e= expression[cfg, block] )? ) )
-			// ILOCGenerator.g:435:7: ^(ast= RETURN (e= expression[cfg, block] )? )
+			// ILOCGenerator.g:488:4: ( ^(ast= RETURN (e= expression[cfg, block] )? ) )
+			// ILOCGenerator.g:488:7: ^(ast= RETURN (e= expression[cfg, block] )? )
 			{
-			ast=(CommonTree)match(input,RETURN,FOLLOW_RETURN_in_return_stmt1433); 
+			ast=(CommonTree)match(input,RETURN,FOLLOW_RETURN_in_return_stmt1445); 
 			if ( input.LA(1)==Token.DOWN ) {
 				match(input, Token.DOWN, null); 
-				// ILOCGenerator.g:435:20: (e= expression[cfg, block] )?
+				// ILOCGenerator.g:488:20: (e= expression[cfg, block] )?
 				int alt16=2;
 				int LA16_0 = input.LA(1);
 				if ( (LA16_0==AND||(LA16_0 >= DIVIDE && LA16_0 <= DOT)||(LA16_0 >= EQ && LA16_0 <= FALSE)||(LA16_0 >= GE && LA16_0 <= ID)||(LA16_0 >= INTEGER && LA16_0 <= INVOKE)||LA16_0==LE||(LA16_0 >= LT && LA16_0 <= OR)||LA16_0==PLUS||(LA16_0 >= TIMES && LA16_0 <= TRUE)) ) {
@@ -1720,12 +1772,13 @@ public class ILOCGenerator extends TreeParser {
 				}
 				switch (alt16) {
 					case 1 :
-						// ILOCGenerator.g:435:21: e= expression[cfg, block]
+						// ILOCGenerator.g:488:21: e= expression[cfg, block]
 						{
-						pushFollow(FOLLOW_expression_in_return_stmt1438);
+						pushFollow(FOLLOW_expression_in_return_stmt1450);
 						e=expression(cfg, block);
 						state._fsp--;
 
+						 hasExpression = true; 
 						}
 						break;
 
@@ -1735,10 +1788,15 @@ public class ILOCGenerator extends TreeParser {
 			}
 
 
-			         IInstruction.STORERET storeret = new IInstruction.STORERET();
-			         storeret.source = e;
-			         block.addInstruction(storeret);
+			         if (hasExpression) {
+			            IInstruction.STORERET storeret = new IInstruction.STORERET();
+			            storeret.source = e;
+			            block.addInstruction(storeret);            
+			         }
 			         block.next.add(cfg.exitBlock);
+			         IInstruction.JUMPI jumpi = new IInstruction.JUMPI();
+			         jumpi.label = cfg.exitBlock.label;
+			         block.addInstruction(jumpi);
 			      
 			}
 
@@ -1757,7 +1815,7 @@ public class ILOCGenerator extends TreeParser {
 
 
 	// $ANTLR start "invocation_stmt"
-	// ILOCGenerator.g:444:1: invocation_stmt[CFG cfg, BasicBlock block] returns [BasicBlock resultBlock = null] : ^( INVOKE id= ID ^( ARGS (e= expression[cfg, block] )* ) ) ;
+	// ILOCGenerator.g:502:1: invocation_stmt[CFG cfg, BasicBlock block] returns [BasicBlock resultBlock = null] : ^( INVOKE id= ID ^( ARGS (e= expression[cfg, block] )* ) ) ;
 	public final BasicBlock invocation_stmt(CFG cfg, BasicBlock block) throws RecognitionException {
 		BasicBlock resultBlock =  null;
 
@@ -1767,19 +1825,19 @@ public class ILOCGenerator extends TreeParser {
 
 		 int argIdx = 0; 
 		try {
-			// ILOCGenerator.g:447:4: ( ^( INVOKE id= ID ^( ARGS (e= expression[cfg, block] )* ) ) )
-			// ILOCGenerator.g:447:7: ^( INVOKE id= ID ^( ARGS (e= expression[cfg, block] )* ) )
+			// ILOCGenerator.g:505:4: ( ^( INVOKE id= ID ^( ARGS (e= expression[cfg, block] )* ) ) )
+			// ILOCGenerator.g:505:7: ^( INVOKE id= ID ^( ARGS (e= expression[cfg, block] )* ) )
 			{
-			match(input,INVOKE,FOLLOW_INVOKE_in_invocation_stmt1483); 
+			match(input,INVOKE,FOLLOW_INVOKE_in_invocation_stmt1497); 
 			match(input, Token.DOWN, null); 
-			id=(CommonTree)match(input,ID,FOLLOW_ID_in_invocation_stmt1487); 
+			id=(CommonTree)match(input,ID,FOLLOW_ID_in_invocation_stmt1501); 
 			 
 			           
 			         
-			match(input,ARGS,FOLLOW_ARGS_in_invocation_stmt1512); 
+			match(input,ARGS,FOLLOW_ARGS_in_invocation_stmt1526); 
 			if ( input.LA(1)==Token.DOWN ) {
 				match(input, Token.DOWN, null); 
-				// ILOCGenerator.g:451:17: (e= expression[cfg, block] )*
+				// ILOCGenerator.g:509:17: (e= expression[cfg, block] )*
 				loop17:
 				while (true) {
 					int alt17=2;
@@ -1790,16 +1848,17 @@ public class ILOCGenerator extends TreeParser {
 
 					switch (alt17) {
 					case 1 :
-						// ILOCGenerator.g:451:18: e= expression[cfg, block]
+						// ILOCGenerator.g:509:18: e= expression[cfg, block]
 						{
-						pushFollow(FOLLOW_expression_in_invocation_stmt1517);
+						pushFollow(FOLLOW_expression_in_invocation_stmt1531);
 						e=expression(cfg, block);
 						state._fsp--;
 
 						  
-						            IInstruction.STOREOUTARGUMENT storeoutarument = new IInstruction.STOREOUTARGUMENT();
-						            storeoutarument.source = e;
-						            storeoutarument.argIdx = argIdx;
+						            IInstruction.STOREOUTARGUMENT storeoutargument = new IInstruction.STOREOUTARGUMENT();
+						            storeoutargument.source = e;
+						            storeoutargument.argIdx = argIdx;
+						            block.addInstruction(storeoutargument);
 						            argIdx++;
 						         
 						}
@@ -1847,7 +1906,7 @@ public class ILOCGenerator extends TreeParser {
 
 
 	// $ANTLR start "lvalue"
-	// ILOCGenerator.g:466:1: lvalue[CFG cfg, BasicBlock block, boolean nested] returns [\n Register resultRegister = null, \n boolean wasGlobal = false, \n boolean wasField = false,\n String fieldName = null,\n String globalName = null,\n String localName = null\n ] : (id= ID | ^(ast= DOT l= lvalue[cfg, block, true] id= ID ) );
+	// ILOCGenerator.g:525:1: lvalue[CFG cfg, BasicBlock block, boolean nested] returns [\n Register resultRegister = null, \n boolean wasGlobal = false, \n boolean wasField = false,\n String fieldName = null,\n String globalName = null,\n String localName = null\n ] : (id= ID | ^(ast= DOT l= lvalue[cfg, block, true] id= ID ) );
 	public final ILOCGenerator.lvalue_return lvalue(CFG cfg, BasicBlock block, boolean nested) throws RecognitionException {
 		ILOCGenerator.lvalue_return retval = new ILOCGenerator.lvalue_return();
 		retval.start = input.LT(1);
@@ -1857,7 +1916,7 @@ public class ILOCGenerator extends TreeParser {
 		TreeRuleReturnScope l =null;
 
 		try {
-			// ILOCGenerator.g:476:4: (id= ID | ^(ast= DOT l= lvalue[cfg, block, true] id= ID ) )
+			// ILOCGenerator.g:535:4: (id= ID | ^(ast= DOT l= lvalue[cfg, block, true] id= ID ) )
 			int alt18=2;
 			int LA18_0 = input.LA(1);
 			if ( (LA18_0==ID) ) {
@@ -1875,9 +1934,9 @@ public class ILOCGenerator extends TreeParser {
 
 			switch (alt18) {
 				case 1 :
-					// ILOCGenerator.g:476:7: id= ID
+					// ILOCGenerator.g:535:7: id= ID
 					{
-					id=(CommonTree)match(input,ID,FOLLOW_ID_in_lvalue1575); 
+					id=(CommonTree)match(input,ID,FOLLOW_ID_in_lvalue1589); 
 
 					         if (cfg.locals.get((id!=null?id.getText():null)) != null) {
 					            retval.resultRegister = cfg.locals.get((id!=null?id.getText():null));
@@ -1898,15 +1957,15 @@ public class ILOCGenerator extends TreeParser {
 					}
 					break;
 				case 2 :
-					// ILOCGenerator.g:494:7: ^(ast= DOT l= lvalue[cfg, block, true] id= ID )
+					// ILOCGenerator.g:553:7: ^(ast= DOT l= lvalue[cfg, block, true] id= ID )
 					{
-					ast=(CommonTree)match(input,DOT,FOLLOW_DOT_in_lvalue1594); 
+					ast=(CommonTree)match(input,DOT,FOLLOW_DOT_in_lvalue1608); 
 					match(input, Token.DOWN, null); 
-					pushFollow(FOLLOW_lvalue_in_lvalue1598);
+					pushFollow(FOLLOW_lvalue_in_lvalue1612);
 					l=lvalue(cfg, block, true);
 					state._fsp--;
 
-					id=(CommonTree)match(input,ID,FOLLOW_ID_in_lvalue1603); 
+					id=(CommonTree)match(input,ID,FOLLOW_ID_in_lvalue1617); 
 					match(input, Token.UP, null); 
 
 					         
@@ -1943,7 +2002,7 @@ public class ILOCGenerator extends TreeParser {
 
 
 	// $ANTLR start "expression"
-	// ILOCGenerator.g:512:1: expression[CFG cfg, BasicBlock block] returns [Register resultRegister = null] : ( ^( (ast= AND |ast= OR ) lft= expression[cfg, block] rht= expression[cfg, block] ) | ^( (ast= EQ |ast= LT |ast= GT |ast= NE |ast= LE |ast= GE ) lft= expression[cfg, block] rht= expression[cfg, block] ) | ^( (ast= PLUS |ast= MINUS |ast= TIMES |ast= DIVIDE ) lft= expression[cfg, block] rht= expression[cfg, block] ) | ^(ast= NOT e= expression[cfg, block] ) | ^(ast= NEG e= expression[cfg, block] ) | ^(ast= DOT e= expression[cfg, block] id= ID ) |e= invocation_exp[cfg, block] |id= ID |i= INTEGER |ast= TRUE |ast= FALSE | ^(ast= NEW id= ID ) |ast= NULL );
+	// ILOCGenerator.g:571:1: expression[CFG cfg, BasicBlock block] returns [Register resultRegister = null] : ( ^( (ast= AND |ast= OR ) lft= expression[cfg, block] rht= expression[cfg, block] ) | ^( (ast= EQ |ast= LT |ast= GT |ast= NE |ast= LE |ast= GE ) lft= expression[cfg, block] rht= expression[cfg, block] ) | ^( (ast= PLUS |ast= MINUS |ast= TIMES |ast= DIVIDE ) lft= expression[cfg, block] rht= expression[cfg, block] ) | ^(ast= NOT e= expression[cfg, block] ) | ^(ast= NEG e= expression[cfg, block] ) | ^(ast= DOT e= expression[cfg, block] id= ID ) |e= invocation_exp[cfg, block] |id= ID |i= INTEGER |ast= TRUE |ast= FALSE | ^(ast= NEW id= ID ) |ast= NULL );
 	public final Register expression(CFG cfg, BasicBlock block) throws RecognitionException {
 		Register resultRegister =  null;
 
@@ -1956,7 +2015,7 @@ public class ILOCGenerator extends TreeParser {
 		Register e =null;
 
 		try {
-			// ILOCGenerator.g:514:4: ( ^( (ast= AND |ast= OR ) lft= expression[cfg, block] rht= expression[cfg, block] ) | ^( (ast= EQ |ast= LT |ast= GT |ast= NE |ast= LE |ast= GE ) lft= expression[cfg, block] rht= expression[cfg, block] ) | ^( (ast= PLUS |ast= MINUS |ast= TIMES |ast= DIVIDE ) lft= expression[cfg, block] rht= expression[cfg, block] ) | ^(ast= NOT e= expression[cfg, block] ) | ^(ast= NEG e= expression[cfg, block] ) | ^(ast= DOT e= expression[cfg, block] id= ID ) |e= invocation_exp[cfg, block] |id= ID |i= INTEGER |ast= TRUE |ast= FALSE | ^(ast= NEW id= ID ) |ast= NULL )
+			// ILOCGenerator.g:573:4: ( ^( (ast= AND |ast= OR ) lft= expression[cfg, block] rht= expression[cfg, block] ) | ^( (ast= EQ |ast= LT |ast= GT |ast= NE |ast= LE |ast= GE ) lft= expression[cfg, block] rht= expression[cfg, block] ) | ^( (ast= PLUS |ast= MINUS |ast= TIMES |ast= DIVIDE ) lft= expression[cfg, block] rht= expression[cfg, block] ) | ^(ast= NOT e= expression[cfg, block] ) | ^(ast= NEG e= expression[cfg, block] ) | ^(ast= DOT e= expression[cfg, block] id= ID ) |e= invocation_exp[cfg, block] |id= ID |i= INTEGER |ast= TRUE |ast= FALSE | ^(ast= NEW id= ID ) |ast= NULL )
 			int alt22=13;
 			switch ( input.LA(1) ) {
 			case AND:
@@ -2040,9 +2099,9 @@ public class ILOCGenerator extends TreeParser {
 			}
 			switch (alt22) {
 				case 1 :
-					// ILOCGenerator.g:514:7: ^( (ast= AND |ast= OR ) lft= expression[cfg, block] rht= expression[cfg, block] )
+					// ILOCGenerator.g:573:7: ^( (ast= AND |ast= OR ) lft= expression[cfg, block] rht= expression[cfg, block] )
 					{
-					// ILOCGenerator.g:514:9: (ast= AND |ast= OR )
+					// ILOCGenerator.g:573:9: (ast= AND |ast= OR )
 					int alt19=2;
 					int LA19_0 = input.LA(1);
 					if ( (LA19_0==AND) ) {
@@ -2060,26 +2119,26 @@ public class ILOCGenerator extends TreeParser {
 
 					switch (alt19) {
 						case 1 :
-							// ILOCGenerator.g:514:10: ast= AND
+							// ILOCGenerator.g:573:10: ast= AND
 							{
-							ast=(CommonTree)match(input,AND,FOLLOW_AND_in_expression1640); 
+							ast=(CommonTree)match(input,AND,FOLLOW_AND_in_expression1654); 
 							}
 							break;
 						case 2 :
-							// ILOCGenerator.g:514:20: ast= OR
+							// ILOCGenerator.g:573:20: ast= OR
 							{
-							ast=(CommonTree)match(input,OR,FOLLOW_OR_in_expression1646); 
+							ast=(CommonTree)match(input,OR,FOLLOW_OR_in_expression1660); 
 							}
 							break;
 
 					}
 
 					match(input, Token.DOWN, null); 
-					pushFollow(FOLLOW_expression_in_expression1660);
+					pushFollow(FOLLOW_expression_in_expression1674);
 					lft=expression(cfg, block);
 					state._fsp--;
 
-					pushFollow(FOLLOW_expression_in_expression1665);
+					pushFollow(FOLLOW_expression_in_expression1679);
 					rht=expression(cfg, block);
 					state._fsp--;
 
@@ -2109,9 +2168,9 @@ public class ILOCGenerator extends TreeParser {
 					}
 					break;
 				case 2 :
-					// ILOCGenerator.g:538:7: ^( (ast= EQ |ast= LT |ast= GT |ast= NE |ast= LE |ast= GE ) lft= expression[cfg, block] rht= expression[cfg, block] )
+					// ILOCGenerator.g:597:7: ^( (ast= EQ |ast= LT |ast= GT |ast= NE |ast= LE |ast= GE ) lft= expression[cfg, block] rht= expression[cfg, block] )
 					{
-					// ILOCGenerator.g:538:9: (ast= EQ |ast= LT |ast= GT |ast= NE |ast= LE |ast= GE )
+					// ILOCGenerator.g:597:9: (ast= EQ |ast= LT |ast= GT |ast= NE |ast= LE |ast= GE )
 					int alt20=6;
 					switch ( input.LA(1) ) {
 					case EQ:
@@ -2151,50 +2210,50 @@ public class ILOCGenerator extends TreeParser {
 					}
 					switch (alt20) {
 						case 1 :
-							// ILOCGenerator.g:538:10: ast= EQ
+							// ILOCGenerator.g:597:10: ast= EQ
 							{
-							ast=(CommonTree)match(input,EQ,FOLLOW_EQ_in_expression1691); 
+							ast=(CommonTree)match(input,EQ,FOLLOW_EQ_in_expression1705); 
 							}
 							break;
 						case 2 :
-							// ILOCGenerator.g:538:19: ast= LT
+							// ILOCGenerator.g:597:19: ast= LT
 							{
-							ast=(CommonTree)match(input,LT,FOLLOW_LT_in_expression1697); 
+							ast=(CommonTree)match(input,LT,FOLLOW_LT_in_expression1711); 
 							}
 							break;
 						case 3 :
-							// ILOCGenerator.g:538:28: ast= GT
+							// ILOCGenerator.g:597:28: ast= GT
 							{
-							ast=(CommonTree)match(input,GT,FOLLOW_GT_in_expression1703); 
+							ast=(CommonTree)match(input,GT,FOLLOW_GT_in_expression1717); 
 							}
 							break;
 						case 4 :
-							// ILOCGenerator.g:538:37: ast= NE
+							// ILOCGenerator.g:597:37: ast= NE
 							{
-							ast=(CommonTree)match(input,NE,FOLLOW_NE_in_expression1709); 
+							ast=(CommonTree)match(input,NE,FOLLOW_NE_in_expression1723); 
 							}
 							break;
 						case 5 :
-							// ILOCGenerator.g:538:46: ast= LE
+							// ILOCGenerator.g:597:46: ast= LE
 							{
-							ast=(CommonTree)match(input,LE,FOLLOW_LE_in_expression1715); 
+							ast=(CommonTree)match(input,LE,FOLLOW_LE_in_expression1729); 
 							}
 							break;
 						case 6 :
-							// ILOCGenerator.g:538:55: ast= GE
+							// ILOCGenerator.g:597:55: ast= GE
 							{
-							ast=(CommonTree)match(input,GE,FOLLOW_GE_in_expression1721); 
+							ast=(CommonTree)match(input,GE,FOLLOW_GE_in_expression1735); 
 							}
 							break;
 
 					}
 
 					match(input, Token.DOWN, null); 
-					pushFollow(FOLLOW_expression_in_expression1735);
+					pushFollow(FOLLOW_expression_in_expression1749);
 					lft=expression(cfg, block);
 					state._fsp--;
 
-					pushFollow(FOLLOW_expression_in_expression1740);
+					pushFollow(FOLLOW_expression_in_expression1754);
 					rht=expression(cfg, block);
 					state._fsp--;
 
@@ -2254,9 +2313,9 @@ public class ILOCGenerator extends TreeParser {
 					}
 					break;
 				case 3 :
-					// ILOCGenerator.g:592:7: ^( (ast= PLUS |ast= MINUS |ast= TIMES |ast= DIVIDE ) lft= expression[cfg, block] rht= expression[cfg, block] )
+					// ILOCGenerator.g:651:7: ^( (ast= PLUS |ast= MINUS |ast= TIMES |ast= DIVIDE ) lft= expression[cfg, block] rht= expression[cfg, block] )
 					{
-					// ILOCGenerator.g:592:9: (ast= PLUS |ast= MINUS |ast= TIMES |ast= DIVIDE )
+					// ILOCGenerator.g:651:9: (ast= PLUS |ast= MINUS |ast= TIMES |ast= DIVIDE )
 					int alt21=4;
 					switch ( input.LA(1) ) {
 					case PLUS:
@@ -2286,38 +2345,38 @@ public class ILOCGenerator extends TreeParser {
 					}
 					switch (alt21) {
 						case 1 :
-							// ILOCGenerator.g:592:10: ast= PLUS
+							// ILOCGenerator.g:651:10: ast= PLUS
 							{
-							ast=(CommonTree)match(input,PLUS,FOLLOW_PLUS_in_expression1766); 
+							ast=(CommonTree)match(input,PLUS,FOLLOW_PLUS_in_expression1780); 
 							}
 							break;
 						case 2 :
-							// ILOCGenerator.g:592:21: ast= MINUS
+							// ILOCGenerator.g:651:21: ast= MINUS
 							{
-							ast=(CommonTree)match(input,MINUS,FOLLOW_MINUS_in_expression1772); 
+							ast=(CommonTree)match(input,MINUS,FOLLOW_MINUS_in_expression1786); 
 							}
 							break;
 						case 3 :
-							// ILOCGenerator.g:592:33: ast= TIMES
+							// ILOCGenerator.g:651:33: ast= TIMES
 							{
-							ast=(CommonTree)match(input,TIMES,FOLLOW_TIMES_in_expression1778); 
+							ast=(CommonTree)match(input,TIMES,FOLLOW_TIMES_in_expression1792); 
 							}
 							break;
 						case 4 :
-							// ILOCGenerator.g:592:45: ast= DIVIDE
+							// ILOCGenerator.g:651:45: ast= DIVIDE
 							{
-							ast=(CommonTree)match(input,DIVIDE,FOLLOW_DIVIDE_in_expression1784); 
+							ast=(CommonTree)match(input,DIVIDE,FOLLOW_DIVIDE_in_expression1798); 
 							}
 							break;
 
 					}
 
 					match(input, Token.DOWN, null); 
-					pushFollow(FOLLOW_expression_in_expression1798);
+					pushFollow(FOLLOW_expression_in_expression1812);
 					lft=expression(cfg, block);
 					state._fsp--;
 
-					pushFollow(FOLLOW_expression_in_expression1803);
+					pushFollow(FOLLOW_expression_in_expression1817);
 					rht=expression(cfg, block);
 					state._fsp--;
 
@@ -2360,11 +2419,11 @@ public class ILOCGenerator extends TreeParser {
 					}
 					break;
 				case 4 :
-					// ILOCGenerator.g:628:7: ^(ast= NOT e= expression[cfg, block] )
+					// ILOCGenerator.g:687:7: ^(ast= NOT e= expression[cfg, block] )
 					{
-					ast=(CommonTree)match(input,NOT,FOLLOW_NOT_in_expression1824); 
+					ast=(CommonTree)match(input,NOT,FOLLOW_NOT_in_expression1838); 
 					match(input, Token.DOWN, null); 
-					pushFollow(FOLLOW_expression_in_expression1828);
+					pushFollow(FOLLOW_expression_in_expression1842);
 					e=expression(cfg, block);
 					state._fsp--;
 
@@ -2381,11 +2440,11 @@ public class ILOCGenerator extends TreeParser {
 					}
 					break;
 				case 5 :
-					// ILOCGenerator.g:637:7: ^(ast= NEG e= expression[cfg, block] )
+					// ILOCGenerator.g:696:7: ^(ast= NEG e= expression[cfg, block] )
 					{
-					ast=(CommonTree)match(input,NEG,FOLLOW_NEG_in_expression1849); 
+					ast=(CommonTree)match(input,NEG,FOLLOW_NEG_in_expression1863); 
 					match(input, Token.DOWN, null); 
-					pushFollow(FOLLOW_expression_in_expression1853);
+					pushFollow(FOLLOW_expression_in_expression1867);
 					e=expression(cfg, block);
 					state._fsp--;
 
@@ -2406,15 +2465,15 @@ public class ILOCGenerator extends TreeParser {
 					}
 					break;
 				case 6 :
-					// ILOCGenerator.g:650:7: ^(ast= DOT e= expression[cfg, block] id= ID )
+					// ILOCGenerator.g:709:7: ^(ast= DOT e= expression[cfg, block] id= ID )
 					{
-					ast=(CommonTree)match(input,DOT,FOLLOW_DOT_in_expression1874); 
+					ast=(CommonTree)match(input,DOT,FOLLOW_DOT_in_expression1888); 
 					match(input, Token.DOWN, null); 
-					pushFollow(FOLLOW_expression_in_expression1878);
+					pushFollow(FOLLOW_expression_in_expression1892);
 					e=expression(cfg, block);
 					state._fsp--;
 
-					id=(CommonTree)match(input,ID,FOLLOW_ID_in_expression1883); 
+					id=(CommonTree)match(input,ID,FOLLOW_ID_in_expression1897); 
 					match(input, Token.UP, null); 
 
 
@@ -2428,9 +2487,9 @@ public class ILOCGenerator extends TreeParser {
 					}
 					break;
 				case 7 :
-					// ILOCGenerator.g:659:7: e= invocation_exp[cfg, block]
+					// ILOCGenerator.g:718:7: e= invocation_exp[cfg, block]
 					{
-					pushFollow(FOLLOW_invocation_exp_in_expression1902);
+					pushFollow(FOLLOW_invocation_exp_in_expression1916);
 					e=invocation_exp(cfg, block);
 					state._fsp--;
 
@@ -2443,9 +2502,9 @@ public class ILOCGenerator extends TreeParser {
 					}
 					break;
 				case 8 :
-					// ILOCGenerator.g:666:7: id= ID
+					// ILOCGenerator.g:725:7: id= ID
 					{
-					id=(CommonTree)match(input,ID,FOLLOW_ID_in_expression1922); 
+					id=(CommonTree)match(input,ID,FOLLOW_ID_in_expression1936); 
 					              
 					         if (cfg.locals.get((id!=null?id.getText():null)) != null) {
 					            resultRegister = cfg.locals.get((id!=null?id.getText():null));
@@ -2461,9 +2520,9 @@ public class ILOCGenerator extends TreeParser {
 					}
 					break;
 				case 9 :
-					// ILOCGenerator.g:679:7: i= INTEGER
+					// ILOCGenerator.g:738:7: i= INTEGER
 					{
-					i=(CommonTree)match(input,INTEGER,FOLLOW_INTEGER_in_expression1940); 
+					i=(CommonTree)match(input,INTEGER,FOLLOW_INTEGER_in_expression1954); 
 
 					         IInstruction.LOADI instruction = new IInstruction.LOADI();
 					         instruction.immediate = Integer.parseInt((i!=null?i.getText():null));
@@ -2474,9 +2533,9 @@ public class ILOCGenerator extends TreeParser {
 					}
 					break;
 				case 10 :
-					// ILOCGenerator.g:687:7: ast= TRUE
+					// ILOCGenerator.g:746:7: ast= TRUE
 					{
-					ast=(CommonTree)match(input,TRUE,FOLLOW_TRUE_in_expression1958); 
+					ast=(CommonTree)match(input,TRUE,FOLLOW_TRUE_in_expression1972); 
 					 
 					         IInstruction.LOADI instruction = new IInstruction.LOADI();
 					         instruction.immediate = 1;
@@ -2487,9 +2546,9 @@ public class ILOCGenerator extends TreeParser {
 					}
 					break;
 				case 11 :
-					// ILOCGenerator.g:695:7: ast= FALSE
+					// ILOCGenerator.g:754:7: ast= FALSE
 					{
-					ast=(CommonTree)match(input,FALSE,FOLLOW_FALSE_in_expression1976); 
+					ast=(CommonTree)match(input,FALSE,FOLLOW_FALSE_in_expression1990); 
 					  
 					         IInstruction.LOADI instruction = new IInstruction.LOADI();
 					         instruction.immediate = 0;
@@ -2500,11 +2559,11 @@ public class ILOCGenerator extends TreeParser {
 					}
 					break;
 				case 12 :
-					// ILOCGenerator.g:703:7: ^(ast= NEW id= ID )
+					// ILOCGenerator.g:762:7: ^(ast= NEW id= ID )
 					{
-					ast=(CommonTree)match(input,NEW,FOLLOW_NEW_in_expression1995); 
+					ast=(CommonTree)match(input,NEW,FOLLOW_NEW_in_expression2009); 
 					match(input, Token.DOWN, null); 
-					id=(CommonTree)match(input,ID,FOLLOW_ID_in_expression1999); 
+					id=(CommonTree)match(input,ID,FOLLOW_ID_in_expression2013); 
 					match(input, Token.UP, null); 
 
 
@@ -2517,9 +2576,9 @@ public class ILOCGenerator extends TreeParser {
 					}
 					break;
 				case 13 :
-					// ILOCGenerator.g:711:7: ast= NULL
+					// ILOCGenerator.g:770:7: ast= NULL
 					{
-					ast=(CommonTree)match(input,NULL,FOLLOW_NULL_in_expression2018); 
+					ast=(CommonTree)match(input,NULL,FOLLOW_NULL_in_expression2032); 
 
 					         IInstruction.LOADI instruction = new IInstruction.LOADI();
 					         instruction.immediate = 0;
@@ -2546,7 +2605,7 @@ public class ILOCGenerator extends TreeParser {
 
 
 	// $ANTLR start "invocation_exp"
-	// ILOCGenerator.g:721:1: invocation_exp[CFG cfg, BasicBlock block] returns [Register resultRegister = null] : ^( INVOKE id= ID ^( ARGS (e= expression[cfg, block] )* ) ) ;
+	// ILOCGenerator.g:780:1: invocation_exp[CFG cfg, BasicBlock block] returns [Register resultRegister = null] : ^( INVOKE id= ID ^( ARGS (e= expression[cfg, block] )* ) ) ;
 	public final Register invocation_exp(CFG cfg, BasicBlock block) throws RecognitionException {
 		Register resultRegister =  null;
 
@@ -2556,19 +2615,19 @@ public class ILOCGenerator extends TreeParser {
 
 		 int argIdx = 0; 
 		try {
-			// ILOCGenerator.g:724:4: ( ^( INVOKE id= ID ^( ARGS (e= expression[cfg, block] )* ) ) )
-			// ILOCGenerator.g:724:7: ^( INVOKE id= ID ^( ARGS (e= expression[cfg, block] )* ) )
+			// ILOCGenerator.g:783:4: ( ^( INVOKE id= ID ^( ARGS (e= expression[cfg, block] )* ) ) )
+			// ILOCGenerator.g:783:7: ^( INVOKE id= ID ^( ARGS (e= expression[cfg, block] )* ) )
 			{
-			match(input,INVOKE,FOLLOW_INVOKE_in_invocation_exp2059); 
+			match(input,INVOKE,FOLLOW_INVOKE_in_invocation_exp2073); 
 			match(input, Token.DOWN, null); 
-			id=(CommonTree)match(input,ID,FOLLOW_ID_in_invocation_exp2063); 
+			id=(CommonTree)match(input,ID,FOLLOW_ID_in_invocation_exp2077); 
 			 
 			            
 			         
-			match(input,ARGS,FOLLOW_ARGS_in_invocation_exp2083); 
+			match(input,ARGS,FOLLOW_ARGS_in_invocation_exp2097); 
 			if ( input.LA(1)==Token.DOWN ) {
 				match(input, Token.DOWN, null); 
-				// ILOCGenerator.g:728:14: (e= expression[cfg, block] )*
+				// ILOCGenerator.g:787:14: (e= expression[cfg, block] )*
 				loop23:
 				while (true) {
 					int alt23=2;
@@ -2579,16 +2638,17 @@ public class ILOCGenerator extends TreeParser {
 
 					switch (alt23) {
 					case 1 :
-						// ILOCGenerator.g:728:15: e= expression[cfg, block]
+						// ILOCGenerator.g:787:15: e= expression[cfg, block]
 						{
-						pushFollow(FOLLOW_expression_in_invocation_exp2088);
+						pushFollow(FOLLOW_expression_in_invocation_exp2102);
 						e=expression(cfg, block);
 						state._fsp--;
 
 						  
-						            IInstruction.STOREOUTARGUMENT storeoutarument = new IInstruction.STOREOUTARGUMENT();
-						            storeoutarument.source = e;
-						            storeoutarument.argIdx = argIdx;
+						            IInstruction.STOREOUTARGUMENT storeoutargument = new IInstruction.STOREOUTARGUMENT();
+						            storeoutargument.source = e;
+						            storeoutargument.argIdx = argIdx;
+						            block.addInstruction(storeoutargument);
 						            argIdx++;
 						         
 						}
@@ -2700,51 +2760,51 @@ public class ILOCGenerator extends TreeParser {
 	public static final BitSet FOLLOW_expression_in_loop1355 = new BitSet(new long[]{0x0000000000000008L});
 	public static final BitSet FOLLOW_DELETE_in_delete1392 = new BitSet(new long[]{0x0000000000000004L});
 	public static final BitSet FOLLOW_expression_in_delete1396 = new BitSet(new long[]{0x0000000000000008L});
-	public static final BitSet FOLLOW_RETURN_in_return_stmt1433 = new BitSet(new long[]{0x0000000000000004L});
-	public static final BitSet FOLLOW_expression_in_return_stmt1438 = new BitSet(new long[]{0x0000000000000008L});
-	public static final BitSet FOLLOW_INVOKE_in_invocation_stmt1483 = new BitSet(new long[]{0x0000000000000004L});
-	public static final BitSet FOLLOW_ID_in_invocation_stmt1487 = new BitSet(new long[]{0x0000000000000020L});
-	public static final BitSet FOLLOW_ARGS_in_invocation_stmt1512 = new BitSet(new long[]{0x0000000000000004L});
-	public static final BitSet FOLLOW_expression_in_invocation_stmt1517 = new BitSet(new long[]{0x006005FEB3998018L});
-	public static final BitSet FOLLOW_ID_in_lvalue1575 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_DOT_in_lvalue1594 = new BitSet(new long[]{0x0000000000000004L});
-	public static final BitSet FOLLOW_lvalue_in_lvalue1598 = new BitSet(new long[]{0x0000000002000000L});
-	public static final BitSet FOLLOW_ID_in_lvalue1603 = new BitSet(new long[]{0x0000000000000008L});
-	public static final BitSet FOLLOW_AND_in_expression1640 = new BitSet(new long[]{0x0000000000000004L});
-	public static final BitSet FOLLOW_OR_in_expression1646 = new BitSet(new long[]{0x0000000000000004L});
-	public static final BitSet FOLLOW_expression_in_expression1660 = new BitSet(new long[]{0x006005FEB3998010L});
-	public static final BitSet FOLLOW_expression_in_expression1665 = new BitSet(new long[]{0x0000000000000008L});
-	public static final BitSet FOLLOW_EQ_in_expression1691 = new BitSet(new long[]{0x0000000000000004L});
-	public static final BitSet FOLLOW_LT_in_expression1697 = new BitSet(new long[]{0x0000000000000004L});
-	public static final BitSet FOLLOW_GT_in_expression1703 = new BitSet(new long[]{0x0000000000000004L});
-	public static final BitSet FOLLOW_NE_in_expression1709 = new BitSet(new long[]{0x0000000000000004L});
-	public static final BitSet FOLLOW_LE_in_expression1715 = new BitSet(new long[]{0x0000000000000004L});
-	public static final BitSet FOLLOW_GE_in_expression1721 = new BitSet(new long[]{0x0000000000000004L});
-	public static final BitSet FOLLOW_expression_in_expression1735 = new BitSet(new long[]{0x006005FEB3998010L});
-	public static final BitSet FOLLOW_expression_in_expression1740 = new BitSet(new long[]{0x0000000000000008L});
-	public static final BitSet FOLLOW_PLUS_in_expression1766 = new BitSet(new long[]{0x0000000000000004L});
-	public static final BitSet FOLLOW_MINUS_in_expression1772 = new BitSet(new long[]{0x0000000000000004L});
-	public static final BitSet FOLLOW_TIMES_in_expression1778 = new BitSet(new long[]{0x0000000000000004L});
-	public static final BitSet FOLLOW_DIVIDE_in_expression1784 = new BitSet(new long[]{0x0000000000000004L});
-	public static final BitSet FOLLOW_expression_in_expression1798 = new BitSet(new long[]{0x006005FEB3998010L});
-	public static final BitSet FOLLOW_expression_in_expression1803 = new BitSet(new long[]{0x0000000000000008L});
-	public static final BitSet FOLLOW_NOT_in_expression1824 = new BitSet(new long[]{0x0000000000000004L});
-	public static final BitSet FOLLOW_expression_in_expression1828 = new BitSet(new long[]{0x0000000000000008L});
-	public static final BitSet FOLLOW_NEG_in_expression1849 = new BitSet(new long[]{0x0000000000000004L});
-	public static final BitSet FOLLOW_expression_in_expression1853 = new BitSet(new long[]{0x0000000000000008L});
-	public static final BitSet FOLLOW_DOT_in_expression1874 = new BitSet(new long[]{0x0000000000000004L});
-	public static final BitSet FOLLOW_expression_in_expression1878 = new BitSet(new long[]{0x0000000002000000L});
-	public static final BitSet FOLLOW_ID_in_expression1883 = new BitSet(new long[]{0x0000000000000008L});
-	public static final BitSet FOLLOW_invocation_exp_in_expression1902 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ID_in_expression1922 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_INTEGER_in_expression1940 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_TRUE_in_expression1958 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_FALSE_in_expression1976 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_NEW_in_expression1995 = new BitSet(new long[]{0x0000000000000004L});
-	public static final BitSet FOLLOW_ID_in_expression1999 = new BitSet(new long[]{0x0000000000000008L});
-	public static final BitSet FOLLOW_NULL_in_expression2018 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_INVOKE_in_invocation_exp2059 = new BitSet(new long[]{0x0000000000000004L});
-	public static final BitSet FOLLOW_ID_in_invocation_exp2063 = new BitSet(new long[]{0x0000000000000020L});
-	public static final BitSet FOLLOW_ARGS_in_invocation_exp2083 = new BitSet(new long[]{0x0000000000000004L});
-	public static final BitSet FOLLOW_expression_in_invocation_exp2088 = new BitSet(new long[]{0x006005FEB3998018L});
+	public static final BitSet FOLLOW_RETURN_in_return_stmt1445 = new BitSet(new long[]{0x0000000000000004L});
+	public static final BitSet FOLLOW_expression_in_return_stmt1450 = new BitSet(new long[]{0x0000000000000008L});
+	public static final BitSet FOLLOW_INVOKE_in_invocation_stmt1497 = new BitSet(new long[]{0x0000000000000004L});
+	public static final BitSet FOLLOW_ID_in_invocation_stmt1501 = new BitSet(new long[]{0x0000000000000020L});
+	public static final BitSet FOLLOW_ARGS_in_invocation_stmt1526 = new BitSet(new long[]{0x0000000000000004L});
+	public static final BitSet FOLLOW_expression_in_invocation_stmt1531 = new BitSet(new long[]{0x006005FEB3998018L});
+	public static final BitSet FOLLOW_ID_in_lvalue1589 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_DOT_in_lvalue1608 = new BitSet(new long[]{0x0000000000000004L});
+	public static final BitSet FOLLOW_lvalue_in_lvalue1612 = new BitSet(new long[]{0x0000000002000000L});
+	public static final BitSet FOLLOW_ID_in_lvalue1617 = new BitSet(new long[]{0x0000000000000008L});
+	public static final BitSet FOLLOW_AND_in_expression1654 = new BitSet(new long[]{0x0000000000000004L});
+	public static final BitSet FOLLOW_OR_in_expression1660 = new BitSet(new long[]{0x0000000000000004L});
+	public static final BitSet FOLLOW_expression_in_expression1674 = new BitSet(new long[]{0x006005FEB3998010L});
+	public static final BitSet FOLLOW_expression_in_expression1679 = new BitSet(new long[]{0x0000000000000008L});
+	public static final BitSet FOLLOW_EQ_in_expression1705 = new BitSet(new long[]{0x0000000000000004L});
+	public static final BitSet FOLLOW_LT_in_expression1711 = new BitSet(new long[]{0x0000000000000004L});
+	public static final BitSet FOLLOW_GT_in_expression1717 = new BitSet(new long[]{0x0000000000000004L});
+	public static final BitSet FOLLOW_NE_in_expression1723 = new BitSet(new long[]{0x0000000000000004L});
+	public static final BitSet FOLLOW_LE_in_expression1729 = new BitSet(new long[]{0x0000000000000004L});
+	public static final BitSet FOLLOW_GE_in_expression1735 = new BitSet(new long[]{0x0000000000000004L});
+	public static final BitSet FOLLOW_expression_in_expression1749 = new BitSet(new long[]{0x006005FEB3998010L});
+	public static final BitSet FOLLOW_expression_in_expression1754 = new BitSet(new long[]{0x0000000000000008L});
+	public static final BitSet FOLLOW_PLUS_in_expression1780 = new BitSet(new long[]{0x0000000000000004L});
+	public static final BitSet FOLLOW_MINUS_in_expression1786 = new BitSet(new long[]{0x0000000000000004L});
+	public static final BitSet FOLLOW_TIMES_in_expression1792 = new BitSet(new long[]{0x0000000000000004L});
+	public static final BitSet FOLLOW_DIVIDE_in_expression1798 = new BitSet(new long[]{0x0000000000000004L});
+	public static final BitSet FOLLOW_expression_in_expression1812 = new BitSet(new long[]{0x006005FEB3998010L});
+	public static final BitSet FOLLOW_expression_in_expression1817 = new BitSet(new long[]{0x0000000000000008L});
+	public static final BitSet FOLLOW_NOT_in_expression1838 = new BitSet(new long[]{0x0000000000000004L});
+	public static final BitSet FOLLOW_expression_in_expression1842 = new BitSet(new long[]{0x0000000000000008L});
+	public static final BitSet FOLLOW_NEG_in_expression1863 = new BitSet(new long[]{0x0000000000000004L});
+	public static final BitSet FOLLOW_expression_in_expression1867 = new BitSet(new long[]{0x0000000000000008L});
+	public static final BitSet FOLLOW_DOT_in_expression1888 = new BitSet(new long[]{0x0000000000000004L});
+	public static final BitSet FOLLOW_expression_in_expression1892 = new BitSet(new long[]{0x0000000002000000L});
+	public static final BitSet FOLLOW_ID_in_expression1897 = new BitSet(new long[]{0x0000000000000008L});
+	public static final BitSet FOLLOW_invocation_exp_in_expression1916 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ID_in_expression1936 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_INTEGER_in_expression1954 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_TRUE_in_expression1972 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_FALSE_in_expression1990 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_NEW_in_expression2009 = new BitSet(new long[]{0x0000000000000004L});
+	public static final BitSet FOLLOW_ID_in_expression2013 = new BitSet(new long[]{0x0000000000000008L});
+	public static final BitSet FOLLOW_NULL_in_expression2032 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_INVOKE_in_invocation_exp2073 = new BitSet(new long[]{0x0000000000000004L});
+	public static final BitSet FOLLOW_ID_in_invocation_exp2077 = new BitSet(new long[]{0x0000000000000020L});
+	public static final BitSet FOLLOW_ARGS_in_invocation_exp2097 = new BitSet(new long[]{0x0000000000000004L});
+	public static final BitSet FOLLOW_expression_in_invocation_exp2102 = new BitSet(new long[]{0x006005FEB3998018L});
 }

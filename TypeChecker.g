@@ -171,7 +171,7 @@ function
          d=declarations[typeEnv]
          s=statement_list[proto, typeEnv])
       {
-         if (!$s.hasReturn) {
+         if (!$s.hasReturn && proto.returnType != MiniType.VOID) {
             throw new TypeException("Missing return statement");
          }
       }
@@ -322,9 +322,10 @@ return_stmt[FunctionPrototype proto, HashMap<String, MiniType> typeEnv]
          else if (hasExpression && proto.returnType == MiniType.VOID) {
             throw new TypeException("Void functions may not return an expression.");
          }
-         if ($e.miniType != proto.returnType) {
-            System.out.println($e.miniType);
-            System.out.println($proto.returnType);
+         else if (!hasExpression && proto.returnType == MiniType.VOID) {
+            // Case where there is no return expression and the function returns void
+         }
+         else if ($e.miniType != proto.returnType) {
             throw new TypeException("Return type mismatch: Expected " 
                + proto.returnType.name + ", found " + $e.miniType.name);
          }
@@ -357,6 +358,9 @@ invocation_stmt[HashMap<String, MiniType> typeEnv]
                argIdx++;
             })*))
       {
+         if (argIdx != proto.argTypes.size()) {
+            throw new TypeException("Argument count mismatch expected " + proto.argTypes.size());
+         }
       }
    ;
 
@@ -517,6 +521,9 @@ invocation_exp[HashMap<String, MiniType> typeEnv]
             argIdx++;
          })*))
       {
+         if (argIdx != proto.argTypes.size()) {
+            throw new TypeException("Argument count mismatch expected " + proto.argTypes.size());
+         }
          if (proto.returnType == MiniType.VOID) {
             throw new TypeException("Void value from call to " +  $id.text + " not ignored as it ought to be.");
          }

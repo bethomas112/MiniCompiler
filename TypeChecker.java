@@ -1,4 +1,4 @@
-// $ANTLR 3.5.2 TypeChecker.g 2015-04-21 23:07:48
+// $ANTLR 3.5.2 TypeChecker.g 2015-04-22 00:28:26
 
    import java.util.HashMap;
    import javax.json.*;
@@ -797,7 +797,7 @@ public class TypeChecker extends TreeParser {
 			match(input, Token.UP, null); 
 
 
-			         if (!s) {
+			         if (!s && proto.returnType != MiniType.VOID) {
 			            throw new TypeException("Missing return statement");
 			         }
 			      
@@ -1661,9 +1661,10 @@ public class TypeChecker extends TreeParser {
 			         else if (hasExpression && proto.returnType == MiniType.VOID) {
 			            throw new TypeException("Void functions may not return an expression.");
 			         }
-			         if (e != proto.returnType) {
-			            System.out.println(e);
-			            System.out.println(proto.returnType);
+			         else if (!hasExpression && proto.returnType == MiniType.VOID) {
+			            // Case where there is no return expression and the function returns void
+			         }
+			         else if (e != proto.returnType) {
 			            throw new TypeException("Return type mismatch: Expected " 
 			               + proto.returnType.name + ", found " + e.name);
 			         }
@@ -1685,7 +1686,7 @@ public class TypeChecker extends TreeParser {
 
 
 	// $ANTLR start "invocation_stmt"
-	// TypeChecker.g:334:1: invocation_stmt[HashMap<String, MiniType> typeEnv] returns [boolean hasReturn = false] : ^( INVOKE id= ID ^( ARGS (e= expression[typeEnv] )* ) ) ;
+	// TypeChecker.g:335:1: invocation_stmt[HashMap<String, MiniType> typeEnv] returns [boolean hasReturn = false] : ^( INVOKE id= ID ^( ARGS (e= expression[typeEnv] )* ) ) ;
 	public final boolean invocation_stmt(HashMap<String, MiniType> typeEnv) throws RecognitionException {
 		boolean hasReturn =  false;
 
@@ -1695,8 +1696,8 @@ public class TypeChecker extends TreeParser {
 
 		 FunctionPrototype proto = null; int argIdx = 0; 
 		try {
-			// TypeChecker.g:337:4: ( ^( INVOKE id= ID ^( ARGS (e= expression[typeEnv] )* ) ) )
-			// TypeChecker.g:337:7: ^( INVOKE id= ID ^( ARGS (e= expression[typeEnv] )* ) )
+			// TypeChecker.g:338:4: ( ^( INVOKE id= ID ^( ARGS (e= expression[typeEnv] )* ) ) )
+			// TypeChecker.g:338:7: ^( INVOKE id= ID ^( ARGS (e= expression[typeEnv] )* ) )
 			{
 			match(input,INVOKE,FOLLOW_INVOKE_in_invocation_stmt1507); 
 			match(input, Token.DOWN, null); 
@@ -1712,7 +1713,7 @@ public class TypeChecker extends TreeParser {
 			match(input,ARGS,FOLLOW_ARGS_in_invocation_stmt1536); 
 			if ( input.LA(1)==Token.DOWN ) {
 				match(input, Token.DOWN, null); 
-				// TypeChecker.g:346:17: (e= expression[typeEnv] )*
+				// TypeChecker.g:347:17: (e= expression[typeEnv] )*
 				loop17:
 				while (true) {
 					int alt17=2;
@@ -1723,7 +1724,7 @@ public class TypeChecker extends TreeParser {
 
 					switch (alt17) {
 					case 1 :
-						// TypeChecker.g:346:18: e= expression[typeEnv]
+						// TypeChecker.g:347:18: e= expression[typeEnv]
 						{
 						pushFollow(FOLLOW_expression_in_invocation_stmt1541);
 						e=expression(typeEnv);
@@ -1755,6 +1756,9 @@ public class TypeChecker extends TreeParser {
 			match(input, Token.UP, null); 
 
 
+			         if (argIdx != proto.argTypes.size()) {
+			            throw new TypeException("Argument count mismatch expected " + proto.argTypes.size());
+			         }
 			      
 			}
 
@@ -1773,7 +1777,7 @@ public class TypeChecker extends TreeParser {
 
 
 	// $ANTLR start "lvalue"
-	// TypeChecker.g:363:1: lvalue[HashMap<String, MiniType> typeEnv] returns [MiniType miniType] : (id= ID | ^(ast= DOT l= lvalue[typeEnv] id= ID ) );
+	// TypeChecker.g:367:1: lvalue[HashMap<String, MiniType> typeEnv] returns [MiniType miniType] : (id= ID | ^(ast= DOT l= lvalue[typeEnv] id= ID ) );
 	public final MiniType lvalue(HashMap<String, MiniType> typeEnv) throws RecognitionException {
 		MiniType miniType = null;
 
@@ -1783,7 +1787,7 @@ public class TypeChecker extends TreeParser {
 		MiniType l =null;
 
 		try {
-			// TypeChecker.g:365:4: (id= ID | ^(ast= DOT l= lvalue[typeEnv] id= ID ) )
+			// TypeChecker.g:369:4: (id= ID | ^(ast= DOT l= lvalue[typeEnv] id= ID ) )
 			int alt18=2;
 			int LA18_0 = input.LA(1);
 			if ( (LA18_0==ID) ) {
@@ -1801,7 +1805,7 @@ public class TypeChecker extends TreeParser {
 
 			switch (alt18) {
 				case 1 :
-					// TypeChecker.g:365:7: id= ID
+					// TypeChecker.g:369:7: id= ID
 					{
 					id=(CommonTree)match(input,ID,FOLLOW_ID_in_lvalue1595); 
 
@@ -1820,7 +1824,7 @@ public class TypeChecker extends TreeParser {
 					}
 					break;
 				case 2 :
-					// TypeChecker.g:379:7: ^(ast= DOT l= lvalue[typeEnv] id= ID )
+					// TypeChecker.g:383:7: ^(ast= DOT l= lvalue[typeEnv] id= ID )
 					{
 					ast=(CommonTree)match(input,DOT,FOLLOW_DOT_in_lvalue1614); 
 					match(input, Token.DOWN, null); 
@@ -1862,7 +1866,7 @@ public class TypeChecker extends TreeParser {
 
 
 	// $ANTLR start "expression"
-	// TypeChecker.g:394:1: expression[HashMap<String, MiniType> typeEnv] returns [MiniType miniType = null] : ( ^( (ast= AND |ast= OR ) lft= expression[typeEnv] rht= expression[typeEnv] ) | ^( (ast= EQ |ast= LT |ast= GT |ast= NE |ast= LE |ast= GE ) lft= expression[typeEnv] rht= expression[typeEnv] ) | ^( (ast= PLUS |ast= MINUS |ast= TIMES |ast= DIVIDE ) lft= expression[typeEnv] rht= expression[typeEnv] ) | ^(ast= NOT e= expression[typeEnv] ) | ^(ast= NEG e= expression[typeEnv] ) | ^(ast= DOT e= expression[typeEnv] id= ID ) |e= invocation_exp[typeEnv] |id= ID |i= INTEGER |ast= TRUE |ast= FALSE | ^(ast= NEW id= ID ) |ast= NULL );
+	// TypeChecker.g:398:1: expression[HashMap<String, MiniType> typeEnv] returns [MiniType miniType = null] : ( ^( (ast= AND |ast= OR ) lft= expression[typeEnv] rht= expression[typeEnv] ) | ^( (ast= EQ |ast= LT |ast= GT |ast= NE |ast= LE |ast= GE ) lft= expression[typeEnv] rht= expression[typeEnv] ) | ^( (ast= PLUS |ast= MINUS |ast= TIMES |ast= DIVIDE ) lft= expression[typeEnv] rht= expression[typeEnv] ) | ^(ast= NOT e= expression[typeEnv] ) | ^(ast= NEG e= expression[typeEnv] ) | ^(ast= DOT e= expression[typeEnv] id= ID ) |e= invocation_exp[typeEnv] |id= ID |i= INTEGER |ast= TRUE |ast= FALSE | ^(ast= NEW id= ID ) |ast= NULL );
 	public final MiniType expression(HashMap<String, MiniType> typeEnv) throws RecognitionException {
 		MiniType miniType =  null;
 
@@ -1875,7 +1879,7 @@ public class TypeChecker extends TreeParser {
 		MiniType e =null;
 
 		try {
-			// TypeChecker.g:396:4: ( ^( (ast= AND |ast= OR ) lft= expression[typeEnv] rht= expression[typeEnv] ) | ^( (ast= EQ |ast= LT |ast= GT |ast= NE |ast= LE |ast= GE ) lft= expression[typeEnv] rht= expression[typeEnv] ) | ^( (ast= PLUS |ast= MINUS |ast= TIMES |ast= DIVIDE ) lft= expression[typeEnv] rht= expression[typeEnv] ) | ^(ast= NOT e= expression[typeEnv] ) | ^(ast= NEG e= expression[typeEnv] ) | ^(ast= DOT e= expression[typeEnv] id= ID ) |e= invocation_exp[typeEnv] |id= ID |i= INTEGER |ast= TRUE |ast= FALSE | ^(ast= NEW id= ID ) |ast= NULL )
+			// TypeChecker.g:400:4: ( ^( (ast= AND |ast= OR ) lft= expression[typeEnv] rht= expression[typeEnv] ) | ^( (ast= EQ |ast= LT |ast= GT |ast= NE |ast= LE |ast= GE ) lft= expression[typeEnv] rht= expression[typeEnv] ) | ^( (ast= PLUS |ast= MINUS |ast= TIMES |ast= DIVIDE ) lft= expression[typeEnv] rht= expression[typeEnv] ) | ^(ast= NOT e= expression[typeEnv] ) | ^(ast= NEG e= expression[typeEnv] ) | ^(ast= DOT e= expression[typeEnv] id= ID ) |e= invocation_exp[typeEnv] |id= ID |i= INTEGER |ast= TRUE |ast= FALSE | ^(ast= NEW id= ID ) |ast= NULL )
 			int alt22=13;
 			switch ( input.LA(1) ) {
 			case AND:
@@ -1959,9 +1963,9 @@ public class TypeChecker extends TreeParser {
 			}
 			switch (alt22) {
 				case 1 :
-					// TypeChecker.g:396:7: ^( (ast= AND |ast= OR ) lft= expression[typeEnv] rht= expression[typeEnv] )
+					// TypeChecker.g:400:7: ^( (ast= AND |ast= OR ) lft= expression[typeEnv] rht= expression[typeEnv] )
 					{
-					// TypeChecker.g:396:9: (ast= AND |ast= OR )
+					// TypeChecker.g:400:9: (ast= AND |ast= OR )
 					int alt19=2;
 					int LA19_0 = input.LA(1);
 					if ( (LA19_0==AND) ) {
@@ -1979,13 +1983,13 @@ public class TypeChecker extends TreeParser {
 
 					switch (alt19) {
 						case 1 :
-							// TypeChecker.g:396:10: ast= AND
+							// TypeChecker.g:400:10: ast= AND
 							{
 							ast=(CommonTree)match(input,AND,FOLLOW_AND_in_expression1660); 
 							}
 							break;
 						case 2 :
-							// TypeChecker.g:396:20: ast= OR
+							// TypeChecker.g:400:20: ast= OR
 							{
 							ast=(CommonTree)match(input,OR,FOLLOW_OR_in_expression1666); 
 							}
@@ -2015,9 +2019,9 @@ public class TypeChecker extends TreeParser {
 					}
 					break;
 				case 2 :
-					// TypeChecker.g:407:7: ^( (ast= EQ |ast= LT |ast= GT |ast= NE |ast= LE |ast= GE ) lft= expression[typeEnv] rht= expression[typeEnv] )
+					// TypeChecker.g:411:7: ^( (ast= EQ |ast= LT |ast= GT |ast= NE |ast= LE |ast= GE ) lft= expression[typeEnv] rht= expression[typeEnv] )
 					{
-					// TypeChecker.g:407:9: (ast= EQ |ast= LT |ast= GT |ast= NE |ast= LE |ast= GE )
+					// TypeChecker.g:411:9: (ast= EQ |ast= LT |ast= GT |ast= NE |ast= LE |ast= GE )
 					int alt20=6;
 					switch ( input.LA(1) ) {
 					case EQ:
@@ -2057,37 +2061,37 @@ public class TypeChecker extends TreeParser {
 					}
 					switch (alt20) {
 						case 1 :
-							// TypeChecker.g:407:10: ast= EQ
+							// TypeChecker.g:411:10: ast= EQ
 							{
 							ast=(CommonTree)match(input,EQ,FOLLOW_EQ_in_expression1711); 
 							}
 							break;
 						case 2 :
-							// TypeChecker.g:407:19: ast= LT
+							// TypeChecker.g:411:19: ast= LT
 							{
 							ast=(CommonTree)match(input,LT,FOLLOW_LT_in_expression1717); 
 							}
 							break;
 						case 3 :
-							// TypeChecker.g:407:28: ast= GT
+							// TypeChecker.g:411:28: ast= GT
 							{
 							ast=(CommonTree)match(input,GT,FOLLOW_GT_in_expression1723); 
 							}
 							break;
 						case 4 :
-							// TypeChecker.g:407:37: ast= NE
+							// TypeChecker.g:411:37: ast= NE
 							{
 							ast=(CommonTree)match(input,NE,FOLLOW_NE_in_expression1729); 
 							}
 							break;
 						case 5 :
-							// TypeChecker.g:407:46: ast= LE
+							// TypeChecker.g:411:46: ast= LE
 							{
 							ast=(CommonTree)match(input,LE,FOLLOW_LE_in_expression1735); 
 							}
 							break;
 						case 6 :
-							// TypeChecker.g:407:55: ast= GE
+							// TypeChecker.g:411:55: ast= GE
 							{
 							ast=(CommonTree)match(input,GE,FOLLOW_GE_in_expression1741); 
 							}
@@ -2117,9 +2121,9 @@ public class TypeChecker extends TreeParser {
 					}
 					break;
 				case 3 :
-					// TypeChecker.g:418:7: ^( (ast= PLUS |ast= MINUS |ast= TIMES |ast= DIVIDE ) lft= expression[typeEnv] rht= expression[typeEnv] )
+					// TypeChecker.g:422:7: ^( (ast= PLUS |ast= MINUS |ast= TIMES |ast= DIVIDE ) lft= expression[typeEnv] rht= expression[typeEnv] )
 					{
-					// TypeChecker.g:418:9: (ast= PLUS |ast= MINUS |ast= TIMES |ast= DIVIDE )
+					// TypeChecker.g:422:9: (ast= PLUS |ast= MINUS |ast= TIMES |ast= DIVIDE )
 					int alt21=4;
 					switch ( input.LA(1) ) {
 					case PLUS:
@@ -2149,25 +2153,25 @@ public class TypeChecker extends TreeParser {
 					}
 					switch (alt21) {
 						case 1 :
-							// TypeChecker.g:418:10: ast= PLUS
+							// TypeChecker.g:422:10: ast= PLUS
 							{
 							ast=(CommonTree)match(input,PLUS,FOLLOW_PLUS_in_expression1786); 
 							}
 							break;
 						case 2 :
-							// TypeChecker.g:418:21: ast= MINUS
+							// TypeChecker.g:422:21: ast= MINUS
 							{
 							ast=(CommonTree)match(input,MINUS,FOLLOW_MINUS_in_expression1792); 
 							}
 							break;
 						case 3 :
-							// TypeChecker.g:418:33: ast= TIMES
+							// TypeChecker.g:422:33: ast= TIMES
 							{
 							ast=(CommonTree)match(input,TIMES,FOLLOW_TIMES_in_expression1798); 
 							}
 							break;
 						case 4 :
-							// TypeChecker.g:418:45: ast= DIVIDE
+							// TypeChecker.g:422:45: ast= DIVIDE
 							{
 							ast=(CommonTree)match(input,DIVIDE,FOLLOW_DIVIDE_in_expression1804); 
 							}
@@ -2197,7 +2201,7 @@ public class TypeChecker extends TreeParser {
 					}
 					break;
 				case 4 :
-					// TypeChecker.g:428:7: ^(ast= NOT e= expression[typeEnv] )
+					// TypeChecker.g:432:7: ^(ast= NOT e= expression[typeEnv] )
 					{
 					ast=(CommonTree)match(input,NOT,FOLLOW_NOT_in_expression1844); 
 					match(input, Token.DOWN, null); 
@@ -2216,7 +2220,7 @@ public class TypeChecker extends TreeParser {
 					}
 					break;
 				case 5 :
-					// TypeChecker.g:435:7: ^(ast= NEG e= expression[typeEnv] )
+					// TypeChecker.g:439:7: ^(ast= NEG e= expression[typeEnv] )
 					{
 					ast=(CommonTree)match(input,NEG,FOLLOW_NEG_in_expression1869); 
 					match(input, Token.DOWN, null); 
@@ -2235,7 +2239,7 @@ public class TypeChecker extends TreeParser {
 					}
 					break;
 				case 6 :
-					// TypeChecker.g:442:7: ^(ast= DOT e= expression[typeEnv] id= ID )
+					// TypeChecker.g:446:7: ^(ast= DOT e= expression[typeEnv] id= ID )
 					{
 					ast=(CommonTree)match(input,DOT,FOLLOW_DOT_in_expression1894); 
 					match(input, Token.DOWN, null); 
@@ -2261,7 +2265,7 @@ public class TypeChecker extends TreeParser {
 					}
 					break;
 				case 7 :
-					// TypeChecker.g:455:7: e= invocation_exp[typeEnv]
+					// TypeChecker.g:459:7: e= invocation_exp[typeEnv]
 					{
 					pushFollow(FOLLOW_invocation_exp_in_expression1922);
 					e=invocation_exp(typeEnv);
@@ -2273,7 +2277,7 @@ public class TypeChecker extends TreeParser {
 					}
 					break;
 				case 8 :
-					// TypeChecker.g:459:7: id= ID
+					// TypeChecker.g:463:7: id= ID
 					{
 					id=(CommonTree)match(input,ID,FOLLOW_ID_in_expression1942); 
 					     
@@ -2289,7 +2293,7 @@ public class TypeChecker extends TreeParser {
 					}
 					break;
 				case 9 :
-					// TypeChecker.g:470:7: i= INTEGER
+					// TypeChecker.g:474:7: i= INTEGER
 					{
 					i=(CommonTree)match(input,INTEGER,FOLLOW_INTEGER_in_expression1960); 
 
@@ -2298,7 +2302,7 @@ public class TypeChecker extends TreeParser {
 					}
 					break;
 				case 10 :
-					// TypeChecker.g:474:7: ast= TRUE
+					// TypeChecker.g:478:7: ast= TRUE
 					{
 					ast=(CommonTree)match(input,TRUE,FOLLOW_TRUE_in_expression1978); 
 					 
@@ -2307,7 +2311,7 @@ public class TypeChecker extends TreeParser {
 					}
 					break;
 				case 11 :
-					// TypeChecker.g:478:7: ast= FALSE
+					// TypeChecker.g:482:7: ast= FALSE
 					{
 					ast=(CommonTree)match(input,FALSE,FOLLOW_FALSE_in_expression1996); 
 
@@ -2316,7 +2320,7 @@ public class TypeChecker extends TreeParser {
 					}
 					break;
 				case 12 :
-					// TypeChecker.g:482:7: ^(ast= NEW id= ID )
+					// TypeChecker.g:486:7: ^(ast= NEW id= ID )
 					{
 					ast=(CommonTree)match(input,NEW,FOLLOW_NEW_in_expression2015); 
 					match(input, Token.DOWN, null); 
@@ -2334,7 +2338,7 @@ public class TypeChecker extends TreeParser {
 					}
 					break;
 				case 13 :
-					// TypeChecker.g:491:7: ast= NULL
+					// TypeChecker.g:495:7: ast= NULL
 					{
 					ast=(CommonTree)match(input,NULL,FOLLOW_NULL_in_expression2038); 
 
@@ -2359,7 +2363,7 @@ public class TypeChecker extends TreeParser {
 
 
 	// $ANTLR start "invocation_exp"
-	// TypeChecker.g:497:1: invocation_exp[HashMap<String, MiniType> typeEnv] returns [MiniType miniType = null] : ^( INVOKE id= ID ^( ARGS (e= expression[typeEnv] )* ) ) ;
+	// TypeChecker.g:501:1: invocation_exp[HashMap<String, MiniType> typeEnv] returns [MiniType miniType = null] : ^( INVOKE id= ID ^( ARGS (e= expression[typeEnv] )* ) ) ;
 	public final MiniType invocation_exp(HashMap<String, MiniType> typeEnv) throws RecognitionException {
 		MiniType miniType =  null;
 
@@ -2369,8 +2373,8 @@ public class TypeChecker extends TreeParser {
 
 		 FunctionPrototype proto = null; int argIdx = 0; 
 		try {
-			// TypeChecker.g:500:4: ( ^( INVOKE id= ID ^( ARGS (e= expression[typeEnv] )* ) ) )
-			// TypeChecker.g:500:7: ^( INVOKE id= ID ^( ARGS (e= expression[typeEnv] )* ) )
+			// TypeChecker.g:504:4: ( ^( INVOKE id= ID ^( ARGS (e= expression[typeEnv] )* ) ) )
+			// TypeChecker.g:504:7: ^( INVOKE id= ID ^( ARGS (e= expression[typeEnv] )* ) )
 			{
 			match(input,INVOKE,FOLLOW_INVOKE_in_invocation_exp2079); 
 			match(input, Token.DOWN, null); 
@@ -2386,7 +2390,7 @@ public class TypeChecker extends TreeParser {
 			match(input,ARGS,FOLLOW_ARGS_in_invocation_exp2103); 
 			if ( input.LA(1)==Token.DOWN ) {
 				match(input, Token.DOWN, null); 
-				// TypeChecker.g:509:14: (e= expression[typeEnv] )*
+				// TypeChecker.g:513:14: (e= expression[typeEnv] )*
 				loop23:
 				while (true) {
 					int alt23=2;
@@ -2397,7 +2401,7 @@ public class TypeChecker extends TreeParser {
 
 					switch (alt23) {
 					case 1 :
-						// TypeChecker.g:509:15: e= expression[typeEnv]
+						// TypeChecker.g:513:15: e= expression[typeEnv]
 						{
 						pushFollow(FOLLOW_expression_in_invocation_exp2108);
 						e=expression(typeEnv);
@@ -2426,7 +2430,9 @@ public class TypeChecker extends TreeParser {
 			match(input, Token.UP, null); 
 
 
-			         System.out.println("Function " + (id!=null?id.getText():null) + " return type is " + proto.returnType);
+			         if (argIdx != proto.argTypes.size()) {
+			            throw new TypeException("Argument count mismatch expected " + proto.argTypes.size());
+			         }
 			         if (proto.returnType == MiniType.VOID) {
 			            throw new TypeException("Void value from call to " +  (id!=null?id.getText():null) + " not ignored as it ought to be.");
 			         }

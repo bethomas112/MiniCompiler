@@ -5,6 +5,7 @@ import org.antlr.stringtemplate.*;
 import java.io.*;
 import java.util.Vector;
 import java.util.HashMap;
+import java.util.Arrays;
 import javax.json.JsonValue;
 import javax.json.Json;
 
@@ -110,7 +111,9 @@ public class Mini
          CommonTreeNodeStream nodes = new CommonTreeNodeStream(tree);
          nodes.setTokenStream(tokens);
          ILOCGenerator igen = new ILOCGenerator(nodes);
-
+         System.out.println(_inputFile);
+         System.out.println(Arrays.toString(_inputFile.split("\\.")));
+         igen.setOutputFile(new File(_inputFile.split("\\.")[0] + ".il"));
          igen.translate();
       }
       catch (org.antlr.runtime.RecognitionException e)

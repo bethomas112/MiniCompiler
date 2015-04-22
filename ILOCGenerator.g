@@ -16,11 +16,12 @@ options
    import java.util.ArrayList;
    import java.util.HashMap;
    import java.util.HashSet;
+   import java.io.*;
    import javax.json.*;
 }
 
 @members
-{
+{   
    public static class CFG {
       public BasicBlock entryBlock;
       public BasicBlock exitBlock;
@@ -88,7 +89,11 @@ options
    }
 
    private HashMap<String, MiniType> structTypes = new HashMap<>();
-   private List<CFG> cfgs = new ArrayList<>();   
+   private List<CFG> cfgs = new ArrayList<>();
+   private File outputFile;
+   public void setOutputFile(File file) {
+      this.outputFile = file;
+   } 
 }
 
 
@@ -169,18 +174,28 @@ functions
    @init{  }
    :  ^(FUNCS (f=function {  })*)
       { 
+         StringBuilder sb = new StringBuilder();
          for (CFG cfg : cfgs) {
             List<BasicBlock> blocks = cfg.bfsBlocks();
-            for (BasicBlock block : blocks) {
-               StringBuilder sb = new StringBuilder();
-               // sb.append(block.label + " -> ");
-               // for (BasicBlock nextBlock : block.next) {
-               //    sb.append(nextBlock.label + ", ");
-               // }
-               sb.append(block);
-               System.out.print(sb.toString());
-            }
+            
+            for (BasicBlock block : blocks) {            
+               sb.append(block);               
+            }           
          } 
+         if (outputFile != null) {
+            try {
+               FileWriter writer = new FileWriter(outputFile);
+               writer.write(sb.toString());
+               writer.close();
+
+            }
+            catch (IOException e) {
+               System.err.println("Error writing .il file: " + e);
+            }
+         }
+         else {
+            System.out.print(sb.toString());   
+         }
       }
    |  {  }
    ;
@@ -372,7 +387,7 @@ conditional[CFG cfg, BasicBlock block]
       BasicBlock thenBlock = new BasicBlock();
       thenBlock.label = getNextLabel();
       BasicBlock elseBlock = new BasicBlock();
-      elseBlock.label = getNextLabel();      
+      elseBlock.label = getNextLabel();
       BasicBlock afterBlock = new BasicBlock();
       afterBlock.label = getNextLabel();
       boolean hasElseBlock = false;
@@ -386,13 +401,30 @@ conditional[CFG cfg, BasicBlock block]
          block.next.add(guardBlock);
          guardBlock.next.add(thenBlock);
          
+         IInstruction.COMPI compi = new IInstruction.COMPI();
+         compi.source = $g.resultRegister;
+         compi.immediate = 1;
+         guardBlock.addInstruction(compi);
+
+         IInstruction.CBREQ cbreq = new IInstruction.CBREQ();
+         cbreq.labelA = thenBlock.label;
+         cbreq.labelB = hasElseBlock ? elseBlock.label : afterBlock.label;
+         guardBlock.addInstruction(cbreq);
          if ($t.resultBlock != null) {
             $t.resultBlock.next.add(afterBlock);
+            
+            IInstruction.JUMPI jumpi = new IInstruction.JUMPI();
+            jumpi.label = afterBlock.label;
+            $t.resultBlock.addInstruction(jumpi);
          }
          if (hasElseBlock) {
             guardBlock.next.add(elseBlock);   
             if ($e.resultBlock != null) {
                $e.resultBlock.next.add(afterBlock);
+
+               IInstruction.JUMPI jumpi = new IInstruction.JUMPI();
+               jumpi.label = afterBlock.label;
+               $e.resultBlock.addInstruction(jumpi);
             }
          }
          $resultBlock = afterBlock;
@@ -415,8 +447,22 @@ loop[CFG cfg, BasicBlock block]
          block.next.add(guardBlock);
          guardBlock.next.add(bodyBlock);
          guardBlock.next.add(afterBlock);
+
+         IInstruction.COMPI compi = new IInstruction.COMPI();
+         compi.source = $e.resultRegister;
+         compi.immediate = 1;
+         guardBlock.addInstruction(compi);
+
+         IInstruction.CBREQ cbreq = new IInstruction.CBREQ();
+         cbreq.labelA = bodyBlock.label;
+         cbreq.labelB = afterBlock.label;
+         guardBlock.addInstruction(cbreq);
          if ($b.resultBlock != null) {
             $b.resultBlock.next.add(guardBlock);
+
+            IInstruction.JUMPI jumpi = new IInstruction.JUMPI();
+            jumpi.label = guardBlock.label;
+            $b.resultBlock.addInstruction(jumpi);
          }
          $resultBlock = afterBlock;
       }
@@ -426,18 +472,30 @@ delete[CFG cfg, BasicBlock block]
    returns [BasicBlock resultBlock = null]
    :  ^(ast=DELETE e=expression[cfg, block])
       {
+         IInstruction.DEL del = new IInstruction.DEL();
+         del.source = $e.resultRegister;
+         block.addInstruction(del);
          $resultBlock = block;
       }
    ;
 
 return_stmt[CFG cfg, BasicBlock block]
    returns [BasicBlock resultBlock = null]
-   :  ^(ast=RETURN (e=expression[cfg, block])?)
+   @init 
+   {
+      boolean hasExpression = false;
+   }
+   :  ^(ast=RETURN (e=expression[cfg, block] { hasExpression = true; })?)
       {
-         IInstruction.STORERET storeret = new IInstruction.STORERET();
-         storeret.source = $e.resultRegister;
-         block.addInstruction(storeret);
+         if (hasExpression) {
+            IInstruction.STORERET storeret = new IInstruction.STORERET();
+            storeret.source = $e.resultRegister;
+            block.addInstruction(storeret);            
+         }
          block.next.add(cfg.exitBlock);
+         IInstruction.JUMPI jumpi = new IInstruction.JUMPI();
+         jumpi.label = cfg.exitBlock.label;
+         block.addInstruction(jumpi);
       }
    ;
 
@@ -450,9 +508,10 @@ invocation_stmt[CFG cfg, BasicBlock block]
          } 
          ^(ARGS (e=expression[cfg, block] 
          {  
-            IInstruction.STOREOUTARGUMENT storeoutarument = new IInstruction.STOREOUTARGUMENT();
-            storeoutarument.source = $e.resultRegister;
-            storeoutarument.argIdx = argIdx;
+            IInstruction.STOREOUTARGUMENT storeoutargument = new IInstruction.STOREOUTARGUMENT();
+            storeoutargument.source = $e.resultRegister;
+            storeoutargument.argIdx = argIdx;
+            block.addInstruction(storeoutargument);
             argIdx++;
          })*))
       {
@@ -727,9 +786,10 @@ invocation_exp[CFG cfg, BasicBlock block]
          }
       ^(ARGS (e=expression[cfg, block] 
          {  
-            IInstruction.STOREOUTARGUMENT storeoutarument = new IInstruction.STOREOUTARGUMENT();
-            storeoutarument.source = $e.resultRegister;
-            storeoutarument.argIdx = argIdx;
+            IInstruction.STOREOUTARGUMENT storeoutargument = new IInstruction.STOREOUTARGUMENT();
+            storeoutargument.source = $e.resultRegister;
+            storeoutargument.argIdx = argIdx;
+            block.addInstruction(storeoutargument);
             argIdx++;
          })*))
       {
