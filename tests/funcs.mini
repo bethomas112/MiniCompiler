@@ -1,0 +1,27 @@
+bool global;
+
+fun a(int b, bool c) bool {
+   int d;
+   
+   d = b + 1;
+   return c && true;
+}
+
+fun b(int a, int b, int c) void {
+   return;
+}
+
+fun c() int {
+   return 3;
+}
+
+fun main() int
+{
+   bool d;
+   int e;
+   
+   d = a();
+   e = b();
+   e = c();
+   return e;
+}

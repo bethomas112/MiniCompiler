@@ -304,15 +304,27 @@ delete[HashMap<String, MiniType> typeEnv]
    ;
 
 return_stmt[FunctionPrototype proto, HashMap<String, MiniType> typeEnv]
-   returns [boolean hasReturn = true]
-   :  ^(ast=RETURN (e=expression[typeEnv])?)
+   returns 
+   [
+      boolean hasReturn = true
+   ]
+   @init 
+   {
+      boolean hasExpression = false;
+   }
+   :  ^(ast=RETURN (e=expression[typeEnv] { hasExpression = true; })?)
       {
          // Case where there is no value after a return 
-         if ($e.miniType == null && proto.returnType != MiniType.VOID) {
+         if (!hasExpression && proto.returnType != MiniType.VOID) {
             throw new TypeException("Return type mismatch: Expected " 
                + proto.returnType.name + ", found void");
          }
+         else if (hasExpression && proto.returnType == MiniType.VOID) {
+            throw new TypeException("Void functions may not return an expression.");
+         }
          if ($e.miniType != proto.returnType) {
+            System.out.println($e.miniType);
+            System.out.println($proto.returnType);
             throw new TypeException("Return type mismatch: Expected " 
                + proto.returnType.name + ", found " + $e.miniType.name);
          }
@@ -371,6 +383,7 @@ lvalue[HashMap<String, MiniType> typeEnv]
             if (!structType.fields.containsKey($id.text)) {
                throw new TypeException("Identifier is not a member of struct: " + $id.text);
             }
+            $miniType = structType.fields.get($id.text);
          }
          else {
             throw new TypeException("Requested member of non-struct: " + $id.text);
@@ -504,6 +517,9 @@ invocation_exp[HashMap<String, MiniType> typeEnv]
             argIdx++;
          })*))
       {
+         if (proto.returnType == MiniType.VOID) {
+            throw new TypeException("Void value from call to " +  $id.text + " not ignored as it ought to be.");
+         }
          $miniType = proto.returnType;
       }
    ;

@@ -1,6 +1,5 @@
 public class Register {
    public static int NEXT_REGISTER = 0;
-   
    public static void resetRegisters() {
       NEXT_REGISTER = 0;
    }
@@ -9,12 +8,16 @@ public class Register {
       return new Register();
    }
    
-   public final int n;
+   public String name;
    private Register() {
-      n = NEXT_REGISTER++;
+      name = "r" + NEXT_REGISTER++;
+   }
+
+   private Register(String name) {
+      this.name = name;
    }
 
    public String toString() {
-      return "r" + n;
+      return name;
    }      
 }

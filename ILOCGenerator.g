@@ -54,16 +54,32 @@ options
 
    public static class BasicBlock {
       public List<BasicBlock> prev;
-      public List<BasicBlock> next;
+      public List<BasicBlock> next;      
       public String label;
+
+      private List<IInstruction> instructions;
       public BasicBlock() {
          prev = new ArrayList<>();
          next = new ArrayList<>();
+         instructions = new ArrayList<>();
       }
 
       public List<IInstruction> getILOC() { 
-         return new ArrayList<>(); 
-      };
+         return instructions; 
+      }
+
+      public void addInstruction(IInstruction instruction) {
+         instructions.add(instruction);
+      }
+
+      public String toString() {
+         StringBuilder sb = new StringBuilder();
+         sb.append(label + ":\n");
+         for (IInstruction instruction : instructions) {
+            sb.append("\t" + instruction.getText() + "\n");
+         }
+         return sb.toString();
+      }
    }
 
    private static int labelCount = 0;
@@ -95,7 +111,7 @@ type_decl
    :  ^(ast=STRUCT 
          id=ID 
             { 
-               structType.name = "Struct " + $id.text;
+               structType.name = $id.text;
                structTypes.put($id.text, structType);               
             } 
          n=nested_decl[structType])
@@ -157,11 +173,12 @@ functions
             List<BasicBlock> blocks = cfg.bfsBlocks();
             for (BasicBlock block : blocks) {
                StringBuilder sb = new StringBuilder();
-               sb.append(block.label + " -> ");
-               for (BasicBlock nextBlock : block.next) {
-                  sb.append(nextBlock.label + ", ");
-               }
-               System.out.println(sb.toString());
+               // sb.append(block.label + " -> ");
+               // for (BasicBlock nextBlock : block.next) {
+               //    sb.append(nextBlock.label + ", ");
+               // }
+               sb.append(block);
+               System.out.print(sb.toString());
             }
          } 
       }
@@ -176,6 +193,7 @@ function
       BasicBlock exitBlock = new BasicBlock();
       exitBlock.label = getNextLabel();
       cfg.exitBlock = exitBlock;
+      exitBlock.addInstruction(new IInstruction.RET());
    }
    :  ^(ast=FUN 
          id=ID          
@@ -194,15 +212,26 @@ function
 
 parameters[CFG cfg]
    returns [BasicBlock entryBlock = null]
-   @init{ int paramNum = 0; }
+   @init
+   { 
+      int paramNum = 0;
+      BasicBlock block = new BasicBlock();
+   }
    :  ^(PARAMS (p=param_decl[] 
       { 
-         cfg.params.put($p.paramId, paramNum++);
-         cfg.locals.put($p.paramId, Register.newRegister());         
+         Register paramReg = Register.newRegister();
+         cfg.params.put($p.paramId, paramNum);
+         cfg.locals.put($p.paramId, paramReg);         
          //TODO: Generate code for setting up params.
+         IInstruction.LOADINARGUMENT loadinargument = new IInstruction.LOADINARGUMENT();
+         loadinargument.variable = $p.paramId;
+         loadinargument.argIdx = paramNum;
+         loadinargument.dest = paramReg;
+         block.instructions.add(loadinargument);
+         paramNum++;
       })*)
       { 
-         $entryBlock = new BasicBlock(); 
+         $entryBlock = block; 
       }
    ;
 
@@ -257,8 +286,27 @@ statement_list[CFG cfg, BasicBlock block]
 
 assignment[CFG cfg, BasicBlock block]
    returns [BasicBlock resultBlock = null]
-   :  ^(ast=ASSIGN e=expression[cfg, block] l=lvalue[cfg, block])
+   :  ^(ast=ASSIGN e=expression[cfg, block] l=lvalue[cfg, block, false])
       {
+         if ($l.wasGlobal) {
+            IInstruction.STOREGLOBAL storeglobal = new IInstruction.STOREGLOBAL();
+            storeglobal.source = $e.resultRegister;
+            storeglobal.globalName = $l.globalName;
+            block.addInstruction(storeglobal);
+         }
+         else if ($l.wasField) {
+            IInstruction.STOREAIFIELD storeaifield = new IInstruction.STOREAIFIELD();
+            storeaifield.source = $e.resultRegister;
+            storeaifield.dest = $l.resultRegister;
+            storeaifield.fieldName = $l.fieldName;
+            block.addInstruction(storeaifield);
+         }
+         else {
+            IInstruction.MOV mov = new IInstruction.MOV();
+            mov.source = $e.resultRegister;
+            mov.dest = $l.resultRegister;
+            block.addInstruction(mov);
+         }
          $resultBlock = block;
       }
    ;
@@ -269,13 +317,48 @@ print[CFG cfg, BasicBlock block]
    :  ^(ast=PRINT e=expression[cfg, block] (ENDL {  })?)
       {
          $resultBlock = block;
+         IInstruction.PRINTLN println = new IInstruction.PRINTLN();
+         println.source = $e.resultRegister;
+         block.addInstruction(println);
       }
    ;
 
 read[CFG cfg, BasicBlock block]
    returns [BasicBlock resultBlock = null]
-   :  ^(ast=READ l=lvalue[cfg, block])
+   :  ^(ast=READ l=lvalue[cfg, block, false])
       {
+         if ($l.wasGlobal) {
+           IInstruction.COMPUTEGLOBALADDRESS computeglobaladdress = new IInstruction.COMPUTEGLOBALADDRESS();
+           computeglobaladdress.dest = Register.newRegister();
+           computeglobaladdress.globalName = $l.globalName;
+           block.addInstruction(computeglobaladdress);
+           IInstruction.READ read = new IInstruction.READ();
+           read.dest = computeglobaladdress.dest;
+           block.addInstruction(read);
+         }
+         else if ($l.wasField) {
+            IInstruction.ADDISTRUCT addistruct = new IInstruction.ADDISTRUCT();
+            addistruct.source = $l.resultRegister;
+            addistruct.fieldName = $l.fieldName;
+            addistruct.dest = Register.newRegister();
+            block.addInstruction(addistruct);
+            IInstruction.READ read = new IInstruction.READ();
+            read.dest = addistruct.dest;
+            block.addInstruction(read);
+         }
+         else {
+            IInstruction.ADDILOCAL addilocal = new IInstruction.ADDILOCAL();
+            addilocal.localName = $l.localName;
+            addilocal.dest = Register.newRegister();
+            block.addInstruction(addilocal);
+            IInstruction.READ read = new IInstruction.READ();
+            read.dest = addilocal.dest;
+            block.addInstruction(read);
+            IInstruction.LOADAILOCAL loadailocal = new IInstruction.LOADAILOCAL();
+            loadailocal.localName = $l.localName;
+            loadailocal.dest = $l.resultRegister;
+            block.addInstruction(loadailocal);
+         }
          $resultBlock = block;
       }
    ;
@@ -351,6 +434,9 @@ return_stmt[CFG cfg, BasicBlock block]
    returns [BasicBlock resultBlock = null]
    :  ^(ast=RETURN (e=expression[cfg, block])?)
       {
+         IInstruction.STORERET storeret = new IInstruction.STORERET();
+         storeret.source = $e.resultRegister;
+         block.addInstruction(storeret);
          block.next.add(cfg.exitBlock);
       }
    ;
@@ -363,23 +449,63 @@ invocation_stmt[CFG cfg, BasicBlock block]
            
          } 
          ^(ARGS (e=expression[cfg, block] 
-            {  
-               
-            })*))
+         {  
+            IInstruction.STOREOUTARGUMENT storeoutarument = new IInstruction.STOREOUTARGUMENT();
+            storeoutarument.source = $e.resultRegister;
+            storeoutarument.argIdx = argIdx;
+            argIdx++;
+         })*))
       {
+         IInstruction.CALL call = new IInstruction.CALL();
+         call.label = $id.text;
+         block.addInstruction(call);
          $resultBlock = block;
       }
    ;
 
-lvalue[CFG cfg, BasicBlock block]
-   returns []
+lvalue[CFG cfg, BasicBlock block, boolean nested]
+   returns 
+      [
+         Register resultRegister = null, 
+         boolean wasGlobal = false, 
+         boolean wasField = false,
+         String fieldName = null,
+         String globalName = null,
+         String localName = null
+      ]
    :  id=ID
       {
-         
+         if (cfg.locals.get($id.text) != null) {
+            $resultRegister = cfg.locals.get($id.text);
+            $localName = $id.text;
+         }
+         else {
+            if (nested == true) {
+               IInstruction.LOADGLOBAL instruction = new IInstruction.LOADGLOBAL();
+               instruction.globalName = $id.text;
+               instruction.dest = Register.newRegister();
+               block.addInstruction(instruction);
+               $resultRegister = instruction.dest;
+            }
+            $wasGlobal = true;
+            $globalName = $id.text;
+         }
       }
-   |  ^(ast=DOT l=lvalue[cfg, block] id=ID)
-      {
-         
+   |  ^(ast=DOT l=lvalue[cfg, block, true] id=ID)
+      {         
+         if (nested) {
+            IInstruction.LOADAIFIELD loadaifield = new IInstruction.LOADAIFIELD();
+            loadaifield.source = $l.resultRegister;
+            loadaifield.fieldName = $id.text;
+            loadaifield.dest = Register.newRegister();
+            block.addInstruction(loadaifield);
+            $resultRegister = loadaifield.dest;
+         }
+         else {
+            $resultRegister = $l.resultRegister;
+         }         
+         $fieldName = $id.text;
+         $wasField = true;
       }
    ;
 
@@ -388,59 +514,207 @@ expression[CFG cfg, BasicBlock block]
    :  ^((ast=AND | ast=OR)
          lft=expression[cfg, block] rht=expression[cfg, block])
       {
+         Register leftReg = $lft.resultRegister;
+         Register rightReg = $rht.resultRegister;
+         Register result = Register.newRegister();
          
+         if ($ast.text.equals("&&")) {
+            IInstruction.AND instruction = new IInstruction.AND();
+            instruction.sourceA = leftReg;
+            instruction.sourceB = rightReg;
+            instruction.dest = result;
+            block.addInstruction(instruction);
+         }
+         else {
+            IInstruction.OR instruction = new IInstruction.OR();
+            instruction.sourceA = leftReg;
+            instruction.sourceB = rightReg;
+            instruction.dest = result;
+            block.addInstruction(instruction);
+         }
+         $resultRegister = result;
       }
    //Comparisons
    |  ^((ast=EQ | ast=LT | ast=GT | ast=NE | ast=LE | ast=GE)
          lft=expression[cfg, block] rht=expression[cfg, block])
       {
-         
+         $resultRegister = Register.newRegister();
+
+         IInstruction.COMP comp = new IInstruction.COMP();
+         comp.sourceA = $lft.resultRegister;
+         comp.sourceB = $rht.resultRegister;
+         block.addInstruction(comp);
+
+         IInstruction.LOADI loadi = new IInstruction.LOADI();
+         loadi.immediate = 0;
+         loadi.dest = $resultRegister;
+         block.addInstruction(loadi);
+         switch ($ast.text) {
+            case "==":
+               IInstruction.MOVEQ moveq = new IInstruction.MOVEQ();
+               moveq.immediate = 1;
+               moveq.dest = $resultRegister;
+               block.addInstruction(moveq);
+               break;
+            case "<":
+               IInstruction.MOVLT movlt = new IInstruction.MOVLT();
+               movlt.immediate = 1;
+               movlt.dest = $resultRegister;
+               block.addInstruction(movlt);
+               break;
+            case ">":
+               IInstruction.MOVGT movgt = new IInstruction.MOVGT();
+               movgt.immediate = 1;
+               movgt.dest = $resultRegister;
+               block.addInstruction(movgt);
+               break;
+            case "!=":
+               IInstruction.MOVNE movne = new IInstruction.MOVNE();
+               movne.immediate = 1;
+               movne.dest = $resultRegister;
+               block.addInstruction(movne);
+               break;
+            case "<=":
+               IInstruction.MOVLE movle = new IInstruction.MOVLE();
+               movle.immediate = 1;
+               movle.dest = $resultRegister;
+               block.addInstruction(movle);
+               break;
+            case ">=":
+               IInstruction.MOVGE movge = new IInstruction.MOVGE();
+               movge.immediate = 1;
+               movge.dest = $resultRegister;
+               block.addInstruction(movge);
+               break;
+         }
       }
    //Arithmetic
    |  ^((ast=PLUS | ast=MINUS | ast=TIMES | ast=DIVIDE)
          lft=expression[cfg, block] rht=expression[cfg, block])
       {
-         
+         Register leftReg = $lft.resultRegister;
+         Register rightReg = $rht.resultRegister;
+         Register result = Register.newRegister();
+         if ($ast.text.equals("+")) {
+            IInstruction.ADD instruction = new IInstruction.ADD();
+            instruction.sourceA = leftReg;
+            instruction.sourceB = rightReg;
+            instruction.dest = result;
+            block.addInstruction(instruction);
+         }
+         else if ($ast.text.equals("-")) {
+            IInstruction.SUB instruction = new IInstruction.SUB();
+            instruction.sourceA = leftReg;
+            instruction.sourceB = rightReg;
+            instruction.dest = result;
+            block.addInstruction(instruction);
+         }
+         else if ($ast.text.equals("*")) {
+            IInstruction.MULT instruction = new IInstruction.MULT();
+            instruction.sourceA = leftReg;
+            instruction.sourceB = rightReg;
+            instruction.dest = result;
+            block.addInstruction(instruction);
+         }
+         else if ($ast.text.equals("/")) {
+            IInstruction.DIV instruction = new IInstruction.DIV();
+            instruction.sourceA = leftReg;
+            instruction.sourceB = rightReg;
+            instruction.dest = result;
+            block.addInstruction(instruction);
+         }
+         $resultRegister = result;
       }
    |  ^(ast=NOT e=expression[cfg, block])
       {
-         
+         IInstruction.XORI xori = new IInstruction.XORI();
+         xori.source = $e.resultRegister;
+         xori.immediate = 1;
+         xori.dest = Register.newRegister();
+         block.addInstruction(xori);
+         $resultRegister = xori.dest;
       }
    |  ^(ast=NEG e=expression[cfg, block])
       {
-         
+         IInstruction.LOADI loadi = new IInstruction.LOADI();
+         loadi.immediate = -1;
+         loadi.dest = Register.newRegister();
+         block.addInstruction(loadi);
+         IInstruction.MULT mult = new IInstruction.MULT();
+         mult.sourceA = $e.resultRegister;
+         mult.sourceB = loadi.dest;
+         mult.dest = loadi.dest;
+         block.addInstruction(mult);
+         $resultRegister = mult.dest;
       }
    |  ^(ast=DOT e=expression[cfg, block] id=ID)
       {
-         
+         IInstruction.LOADAIFIELD loadaifield = new IInstruction.LOADAIFIELD();
+         loadaifield.source = $e.resultRegister;
+         loadaifield.fieldName = $id.text;
+         loadaifield.dest = Register.newRegister();
+         block.addInstruction(loadaifield);
+         $resultRegister = loadaifield.dest;
       }
    |  e=invocation_exp[cfg, block] 
       {
-         
+         IInstruction.LOADRET loadret = new IInstruction.LOADRET();
+         loadret.dest = Register.newRegister();
+         block.addInstruction(loadret);
+         $resultRegister = loadret.dest;
       }
    |  id=ID
-      {     
-                 
+      {              
+         if (cfg.locals.get($id.text) != null) {
+            $resultRegister = cfg.locals.get($id.text);
+         }
+         else {
+            IInstruction.LOADGLOBAL instruction = new IInstruction.LOADGLOBAL();
+            instruction.globalName = $id.text;
+            instruction.dest = Register.newRegister();
+            block.addInstruction(instruction);
+            $resultRegister = instruction.dest;
+         }
       }
    |  i=INTEGER
       {
-         
+         IInstruction.LOADI instruction = new IInstruction.LOADI();
+         instruction.immediate = Integer.parseInt($i.text);
+         instruction.dest = Register.newRegister();
+         block.addInstruction(instruction);
+         $resultRegister = instruction.dest;
       }
    |  ast=TRUE
       { 
-         
+         IInstruction.LOADI instruction = new IInstruction.LOADI();
+         instruction.immediate = 1;
+         instruction.dest = Register.newRegister();
+         block.addInstruction(instruction);
+         $resultRegister = instruction.dest;  
       }
    |  ast=FALSE
-      {
-         
+      {  
+         IInstruction.LOADI instruction = new IInstruction.LOADI();
+         instruction.immediate = 0;
+         instruction.dest = Register.newRegister();
+         block.addInstruction(instruction);
+         $resultRegister = instruction.dest;
       }
    |  ^(ast=NEW id=ID)
       {
-         
+         IInstruction.NEW instruction = new IInstruction.NEW();
+         instruction.struct = (MiniType.StructType)structTypes.get($id.text);;
+         instruction.dest = Register.newRegister();
+         block.addInstruction(instruction);
+         $resultRegister = instruction.dest;
       }
    |  ast=NULL
       {
-         
+         IInstruction.LOADI instruction = new IInstruction.LOADI();
+         instruction.immediate = 0;
+         instruction.dest = Register.newRegister();
+         block.addInstruction(instruction);
+         $resultRegister = instruction.dest;
       }
    ;
 
@@ -453,9 +727,14 @@ invocation_exp[CFG cfg, BasicBlock block]
          }
       ^(ARGS (e=expression[cfg, block] 
          {  
-            
+            IInstruction.STOREOUTARGUMENT storeoutarument = new IInstruction.STOREOUTARGUMENT();
+            storeoutarument.source = $e.resultRegister;
+            storeoutarument.argIdx = argIdx;
+            argIdx++;
          })*))
       {
-         
+         IInstruction.CALL call = new IInstruction.CALL();
+         call.label = $id.text;
+         block.addInstruction(call);
       }
    ;

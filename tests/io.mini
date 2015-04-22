@@ -1,0 +1,23 @@
+struct J {
+   int a;
+   struct J b;
+};
+
+int global;
+
+fun main() int
+{
+   struct J j;
+   int local;
+
+   j = new J;
+   read j.a;
+   print j.a;
+   
+   read local;
+   print local;
+
+   read global;
+   print global;
+   return 1;
+}

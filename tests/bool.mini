@@ -1,0 +1,11 @@
+bool global;
+
+fun main() int
+{
+   bool a, b, c, d;
+   a = 2 > 3;
+   b = 3 != 3;
+   c = 4 < 5;
+   d = a && b || c;
+   return 1;
+}
