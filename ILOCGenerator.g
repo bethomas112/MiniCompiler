@@ -16,6 +16,7 @@ options
    import java.util.ArrayList;
    import java.util.HashMap;
    import java.util.HashSet;
+   import java.util.Map;
    import java.io.*;
    import javax.json.*;
 }
@@ -23,19 +24,20 @@ options
 @members
 {   
    public static class ILOCResult {
-      public List<IInstruction> iloc;
       public List<CFG> cfgs;
    }
 
    public static class CFG {
       public BasicBlock entryBlock;
       public BasicBlock exitBlock;
-      public List<String> localsOrdered = new ArrayList<>();
       public HashMap<String, Register> locals;
+      public HashMap<String, MiniType> localTypes;
+      public List<String> localsOrdered;
       public HashMap<String, Integer> params;
       public HashMap<String, MiniType.StructType> structTypes;
       public CFG(HashMap<String, MiniType.StructType> structTypes) {
          this.locals = new HashMap<>();
+         this.localsOrdered = new ArrayList<>();
          this.params = new HashMap<>();
          this.structTypes = structTypes;
       }
@@ -99,12 +101,24 @@ options
    private List<CFG> cfgs = new ArrayList<>();
    private ILOCResult result = new ILOCResult();
    private File outputFile;
+   private HashMap<String, HashMap<String, MiniType>> functionLocalTypes = new HashMap<>();
+   private HashMap<String, MiniType> globalTypes = new HashMap<>();
    public void setOutputFile(File file) {
       this.outputFile = file;
    }
 
    public ILOCResult getResult() {
       return result;
+   }
+
+   public void setLocalTypes(HashMap<String, TypeChecker.FunctionPrototype> localTypes) {
+      for (Map.Entry<String, TypeChecker.FunctionPrototype> entry : localTypes.entrySet()) {
+         this.functionLocalTypes.put(entry.getKey(), entry.getValue().localTypes);
+      }
+   }
+
+   public void setGlobalTypes(HashMap<String, MiniType> globalTypes) {
+      this.globalTypes = globalTypes;
    }
 
 }
@@ -195,7 +209,6 @@ functions
             
             for (BasicBlock block : blocks) {            
                sb.append(block);               
-               result.iloc.addAll(block.getILOC());
             }           
          } 
          if (outputFile != null) {
@@ -224,7 +237,10 @@ function
       exitBlock.addInstruction(new IInstruction.RET());
    }
    :  ^(ast=FUN 
-         id=ID          
+         id=ID
+         {
+            cfg.localTypes = functionLocalTypes.get($id.text);
+         }        
          p=parameters[cfg] 
          {
             cfg.entryBlock = $p.entryBlock;
@@ -384,10 +400,12 @@ read[CFG cfg, BasicBlock block]
             addistruct.source = $l.resultRegister;
             addistruct.fieldName = $l.fieldName;
             addistruct.dest = Register.newRegister();
+            addistruct.structType = $l.structType;
             block.addInstruction(addistruct);
             IInstruction.READ read = new IInstruction.READ();
             read.dest = addistruct.dest;
             block.addInstruction(read);
+            System.out.println("ADDISTRUCT with structType: " + $l.structType);
          }
          else {
             IInstruction.ADDILOCAL addilocal = new IInstruction.ADDILOCAL();
@@ -566,13 +584,18 @@ lvalue[CFG cfg, BasicBlock block, boolean nested]
          boolean wasField = false,
          String fieldName = null,
          String globalName = null,
-         String localName = null
+         String localName = null,
+         MiniType.StructType structType = null
       ]
    :  id=ID
       {
          if (cfg.locals.get($id.text) != null) {
             $resultRegister = cfg.locals.get($id.text);
             $localName = $id.text;
+            MiniType localType = cfg.localTypes.get($id.text);
+            if (localType instanceof MiniType.StructType) {
+               $structType = (MiniType.StructType)localType;
+            }
          }
          else {
             if (nested == true) {
@@ -584,6 +607,10 @@ lvalue[CFG cfg, BasicBlock block, boolean nested]
             }
             $wasGlobal = true;
             $globalName = $id.text;
+            MiniType globalType = globalTypes.get($id.text);
+            if (globalType instanceof MiniType.StructType) {
+               $structType = (MiniType.StructType)globalType;
+            }
          }
       }
    |  ^(ast=DOT l=lvalue[cfg, block, true] id=ID)
@@ -593,14 +620,21 @@ lvalue[CFG cfg, BasicBlock block, boolean nested]
             loadaifield.source = $l.resultRegister;
             loadaifield.fieldName = $id.text;
             loadaifield.dest = Register.newRegister();
+            loadaifield.structType = $l.structType;
             block.addInstruction(loadaifield);
-            $resultRegister = loadaifield.dest;
+            $resultRegister = loadaifield.dest;            
+            MiniType fieldType = $l.structType.fields.get($id.text);
+            if (fieldType instanceof MiniType.StructType) {
+               $structType = (MiniType.StructType)fieldType;
+            }
          }
          else {
             $resultRegister = $l.resultRegister;
-         }         
+            $structType = $l.structType;
+         }
          $fieldName = $id.text;
          $wasField = true;
+
       }
    ;
 

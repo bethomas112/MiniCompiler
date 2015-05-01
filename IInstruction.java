@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class IInstruction {  
-
+   private static final int SPILL_THRESHOLD = 6;
    /* Arithmetic*/
    public static class ADD extends IInstruction {
       public Register sourceA, sourceB, dest;
@@ -33,6 +33,7 @@ public abstract class IInstruction {
    public static class ADDISTRUCT extends IInstruction {
       public Register source, dest;
       public String fieldName;
+      public MiniType.StructType structType;
       public String getText() {
          return "addi " + source + ", " + fieldName + ", " + dest;
       }
@@ -102,6 +103,7 @@ public abstract class IInstruction {
    public static class LOADAIFIELD extends IInstruction {
       public Register source, dest;
       public String fieldName;
+      public MiniType.StructType structType;
       public String getText() {
          return "loadai " + source + ", " + fieldName + ", " + dest;
       }
@@ -348,6 +350,14 @@ public abstract class IInstruction {
       public String getText() {
          return "ret";
       }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         int spillCount = cfg.params.size() > SPILL_THRESHOLD ? cfg.params.size() - SPILL_THRESHOLD : 0;
+         int localCount = cfg.localsOrdered.size();
+         int frameSize = (spillCount + localCount) * 8;
+         StringBuilder builder = new StringBuilder();
+         return "";
+      }
    }
 
    /* Allocation */
@@ -359,6 +369,16 @@ public abstract class IInstruction {
       public String getText() {
          return "new " + struct.name + ", " + struct.fieldsOrdered + ", " + dest;
       }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         int byteSize = struct.fieldsOrdered.size() * 8;
+         StringBuilder builder = new StringBuilder();
+
+         builder.append("movl $" + byteSize + ", %edi\n");
+         builder.append("call malloc\n");
+         builder.append("movq %rax, " + "%" + dest + "\n");
+         return builder.toString();
+      }
    }
 
    public static class DEL extends IInstruction {
@@ -367,8 +387,15 @@ public abstract class IInstruction {
       public String getText() {
          return "del " + source;
       }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         StringBuilder builder = new StringBuilder();
+         builder.append("movq %" + source + ", %rdi\n");
+         builder.append("call free\n");
+         return builder.toString();
+      }
    }
 
    public abstract String getText();
-   public abstract String getX86(ILOCGenerator.CFG cfg);
+   //public abstract String getX86(ILOCGenerator.CFG cfg);
 }

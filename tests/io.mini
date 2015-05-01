@@ -3,16 +3,26 @@ struct J {
    struct J b;
 };
 
-int global;
+struct B {
+   int a;
+   struct J j;
+   struct B b;
+};
 
+int global;
+struct B b;
+struct J j;
 fun main() int
 {
-   struct J j;
    int local;
 
    j = new J;
    read j.a;
    print j.a;
+   
+   b = new B;
+   read b.b.j.a;
+   print b.b.j.a;
    
    read local;
    print local;
