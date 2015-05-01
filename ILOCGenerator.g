@@ -22,6 +22,11 @@ options
 
 @members
 {   
+   public static class ILOCResult {
+      public List<IInstruction> iloc;
+      public List<CFG> cfgs;
+   }
+
    public static class CFG {
       public BasicBlock entryBlock;
       public BasicBlock exitBlock;
@@ -90,10 +95,16 @@ options
 
    private HashMap<String, MiniType> structTypes = new HashMap<>();
    private List<CFG> cfgs = new ArrayList<>();
+   private ILOCResult result = new ILOCResult();
    private File outputFile;
    public void setOutputFile(File file) {
       this.outputFile = file;
-   } 
+   }
+
+   public ILOCResult getResult() {
+      return result;
+   }
+
 }
 
 
@@ -175,11 +186,13 @@ functions
    :  ^(FUNCS (f=function {  })*)
       { 
          StringBuilder sb = new StringBuilder();
+         result.cfgs = new ArrayList<>(cfgs);
          for (CFG cfg : cfgs) {
             List<BasicBlock> blocks = cfg.bfsBlocks();
             
             for (BasicBlock block : blocks) {            
                sb.append(block);               
+               result.iloc.addAll(block.getILOC());
             }           
          } 
          if (outputFile != null) {
@@ -187,14 +200,10 @@ functions
                FileWriter writer = new FileWriter(outputFile);
                writer.write(sb.toString());
                writer.close();
-
             }
             catch (IOException e) {
                System.err.println("Error writing .il file: " + e);
             }
-         }
-         else {
-            System.out.print(sb.toString());   
          }
       }
    |  {  }

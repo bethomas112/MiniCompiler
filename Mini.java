@@ -28,9 +28,8 @@ public class Mini
       else if (!parser.hasErrors())
       {
          typeCheck(tree, tokens);
-         if (_dumpIL) {
-            generateILOC(tree, tokens);
-         }
+         ILOCGenerator.ILOCResult result = generateILOC(tree, tokens);
+         generateX86(result);
       }
    }
 
@@ -105,19 +104,23 @@ public class Mini
       }
    }
 
-   private static void generateILOC(CommonTree tree, CommonTokenStream tokens) {
-      try
-      {
-         CommonTreeNodeStream nodes = new CommonTreeNodeStream(tree);
-         nodes.setTokenStream(tokens);
-         ILOCGenerator igen = new ILOCGenerator(nodes);
-         igen.setOutputFile(new File(_inputFile.split("\\.")[0] + ".il"));
+   private static ILOCGenerator.ILOCResult generateILOC(CommonTree tree, CommonTokenStream tokens) {
+      CommonTreeNodeStream nodes = new CommonTreeNodeStream(tree);
+      nodes.setTokenStream(tokens);
+      ILOCGenerator igen = new ILOCGenerator(nodes);
+      igen.setOutputFile(new File(_inputFile.split("\\.")[0] + ".il"));
+      try {         
          igen.translate();
       }
-      catch (org.antlr.runtime.RecognitionException e)
-      {
+      catch (org.antlr.runtime.RecognitionException e) {
          error(e.getMessage());
       }
+      return igen.getResult();
+   }
+
+   private static void generateX86(ILOCGenerator.ILOCResult result) {
+      X86Generator generator = new X86Generator(result);
+
    }
 
    private static JsonValue translate(CommonTree tree, CommonTokenStream tokens)
