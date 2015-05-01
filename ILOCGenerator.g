@@ -30,6 +30,7 @@ options
    public static class CFG {
       public BasicBlock entryBlock;
       public BasicBlock exitBlock;
+      public List<String> localsOrdered = new ArrayList<>();
       public HashMap<String, Register> locals;
       public HashMap<String, Integer> params;
       public HashMap<String, MiniType.StructType> structTypes;
@@ -175,6 +176,7 @@ decl_list[CFG cfg]
             {
                if (cfg != null) {
                   cfg.locals.put($id.text, Register.newRegister());
+                  cfg.localsOrdered.add($id.text);
                }
             }
          )+
