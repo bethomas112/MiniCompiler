@@ -1,14 +1,10 @@
+import java.io.File;
 public class X86Mapper {
-   private static class ParamStore {
-
-   }
-
    private static class X86Function {
-      public static X86Function fromCFG(CFG cfg) {
+      public static X86Function fromCFG(ILOCGenerator.CFG cfg) {
          X86Function x86Function = new X86Function();
+         return x86Function;
       }
-
-      public int getLocal
    }
 
    private ILOCGenerator.ILOCResult ilocResult;

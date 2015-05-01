@@ -119,7 +119,7 @@ public class Mini
    }
 
    private static void generateX86(ILOCGenerator.ILOCResult result) {
-      X86Generator generator = new X86Generator(result);
+      X86Mapper generator = new X86Mapper(result);
 
    }
 

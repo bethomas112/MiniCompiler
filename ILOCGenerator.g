@@ -32,10 +32,11 @@ options
       public BasicBlock exitBlock;
       public HashMap<String, Register> locals;
       public HashMap<String, Integer> params;
-
-      public CFG() {
+      public HashMap<String, MiniType.StructType> structTypes;
+      public CFG(HashMap<String, MiniType.StructType> structTypes) {
          this.locals = new HashMap<>();
          this.params = new HashMap<>();
+         this.structTypes = structTypes;
       }
 
       public List<BasicBlock> bfsBlocks() {
@@ -93,7 +94,7 @@ options
       return "L" + labelCount++;
    }
 
-   private HashMap<String, MiniType> structTypes = new HashMap<>();
+   private HashMap<String, MiniType.StructType> structTypes = new HashMap<>();
    private List<CFG> cfgs = new ArrayList<>();
    private ILOCResult result = new ILOCResult();
    private File outputFile;
@@ -213,7 +214,7 @@ function
    @init 
    { 
       boolean hasStatements = false;
-      CFG cfg = new CFG();
+      CFG cfg = new CFG(structTypes);
       Register.resetRegisters();
       BasicBlock exitBlock = new BasicBlock();
       exitBlock.label = getNextLabel();

@@ -1,3 +1,4 @@
+
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +11,7 @@ public abstract class IInstruction {
       public String getText() {
          return "add " + sourceA + ", " + sourceB + ", " + dest;
       }
+
    }
 
    public static class ADDI extends IInstruction {
@@ -368,4 +370,5 @@ public abstract class IInstruction {
    }
 
    public abstract String getText();
+   public abstract String getX86(ILOCGenerator.CFG cfg);
 }
