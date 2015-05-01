@@ -12,6 +12,13 @@ public abstract class IInstruction {
          return "add " + sourceA + ", " + sourceB + ", " + dest;
       }
 
+      public String getX86(ILOCGenerator.CFG cfg) {
+         StringBuilder builder = new StringBuilder();
+         builder.append("movq %" + sourceA + ", %" + dest + "\n");
+         builder.append("addq %" + sourceB + ", %" + dest + "\n");
+         return builder.toString();
+      }
+
    }
 
    public static class ADDI extends IInstruction {
@@ -20,21 +27,40 @@ public abstract class IInstruction {
       public String getText() {
          return "addi " + source + ", " + immediate + ", " + dest;
       }
-   }
 
+      public String getX86(ILOCGenerator.CFG cfg) {
+         StringBuilder builder = new StringBuilder();
+         builder.append("movq %", + source + ", %" + dest + "\n");
+         builder.append("addq $" + immediate + ", %" + dest + "\n");
+         return builder.toString();
+      }
+   }
+ 
+   /* Returns the address of the local */
    public static class ADDILOCAL extends IInstruction {
       public Register dest;
       public String localName;
       public String getText() {
          return "addi rarp, " + localName + ", " + dest;
       }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         StringBuilder builder = new StringBuilder();
+         return "ADDILOCAL not yet implemented\n";
+      }
    }
 
+   /* Address of the field of the struct */
    public static class ADDISTRUCT extends IInstruction {
       public Register source, dest;
       public String fieldName;
       public String getText() {
          return "addi " + source + ", " + fieldName + ", " + dest;
+      }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         StringBuilder builder = new StringBuilder();
+         builder.append("movq ");
       }
    }
 
