@@ -28,29 +28,12 @@ options
    static class FunctionPrototype {
       MiniType returnType;
       List<MiniType> argTypes = new ArrayList<>();
-   }
+      HashMap<String, MiniType> localTypes = new HashMap<>();
+   } 
 
-   static class MiniType {
-      static final MiniType INT = new MiniType("INT");
-      static final MiniType BOOL = new MiniType("BOOL");
-      static final MiniType VOID = new MiniType("VOID");
-      static final MiniType NULL = new MiniType("NULL");
-      String name;
-      public MiniType() {
-
-      }
-      public MiniType(String name) {
-         this.name = name;
-      }
-   }
-
-   class StructType extends MiniType {
-      HashMap<String, MiniType> fields = new HashMap<>();
-   }   
-
-   HashMap<String, MiniType> structTypes = new HashMap<>();
-   HashMap<String, MiniType> globalTypeEnv = new HashMap<>();
-   HashMap<String, FunctionPrototype> functionDefs = new HashMap<>();
+   public HashMap<String, MiniType> structTypes = new HashMap<>();
+   public HashMap<String, MiniType> globalTypeEnv = new HashMap<>();
+   public HashMap<String, FunctionPrototype> functionDefs = new HashMap<>();
 }
 
 
@@ -74,7 +57,7 @@ types
 
 type_decl
    returns [MiniType miniType = null]
-   @init { StructType structType = new StructType(); }
+   @init { MiniType.StructType structType = new MiniType.StructType(); }
    :  ^(ast=STRUCT 
          id=ID 
             { 
@@ -89,14 +72,14 @@ type_decl
       }
    ;
 
-nested_decl [StructType structType]
+nested_decl [MiniType.StructType structType]
    returns [MiniType miniType = null]
    @init{  }
    :  (f=field_decl[structType] {  })+
       { $miniType = structType; }
    ;
 
-field_decl [StructType structType]
+field_decl [MiniType.StructType structType]
    returns [MiniType miniType = null]
    :  ^(DECL ^(TYPE t=type) id=ID)
       {
@@ -152,9 +135,9 @@ functions
 
 function
    @init 
-   { 
-      HashMap<String, MiniType> typeEnv = new HashMap<>();
+   {    
       FunctionPrototype proto = new FunctionPrototype();
+      HashMap<String, MiniType> typeEnv = proto.localTypes;
    }
    :  ^(ast=FUN 
          id=ID 
@@ -244,7 +227,7 @@ assignment[HashMap<String, MiniType> typeEnv]
    :  ^(ast=ASSIGN e=expression[typeEnv] l=lvalue[typeEnv])
       {
          if (!($e.miniType == $l.miniType)) {
-            if (!($l.miniType instanceof StructType && $e.miniType == MiniType.NULL)) {
+            if (!($l.miniType instanceof MiniType.StructType && $e.miniType == MiniType.NULL)) {
                throw new TypeException("Type mismatch in assignment: " + $l.miniType.name + ", " + $e.miniType.name);               
             }
          }
@@ -297,7 +280,7 @@ delete[HashMap<String, MiniType> typeEnv]
    returns [boolean hasReturn = false]
    :  ^(ast=DELETE e=expression[typeEnv])
       {
-         if (!($e.miniType instanceof StructType)) {
+         if (!($e.miniType instanceof MiniType.StructType)) {
             throw new TypeException("Cannot delete a non-struct type " + $e.miniType.name);
          }
       }
@@ -350,7 +333,7 @@ invocation_stmt[HashMap<String, MiniType> typeEnv]
                   throw new TypeException("Argument count mismatch expected " + proto.argTypes.size());
                }
                if (proto.argTypes.get(argIdx) != $e.miniType) {
-                  if (!(proto.argTypes.get(argIdx) instanceof StructType && $e.miniType == MiniType.NULL)) {
+                  if (!(proto.argTypes.get(argIdx) instanceof MiniType.StructType && $e.miniType == MiniType.NULL)) {
                      throw new TypeException("Argument " + argIdx + " type mismatch: Expected " 
                         + proto.argTypes.get(argIdx).name + ", given " + $e.miniType.name);
                   }
@@ -382,8 +365,8 @@ lvalue[HashMap<String, MiniType> typeEnv]
       }
    |  ^(ast=DOT l=lvalue[typeEnv] id=ID)
       {
-         if ($l.miniType instanceof StructType) {
-            StructType structType = (StructType)$l.miniType;
+         if ($l.miniType instanceof MiniType.StructType) {
+            MiniType.StructType structType = (MiniType.StructType)$l.miniType;
             if (!structType.fields.containsKey($id.text)) {
                throw new TypeException("Identifier is not a member of struct: " + $id.text);
             }
@@ -445,8 +428,8 @@ expression[HashMap<String, MiniType> typeEnv]
       }
    |  ^(ast=DOT e=expression[typeEnv] id=ID)
       {
-         if ($e.miniType instanceof StructType) {
-            StructType structType = (StructType)$e.miniType;
+         if ($e.miniType instanceof MiniType.StructType) {
+            MiniType.StructType structType = (MiniType.StructType)$e.miniType;
             if (!structType.fields.containsKey($id.text)) {
                throw new TypeException("Struct does not contain member: " + $id.text);   
             }
@@ -513,7 +496,7 @@ invocation_exp[HashMap<String, MiniType> typeEnv]
       ^(ARGS (e=expression[typeEnv] 
          {  
             if (proto.argTypes.get(argIdx) != $e.miniType) {
-               if (!(proto.argTypes.get(argIdx) instanceof StructType && $e.miniType == MiniType.NULL)) {
+               if (!(proto.argTypes.get(argIdx) instanceof MiniType.StructType && $e.miniType == MiniType.NULL)) {
                   throw new TypeException("Argument " + argIdx + " type mismatch: Expected " 
                         + proto.argTypes.get(argIdx).name + ", given " + $e.miniType.name);
                }

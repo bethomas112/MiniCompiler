@@ -27,8 +27,8 @@ public class Mini
       }
       else if (!parser.hasErrors())
       {
-         typeCheck(tree, tokens);
-         ILOCGenerator.ILOCResult result = generateILOC(tree, tokens);
+         TypeChecker typeChecker = typeCheck(tree, tokens);
+         ILOCGenerator.ILOCResult result = generateILOC(tree, tokens, typeChecker);
          generateX86(result);
       }
    }
@@ -89,7 +89,7 @@ public class Mini
       return null;
    }
 
-   private static void typeCheck(CommonTree tree, CommonTokenStream tokens) {
+   private static TypeChecker typeCheck(CommonTree tree, CommonTokenStream tokens) {
       try
       {
          CommonTreeNodeStream nodes = new CommonTreeNodeStream(tree);
@@ -97,18 +97,22 @@ public class Mini
          TypeChecker tc = new TypeChecker(nodes);
 
          tc.translate();
+         return tc;
       }
       catch (org.antlr.runtime.RecognitionException | TypeChecker.TypeException e)
       {
          error(e.getMessage());
       }
+      return null;
    }
 
-   private static ILOCGenerator.ILOCResult generateILOC(CommonTree tree, CommonTokenStream tokens) {
+   private static ILOCGenerator.ILOCResult generateILOC(CommonTree tree, CommonTokenStream tokens, TypeChecker typeChecker) {
       CommonTreeNodeStream nodes = new CommonTreeNodeStream(tree);
       nodes.setTokenStream(tokens);
       ILOCGenerator igen = new ILOCGenerator(nodes);
       igen.setOutputFile(new File(_inputFile.split("\\.")[0] + ".il"));
+      igen.setLocalTypes(typeChecker.functionDefs);
+      igen.setGlobalTypes(typeChecker.globalTypeEnv);
       try {         
          igen.translate();
       }
