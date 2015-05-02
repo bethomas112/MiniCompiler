@@ -95,7 +95,7 @@ options
          StringBuilder sb = new StringBuilder();
          sb.append(label + ":\n");
          for (IInstruction instruction : instructions) {
-            sb.append("\t" + instruction.getX86(cfg));
+            sb.append(instruction.getX86(cfg));
          }
          return sb.toString();
       }
