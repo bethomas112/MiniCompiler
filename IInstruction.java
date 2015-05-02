@@ -14,8 +14,8 @@ public abstract class IInstruction {
 
       public String getX86(ILOCGenerator.CFG cfg) {
          StringBuilder builder = new StringBuilder();
-         builder.append("movq %" + sourceA + ", %" + dest + "\n");
-         builder.append("addq %" + sourceB + ", %" + dest + "\n");
+         builder.append("movq " + sourceA + ", " + dest + "\n");
+         builder.append("addq " + sourceB + ", " + dest + "\n");
          return builder.toString();
       }
 
@@ -30,8 +30,8 @@ public abstract class IInstruction {
 
       public String getX86(ILOCGenerator.CFG cfg) {
          StringBuilder builder = new StringBuilder();
-         builder.append("movq %", + source + ", %" + dest + "\n");
-         builder.append("addq $" + immediate + ", %" + dest + "\n");
+         builder.append("movq ", + source + ", " + dest + "\n");
+         builder.append("addq $" + immediate + ", " + dest + "\n");
          return builder.toString();
       }
    }
@@ -46,7 +46,18 @@ public abstract class IInstruction {
 
       public String getX86(ILOCGenerator.CFG cfg) {
          StringBuilder builder = new StringBuilder();
-         return "ADDILOCAL not yet implemented\n";
+         int offset = cfg.localsOrdered.indexOf(localName);
+         if (offset == -1) {
+            offset = 8 * offset + 8;
+            // Because the locals are below the %rbp
+            offset *= -1;
+            builder.append("movq %rbp, " + dest + "\n");
+            builder.append("addq $" + offset + ", " + dest);
+         }
+         else {
+            throw new RuntimeException("ADDILOCAL: Could not find local");
+         }
+         return builder.toString();
       }
    }
 
@@ -61,7 +72,16 @@ public abstract class IInstruction {
 
       public String getX86(ILOCGenerator.CFG cfg) {
          StringBuilder builder = new StringBuilder();
-         builder.append("movq ");
+         int offset = structType.fieldsOrdered.indexOf(fieldName);
+         if (offset != -1) {
+            offset = offset * 8;
+            builder.append("movq " + source + ", " + dest + "\n");
+            builder.append("addq $" + offset + ", " + dest + "\n");
+         }
+         else {
+            throw new RuntimeException("ADDISTRUCT: Unable to find field");
+         }
+         return builder.toString();
       }
    }
 
@@ -70,6 +90,16 @@ public abstract class IInstruction {
       public String getText() {
          return "div " + sourceA + ", " + sourceB + ", " + dest;
       }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         StringBuilder builder = new StringBuilder();
+         builder.append("movq " + sourceA + ", %rax\n");
+         builder.append("movq " + sourceA + ", %rdx\n");
+         builder.append("sarq $63, %rdx\n");
+         builder.append("idivq " + sourceB + "\n");
+         builder.append("movq %rax, " + dest);
+         return builder.toString();
+      }
    }
 
    public static class MULT extends IInstruction {
@@ -77,12 +107,26 @@ public abstract class IInstruction {
       public String getText() {
          return "mult " + sourceA + ", " + sourceB + ", " + dest;
       }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         StringBuilder builder = new StringBuilder();
+         builder.append("movq " + sourceA + ", " + dest + "\n");
+         builder.append("imulq " + sourceB + ", " + dest + "\n");
+         return builder.toString();
+      }
    }
 
    public static class SUB extends IInstruction {
       public Register sourceA, sourceB, dest;
       public String getText() {
          return "sub " + sourceA + ", " + sourceB + ", " + dest;
+      }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         StringBuilder builder = new StringBuilder();
+         builder.append("movq " + sourceA + ", " + dest + "\n");
+         builder.append("subq " + sourceB + ", " + dest + "\n");
+         return builder.toString();
       }
    }
 
@@ -92,6 +136,13 @@ public abstract class IInstruction {
       public String getText() {
          return "subi " + source + ", " + immediate + ", " + dest;
       }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         StringBuilder builder = new StringBuilder();
+         builder.append("movq " + source ", " + dest + "\n");
+         builder.append("subq $" + immediate + ", " + dest + "\n");
+         return builder.toString();
+      }
    }
 
    /* Boolean */
@@ -100,12 +151,26 @@ public abstract class IInstruction {
       public String getText() {
          return "and " + sourceA + ", " + sourceB + ", " + dest;
       }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         StringBuilder builder = new StringBuilder();
+         builder.append("movq " + sourceA + ", " + dest + "\n");
+         builder.append("andq " + sourceB + ", " + dest + "\n");
+         return builder.toString();
+      }
    }
 
    public static class OR extends IInstruction {
       public Register sourceA, sourceB, dest;
       public String getText() {
          return "or " + sourceA + ", " + sourceB + ", " + dest;
+      }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         StringBuilder builder = new StringBuilder();
+         builder.append("movq " + sourceA + ", " + dest + "\n");
+         builder.append("orq " + sourceB + ", " + dest + "\n");
+         return builder.toString();
       }
    }
 
@@ -114,6 +179,12 @@ public abstract class IInstruction {
       public int immediate;
       public String getText() {
          return "xori " + source + ", " + immediate + ", " + dest;
+      }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         StringBuilder builder = new StringBuilder();
+         builder.append("movq " + source + ", " + dest + "\n");
+         builder.append("xorq $" + immediate + ", " + dest + "\n");
       }
    }
 
@@ -124,8 +195,13 @@ public abstract class IInstruction {
       public String getText() {
          return "loadi " + immediate + ", " + dest;
       }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         return "movq $" + immediate + ", " + dest + "\n";
+      }
    }
 
+   /* Loads the field at the address in source into dest*/
    public static class LOADAIFIELD extends IInstruction {
       public Register source, dest;
       public String fieldName;
@@ -133,13 +209,44 @@ public abstract class IInstruction {
       public String getText() {
          return "loadai " + source + ", " + fieldName + ", " + dest;
       }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         StringBuilder builder = new StringBuilder();
+         int offset = structType.fieldsOrdered.indexOf(fieldName);
+
+         if (offset != -1) {
+            offset = offset * 8;
+            builder.append("movq " + offset + "(" + source + "), " + dest +"\n");
+         }
+         else {
+            throw new RuntimeException("LOADAIFIELD: Unable to find field: " + fieldName);
+         }
+         return builder.toString();
+      }
    }
 
+   /* Loads the local from the stack into the destination register */
    public static class LOADAILOCAL extends IInstruction {
       public String localName;
       public Register dest;
       public String getText() {
          return "loadai rarp, " + localName + ", " + dest;
+      }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         StringBuilder builder = new StringBuilder();
+         int offset = cfg.localsOrdered.indexOf(localName);
+
+         if (offset != -1) {
+            offset = 8 * offset + 8;
+            // Because the locals are below the %rbp
+            offset *= -1;
+            builder.append("movq " + offset + "(%rbp), " + dest + "\n");
+         }
+         else {
+            throw new RuntimeException("LOADAILOCAL: Unable to find local: " + localName);
+         }
+         return builder.toString();
       }
    }
 
@@ -147,8 +254,25 @@ public abstract class IInstruction {
       public String variable;
       public int argIdx;
       public Register dest;
+
+      public List<String> argRegisters = Arrays.asList("%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9");
+
       public String getText() {
          return "loadinargument " + variable + ", " + argIdx + ", " + dest;
+      }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         StringBuilder builder = new StringBuilder();
+
+         if (argIdx >= 6) {
+            // Calculate the args address on the stack 
+            int offset = 16 + (6 - argIdx) * 8;
+            builder.append("movq " + offset + "(%rsp), " + dest + "\n");
+         }
+         else {
+            builder.append("movq " + argRegisters.get(argIdx) + ", " + dest + "\n");
+         }
+
       }
    }
 
@@ -158,12 +282,25 @@ public abstract class IInstruction {
       public String getText() {
          return "loadglobal " + globalName + ", " + dest;
       }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         StringBuilder builder = new StringBuilder();
+         builder.append("movq " + globalName + "(%rip), " + dest + "\n");
+         return builder.toString();
+      }
+      
    }
 
    public static class LOADRET extends IInstruction {
       public Register dest;
       public String getText() {
          return "loadret " + dest;
+      }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         StringBuilder builder = new StringBuilder();
+         builder.append("movq %rax, " + dest + "\n");
+         return builder.toString();
       }
    }
 
@@ -179,16 +316,48 @@ public abstract class IInstruction {
    public static class STOREAIFIELD extends IInstruction {
       public Register source, dest;
       public String fieldName;
+      public MiniType.StructType structType;
       public String getText() {
          return "storeai " + source + ", " + dest + ", " + fieldName;
       }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         StringBuilder builder = new StringBuilder();
+         int offset = structType.fieldsOrdered.indexOf(fieldName);
+
+         if (offset != -1) {
+            offset *= 8;
+            builder.append("movq " + source + ", " + offset + "(" + dest + ")\n");
+         }
+         else {
+            throw new Runtimeexception("STOREAIFIELD: unable to find field: " + fieldName);
+         }
+         return builder.toString();
+      } 
    }
 
    public static class STOREOUTARGUMENT extends IInstruction {
       public Register source;
       public int argIdx;
+      public List<String> argRegisters = Arrays.asList("%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9");
+
       public String getText() {
          return "storeoutargument " + source + ", " + argIdx;
+      }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         StringBuilder builder = new StringBuilder();
+
+         if (argIdx >= 6) {
+            int offset = argIdx - 6;
+            offset *= 8;
+
+            builder.append("movq " + source + ", " + offset + "(%rsp)\n");
+         }
+         else {
+            builder.append("movq " + source + ", " + argRegisters.get(argIdx) + "\n");
+         }
+         return builder.toString();
       }
    }
 

@@ -355,6 +355,7 @@ assignment[CFG cfg, BasicBlock block]
          }
          else if ($l.wasField) {
             IInstruction.STOREAIFIELD storeaifield = new IInstruction.STOREAIFIELD();
+            storeaifield.structType = $l.structType;
             storeaifield.source = $e.resultRegister;
             storeaifield.dest = $l.resultRegister;
             storeaifield.fieldName = $l.fieldName;
