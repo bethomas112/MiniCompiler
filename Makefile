@@ -1,4 +1,4 @@
-FILES=Mini.java MiniType.java IInstruction.java Register.java
+FILES=Mini.java MiniType.java IInstruction.java Register.java X86Mapper.java
 
 Mini.class : antlr.generated ${FILES}
 	javac *.java

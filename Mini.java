@@ -111,7 +111,7 @@ public class Mini
       nodes.setTokenStream(tokens);
       ILOCGenerator igen = new ILOCGenerator(nodes);
       igen.setOutputFile(new File(_inputFile.split("\\.")[0] + ".il"));
-      igen.setLocalTypes(typeChecker.functionDefs);
+      igen.setFunctionTypeinfo(typeChecker.functionDefs);
       igen.setGlobalTypes(typeChecker.globalTypeEnv);
       try {         
          igen.translate();
@@ -124,7 +124,7 @@ public class Mini
 
    private static void generateX86(ILOCGenerator.ILOCResult result) {
       X86Mapper generator = new X86Mapper(result);
-
+      generator.process(new File(_inputFile.split("\\.")[0] + ".s"));
    }
 
    private static JsonValue translate(CommonTree tree, CommonTokenStream tokens)

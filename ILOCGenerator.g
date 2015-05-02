@@ -90,6 +90,15 @@ options
          }
          return sb.toString();
       }
+
+      public String getX86(CFG cfg) {
+         StringBuilder sb = new StringBuilder();
+         sb.append(label + ":\n");
+         for (IInstruction instruction : instructions) {
+            sb.append("\t" + instruction.getX86(cfg));
+         }
+         return sb.toString();
+      }
    }
 
    private static int labelCount = 0;
@@ -103,6 +112,7 @@ options
    private File outputFile;
    private HashMap<String, HashMap<String, MiniType>> functionLocalTypes = new HashMap<>();
    private HashMap<String, MiniType> globalTypes = new HashMap<>();
+   private HashMap<String, MiniType> functionReturnTypes = new HashMap<>();
    public void setOutputFile(File file) {
       this.outputFile = file;
    }
@@ -111,9 +121,10 @@ options
       return result;
    }
 
-   public void setLocalTypes(HashMap<String, TypeChecker.FunctionPrototype> localTypes) {
+   public void setFunctionTypeinfo(HashMap<String, TypeChecker.FunctionPrototype> localTypes) {
       for (Map.Entry<String, TypeChecker.FunctionPrototype> entry : localTypes.entrySet()) {
          this.functionLocalTypes.put(entry.getKey(), entry.getValue().localTypes);
+         this.functionReturnTypes.put(entry.getKey(), entry.getValue().returnType);
       }
    }
 
@@ -161,8 +172,8 @@ field_decl [MiniType.StructType structType]
    returns [MiniType miniType = null]
    :  ^(DECL ^(TYPE t=type) id=ID)
       {
-         structType.fieldsOrdered.add($id.text);
-         structType.fields.put($id.text, $t.miniType);
+         structType.fieldsOrdered.add($id.text);         
+         structType.fields.put($id.text, $t.miniType);      
          $miniType = structType;
       }
    ;
@@ -639,7 +650,16 @@ lvalue[CFG cfg, BasicBlock block, boolean nested]
    ;
 
 expression[CFG cfg, BasicBlock block]
-   returns [Register resultRegister = null]
+   returns
+   [
+      Register resultRegister = null,
+      MiniType.StructType structType = null
+   ]
+   @init 
+   {
+      int argIdx = 0; 
+      List<IInstruction> instructions = new ArrayList<IInstruction>();
+   }
    :  ^((ast=AND | ast=OR)
          lft=expression[cfg, block] rht=expression[cfg, block])
       {
@@ -678,40 +698,45 @@ expression[CFG cfg, BasicBlock block]
          loadi.immediate = 0;
          loadi.dest = $resultRegister;
          block.addInstruction(loadi);
+
+         IInstruction.LOADI loadi1 = new IInstruction.LOADI();
+         loadi1.immediate = 1;
+         loadi1.dest = Register.newRegister();
+         block.addInstruction(loadi1);         
          switch ($ast.text) {
             case "==":
                IInstruction.MOVEQ moveq = new IInstruction.MOVEQ();
-               moveq.immediate = 1;
+               moveq.source = loadi1.dest;
                moveq.dest = $resultRegister;
                block.addInstruction(moveq);
                break;
             case "<":
                IInstruction.MOVLT movlt = new IInstruction.MOVLT();
-               movlt.immediate = 1;
+               movlt.source = loadi1.dest;
                movlt.dest = $resultRegister;
                block.addInstruction(movlt);
                break;
             case ">":
                IInstruction.MOVGT movgt = new IInstruction.MOVGT();
-               movgt.immediate = 1;
+               movgt.source = loadi1.dest;
                movgt.dest = $resultRegister;
                block.addInstruction(movgt);
                break;
             case "!=":
                IInstruction.MOVNE movne = new IInstruction.MOVNE();
-               movne.immediate = 1;
+               movne.source = loadi1.dest;
                movne.dest = $resultRegister;
                block.addInstruction(movne);
                break;
             case "<=":
                IInstruction.MOVLE movle = new IInstruction.MOVLE();
-               movle.immediate = 1;
+               movle.source = loadi1.dest;
                movle.dest = $resultRegister;
                block.addInstruction(movle);
                break;
             case ">=":
                IInstruction.MOVGE movge = new IInstruction.MOVGE();
-               movge.immediate = 1;
+               movge.source = loadi1.dest;
                movge.dest = $resultRegister;
                block.addInstruction(movge);
                break;
@@ -782,27 +807,60 @@ expression[CFG cfg, BasicBlock block]
          loadaifield.source = $e.resultRegister;
          loadaifield.fieldName = $id.text;
          loadaifield.dest = Register.newRegister();
+         loadaifield.structType = (MiniType.StructType)$e.structType;
          block.addInstruction(loadaifield);
          $resultRegister = loadaifield.dest;
+
+         MiniType fieldType = $e.structType.fields.get($id.text);
+         if (fieldType instanceof MiniType.StructType) {
+            $structType = (MiniType.StructType)fieldType;
+         }
       }
-   |  e=invocation_exp[cfg, block] 
+   |  ^(INVOKE id=ID
+         { 
+            
+         }
+      ^(ARGS (e=expression[cfg, block] 
+         {  
+            IInstruction.STOREOUTARGUMENT storeoutargument = new IInstruction.STOREOUTARGUMENT();
+            storeoutargument.source = $e.resultRegister;
+            storeoutargument.argIdx = argIdx;
+            instructions.add(storeoutargument);
+            argIdx++;
+         })*))
       {
+         for (IInstruction instruction : instructions) {
+            block.addInstruction(instruction);
+         }
+         IInstruction.CALL call = new IInstruction.CALL();
+         call.label = $id.text;
+         block.addInstruction(call);
+
+         if (functionReturnTypes.get($id.text) instanceof MiniType.StructType) {
+            $structType = (MiniType.StructType)functionReturnTypes.get($id.text);   
+         } 
          IInstruction.LOADRET loadret = new IInstruction.LOADRET();
          loadret.dest = Register.newRegister();
          block.addInstruction(loadret);
-         $resultRegister = loadret.dest;
+         $resultRegister = loadret.dest;  
       }
    |  id=ID
       {              
          if (cfg.locals.get($id.text) != null) {
             $resultRegister = cfg.locals.get($id.text);
+            if (cfg.localTypes.get($id.text) instanceof MiniType.StructType) {
+               $structType = (MiniType.StructType)cfg.localTypes.get($id.text);
+            }            
          }
          else {
             IInstruction.LOADGLOBAL instruction = new IInstruction.LOADGLOBAL();
             instruction.globalName = $id.text;
             instruction.dest = Register.newRegister();
             block.addInstruction(instruction);
-            $resultRegister = instruction.dest;
+            $resultRegister = instruction.dest;            
+            if (globalTypes.get($id.text) instanceof MiniType.StructType) {
+               $structType = (MiniType.StructType)globalTypes.get($id.text);
+            }
          }
       }
    |  i=INTEGER
@@ -836,6 +894,7 @@ expression[CFG cfg, BasicBlock block]
          instruction.dest = Register.newRegister();
          block.addInstruction(instruction);
          $resultRegister = instruction.dest;
+         $structType = instruction.struct;
       }
    |  ast=NULL
       {
@@ -844,34 +903,5 @@ expression[CFG cfg, BasicBlock block]
          instruction.dest = Register.newRegister();
          block.addInstruction(instruction);
          $resultRegister = instruction.dest;
-      }
-   ;
-
-invocation_exp[CFG cfg, BasicBlock block]
-   returns [Register resultRegister = null]
-   @init 
-   { 
-      int argIdx = 0; 
-      List<IInstruction> instructions = new ArrayList<IInstruction>();
-   }
-   :  ^(INVOKE id=ID
-         { 
-            
-         }
-      ^(ARGS (e=expression[cfg, block] 
-         {  
-            IInstruction.STOREOUTARGUMENT storeoutargument = new IInstruction.STOREOUTARGUMENT();
-            storeoutargument.source = $e.resultRegister;
-            storeoutargument.argIdx = argIdx;
-            instructions.add(storeoutargument);
-            argIdx++;
-         })*))
-      {
-         for (IInstruction instruction : instructions) {
-            block.addInstruction(instruction);
-         }
-         IInstruction.CALL call = new IInstruction.CALL();
-         call.label = $id.text;
-         block.addInstruction(call);
       }
    ;

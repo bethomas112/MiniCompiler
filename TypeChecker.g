@@ -86,6 +86,7 @@ field_decl [MiniType.StructType structType]
          if (structType.fields.put($id.text, $t.miniType) != null) {
             throw new TypeException("Member already decleared: " + $id.text);
          }
+         structType.fieldsOrdered.add($id.text);
          $miniType = structType;
       }
    ;

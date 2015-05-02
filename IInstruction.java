@@ -30,7 +30,7 @@ public abstract class IInstruction {
 
       public String getX86(ILOCGenerator.CFG cfg) {
          StringBuilder builder = new StringBuilder();
-         builder.append("movq ", + source + ", " + dest + "\n");
+         builder.append("movq " + source + ", " + dest + "\n");
          builder.append("addq $" + immediate + ", " + dest + "\n");
          return builder.toString();
       }
@@ -139,7 +139,7 @@ public abstract class IInstruction {
 
       public String getX86(ILOCGenerator.CFG cfg) {
          StringBuilder builder = new StringBuilder();
-         builder.append("movq " + source ", " + dest + "\n");
+         builder.append("movq " + source + ", " + dest + "\n");
          builder.append("subq $" + immediate + ", " + dest + "\n");
          return builder.toString();
       }
@@ -185,6 +185,8 @@ public abstract class IInstruction {
          StringBuilder builder = new StringBuilder();
          builder.append("movq " + source + ", " + dest + "\n");
          builder.append("xorq $" + immediate + ", " + dest + "\n");
+
+         return builder.toString();
       }
    }
 
@@ -219,7 +221,8 @@ public abstract class IInstruction {
             builder.append("movq " + offset + "(" + source + "), " + dest +"\n");
          }
          else {
-            throw new RuntimeException("LOADAIFIELD: Unable to find field: " + fieldName);
+            System.out.println(structType.fieldsOrdered);
+            throw new RuntimeException("LOADAIFIELD: Unable to find field: " + fieldName + " in struct " + structType);
          }
          return builder.toString();
       }
@@ -272,7 +275,7 @@ public abstract class IInstruction {
          else {
             builder.append("movq " + argRegisters.get(argIdx) + ", " + dest + "\n");
          }
-
+         return builder.toString();
       }
    }
 
@@ -334,7 +337,7 @@ public abstract class IInstruction {
             builder.append("movq " + source + ", " + offset + "(" + dest + ")\n");
          }
          else {
-            throw new Runtimeexception("STOREAIFIELD: unable to find field: " + fieldName);
+            throw new RuntimeException("STOREAIFIELD: unable to find field: " + fieldName);
          }
          return builder.toString();
       } 
@@ -396,79 +399,73 @@ public abstract class IInstruction {
       }
 
       public String getX86(ILOCGenerator.CFG cfg) {
-         return "movq " + sourceA + ", " + sourceB + "\n";
+         return "movq " + source + ", " + dest + "\n";
       }
    }
 
    public static class MOVEQ extends IInstruction {
-      public int immediate;
-      public Register dest;
+      public Register source, dest;
       public String getText() {
-         return "moveq " + immediate + ", "+ dest;
+         return "moveq " + source + ", "+ dest;
       }
 
       public String getX86(ILOCGenerator.CFG cfg) {
-         return "cmovgeq " + sourceA + ", " + sourceB + "\n";
+         return "cmovgeq " + source + ", " + dest + "\n";
       }
    }
 
    public static class MOVGE extends IInstruction {
-      public int immediate;
-      public Register dest;
+      public Register source, dest;
       public String getText() {
-         return "movge " + immediate + ", "+ dest;
+         return "movge " + source + ", "+ dest;
       }
 
       public String getX86(ILOCGenerator.CFG cfg) {
-         return "cmovgeq " + sourceA + ", " + sourceB + "\n";
+         return "cmovgeq " + source + ", " + dest + "\n";
       }
    }
 
    public static class MOVGT extends IInstruction {
-      public int immediate;
-      public Register dest;
+      public Register source, dest;
       public String getText() {
-         return "movgt " + immediate + ", "+ dest;
+         return "movgt " + source + ", "+ dest;
       }
 
       public String getX86(ILOCGenerator.CFG cfg) {
-         return "cmovgq " + sourceA + ", " + sourceB + "\n";
+         return "cmovgq " + source + ", " + dest + "\n";
       }
    }
 
    public static class MOVLE extends IInstruction {
-      public int immediate;
-      public Register dest;
+      public Register source, dest;
       public String getText() {
-         return "movle " + immediate + ", "+ dest;
+         return "movle " + source + ", "+ dest;
       }
 
       public String getX86(ILOCGenerator.CFG cfg) {
-         return "cmovleq " + sourceA + ", " + sourceB + "\n";
+         return "cmovleq " + source + ", " + dest + "\n";
       }
    }
 
    public static class MOVLT extends IInstruction {
-      public int immediate;
-      public Register dest;
+      public Register source, dest;
       public String getText() {
-         return "movlt " + immediate + ", "+ dest;
+         return "movlt " + source + ", "+ dest;
       }
 
       public String getX86(ILOCGenerator.CFG cfg) {
-         return "cmovlq " + sourceA + ", " + sourceB + "\n";
+         return "cmovlq " + source + ", " + dest + "\n";
       }
    }
 
    public static class MOVNE extends IInstruction {
-      public int immediate;
-      public Register dest;
+      public Register source, dest;
       public String getText() {
-         return "movne " + immediate + ", "+ dest;
+         return "movne " + source + ", "+ dest;
       }
 
       public String getX86(ILOCGenerator.CFG cfg) {
-         return "cmovneq " + sourceA + ", " + sourceB + "\n";
+         return "cmovneq " + source + ", " + dest + "\n";
       }
    }
 
@@ -611,7 +608,7 @@ public abstract class IInstruction {
 
    /* I/O */
    public static class PRINT extends IInstruction {
-      public static final String PRINT_STRING_LABEL = ".PRINTSTRING"
+      public static final String PRINT_STRING_LABEL = ".PRINTSTRING";
       public Register source;
 
       public String getText() {
@@ -622,13 +619,13 @@ public abstract class IInstruction {
          StringBuilder builder = new StringBuilder();
 
          builder.append("movq $" + PRINT_STRING_LABEL + ", %rdi\n");
-         builder.append("movq " + dest + ", %rsi\n");
+         builder.append("movq " + source + ", %rsi\n");
          return builder.toString();
       }
    }
 
    public static class PRINTLN extends IInstruction {
-      public static final String PRINTLN_STRING_LABEL = ".PRINTLNSTRING"
+      public static final String PRINTLN_STRING_LABEL = ".PRINTLNSTRING";
       public Register source;
 
       public String getText() {
@@ -639,13 +636,13 @@ public abstract class IInstruction {
          StringBuilder builder = new StringBuilder();
 
          builder.append("movq $" + PRINTLN_STRING_LABEL + ", %rdi\n");
-         builder.append("movq " + dest + ", %rsi\n");
+         builder.append("movq " + source + ", %rsi\n");
          return builder.toString();
       }
    }
 
    public static class READ extends IInstruction {
-      public static final String READ_STRING_LABEL = ".READSTRING"
+      public static final String READ_STRING_LABEL = ".READSTRING";
       public Register dest;
 
       public String getText() {
@@ -731,5 +728,5 @@ public abstract class IInstruction {
    }
 
    public abstract String getText();
-   //public abstract String getX86(ILOCGenerator.CFG cfg);
+   public abstract String getX86(ILOCGenerator.CFG cfg);
 }

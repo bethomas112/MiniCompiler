@@ -1,4 +1,6 @@
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 public class X86Mapper {
    private static class X86Function {
       public static X86Function fromCFG(ILOCGenerator.CFG cfg) {
@@ -13,6 +15,18 @@ public class X86Mapper {
    }
 
    public void process(File toFile) {
+      try {
+         FileWriter writer = new FileWriter(toFile);
 
+         for (ILOCGenerator.CFG cfg : ilocResult.cfgs) {
+            for (ILOCGenerator.BasicBlock block : cfg.bfsBlocks()) {
+               writer.write(block.getX86(cfg));
+            }            
+         }
+         writer.close();
+      } 
+      catch (IOException e) {
+         throw new RuntimeException(e);
+      }
    }
 }
