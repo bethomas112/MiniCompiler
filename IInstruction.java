@@ -14,8 +14,8 @@ public abstract class IInstruction {
 
       public String getX86(ILOCGenerator.CFG cfg) {
          StringBuilder builder = new StringBuilder();
-         builder.append("movq " + sourceA + ", " + dest + "\n");
-         builder.append("addq " + sourceB + ", " + dest + "\n");
+         builder.append("\tmovq " + sourceA + ", " + dest + "\n");
+         builder.append("\taddq " + sourceB + ", " + dest + "\n");
          return builder.toString();
       }
 
@@ -30,8 +30,8 @@ public abstract class IInstruction {
 
       public String getX86(ILOCGenerator.CFG cfg) {
          StringBuilder builder = new StringBuilder();
-         builder.append("movq " + source + ", " + dest + "\n");
-         builder.append("addq $" + immediate + ", " + dest + "\n");
+         builder.append("\tmovq " + source + ", " + dest + "\n");
+         builder.append("\taddq $" + immediate + ", " + dest + "\n");
          return builder.toString();
       }
    }
@@ -51,8 +51,8 @@ public abstract class IInstruction {
             offset = 8 * offset + 8;
             // Because the locals are below the %rbp
             offset *= -1;
-            builder.append("movq %rbp, " + dest + "\n");
-            builder.append("addq $" + offset + ", " + dest);
+            builder.append("\tmovq %rbp, " + dest + "\n");
+            builder.append("\taddq $" + offset + ", " + dest);
          }
          else {
             throw new RuntimeException("ADDILOCAL: Could not find local");
@@ -75,8 +75,8 @@ public abstract class IInstruction {
          int offset = structType.fieldsOrdered.indexOf(fieldName);
          if (offset != -1) {
             offset = offset * 8;
-            builder.append("movq " + source + ", " + dest + "\n");
-            builder.append("addq $" + offset + ", " + dest + "\n");
+            builder.append("\tmovq " + source + ", " + dest + "\n");
+            builder.append("\taddq $" + offset + ", " + dest + "\n");
          }
          else {
             throw new RuntimeException("ADDISTRUCT: Unable to find field");
@@ -93,11 +93,11 @@ public abstract class IInstruction {
 
       public String getX86(ILOCGenerator.CFG cfg) {
          StringBuilder builder = new StringBuilder();
-         builder.append("movq " + sourceA + ", %rax\n");
-         builder.append("movq " + sourceA + ", %rdx\n");
-         builder.append("sarq $63, %rdx\n");
-         builder.append("idivq " + sourceB + "\n");
-         builder.append("movq %rax, " + dest);
+         builder.append("\tmovq " + sourceA + ", %rax\n");
+         builder.append("\tmovq " + sourceA + ", %rdx\n");
+         builder.append("\tsarq $63, %rdx\n");
+         builder.append("\tidivq " + sourceB + "\n");
+         builder.append("\tmovq %rax, " + dest);
          return builder.toString();
       }
    }
@@ -110,8 +110,8 @@ public abstract class IInstruction {
 
       public String getX86(ILOCGenerator.CFG cfg) {
          StringBuilder builder = new StringBuilder();
-         builder.append("movq " + sourceA + ", " + dest + "\n");
-         builder.append("imulq " + sourceB + ", " + dest + "\n");
+         builder.append("\tmovq " + sourceA + ", " + dest + "\n");
+         builder.append("\timulq " + sourceB + ", " + dest + "\n");
          return builder.toString();
       }
    }
@@ -124,8 +124,8 @@ public abstract class IInstruction {
 
       public String getX86(ILOCGenerator.CFG cfg) {
          StringBuilder builder = new StringBuilder();
-         builder.append("movq " + sourceA + ", " + dest + "\n");
-         builder.append("subq " + sourceB + ", " + dest + "\n");
+         builder.append("\tmovq " + sourceA + ", " + dest + "\n");
+         builder.append("\tsubq " + sourceB + ", " + dest + "\n");
          return builder.toString();
       }
    }
@@ -139,8 +139,8 @@ public abstract class IInstruction {
 
       public String getX86(ILOCGenerator.CFG cfg) {
          StringBuilder builder = new StringBuilder();
-         builder.append("movq " + source + ", " + dest + "\n");
-         builder.append("subq $" + immediate + ", " + dest + "\n");
+         builder.append("\tmovq " + source + ", " + dest + "\n");
+         builder.append("\tsubq $" + immediate + ", " + dest + "\n");
          return builder.toString();
       }
    }
@@ -154,8 +154,8 @@ public abstract class IInstruction {
 
       public String getX86(ILOCGenerator.CFG cfg) {
          StringBuilder builder = new StringBuilder();
-         builder.append("movq " + sourceA + ", " + dest + "\n");
-         builder.append("andq " + sourceB + ", " + dest + "\n");
+         builder.append("\tmovq " + sourceA + ", " + dest + "\n");
+         builder.append("\tandq " + sourceB + ", " + dest + "\n");
          return builder.toString();
       }
    }
@@ -168,8 +168,8 @@ public abstract class IInstruction {
 
       public String getX86(ILOCGenerator.CFG cfg) {
          StringBuilder builder = new StringBuilder();
-         builder.append("movq " + sourceA + ", " + dest + "\n");
-         builder.append("orq " + sourceB + ", " + dest + "\n");
+         builder.append("\tmovq " + sourceA + ", " + dest + "\n");
+         builder.append("\torq " + sourceB + ", " + dest + "\n");
          return builder.toString();
       }
    }
@@ -183,8 +183,8 @@ public abstract class IInstruction {
 
       public String getX86(ILOCGenerator.CFG cfg) {
          StringBuilder builder = new StringBuilder();
-         builder.append("movq " + source + ", " + dest + "\n");
-         builder.append("xorq $" + immediate + ", " + dest + "\n");
+         builder.append("\tmovq " + source + ", " + dest + "\n");
+         builder.append("\txorq $" + immediate + ", " + dest + "\n");
 
          return builder.toString();
       }
@@ -199,7 +199,7 @@ public abstract class IInstruction {
       }
 
       public String getX86(ILOCGenerator.CFG cfg) {
-         return "movq $" + immediate + ", " + dest + "\n";
+         return "\tmovq $" + immediate + ", " + dest + "\n";
       }
    }
 
@@ -218,7 +218,7 @@ public abstract class IInstruction {
 
          if (offset != -1) {
             offset = offset * 8;
-            builder.append("movq " + offset + "(" + source + "), " + dest +"\n");
+            builder.append("\tmovq " + offset + "(" + source + "), " + dest +"\n");
          }
          else {
             System.out.println(structType.fieldsOrdered);
@@ -244,7 +244,7 @@ public abstract class IInstruction {
             offset = 8 * offset + 8;
             // Because the locals are below the %rbp
             offset *= -1;
-            builder.append("movq " + offset + "(%rbp), " + dest + "\n");
+            builder.append("\tmovq " + offset + "(%rbp), " + dest + "\n");
          }
          else {
             throw new RuntimeException("LOADAILOCAL: Unable to find local: " + localName);
@@ -270,10 +270,10 @@ public abstract class IInstruction {
          if (argIdx >= 6) {
             // Calculate the args address on the stack 
             int offset = 16 + (6 - argIdx) * 8;
-            builder.append("movq " + offset + "(%rsp), " + dest + "\n");
+            builder.append("\tmovq " + offset + "(%rsp), " + dest + "\n");
          }
          else {
-            builder.append("movq " + argRegisters.get(argIdx) + ", " + dest + "\n");
+            builder.append("\tmovq " + argRegisters.get(argIdx) + ", " + dest + "\n");
          }
          return builder.toString();
       }
@@ -288,7 +288,7 @@ public abstract class IInstruction {
 
       public String getX86(ILOCGenerator.CFG cfg) {
          StringBuilder builder = new StringBuilder();
-         builder.append("movq " + globalName + "(%rip), " + dest + "\n");
+         builder.append("\tmovq " + globalName + "(%rip), " + dest + "\n");
          return builder.toString();
       }
       
@@ -302,7 +302,7 @@ public abstract class IInstruction {
 
       public String getX86(ILOCGenerator.CFG cfg) {
          StringBuilder builder = new StringBuilder();
-         builder.append("movq %rax, " + dest + "\n");
+         builder.append("\tmovq %rax, " + dest + "\n");
          return builder.toString();
       }
    }
@@ -315,7 +315,7 @@ public abstract class IInstruction {
       }
 
       public String getX86(ILOCGenerator.CFG cfg) {
-         return "movq $" + globalName + ", " + dest + "\n"; 
+         return "\tmovq $" + globalName + ", " + dest + "\n"; 
       }
    }
 
@@ -334,7 +334,7 @@ public abstract class IInstruction {
 
          if (offset != -1) {
             offset *= 8;
-            builder.append("movq " + source + ", " + offset + "(" + dest + ")\n");
+            builder.append("\tmovq " + source + ", " + offset + "(" + dest + ")\n");
          }
          else {
             throw new RuntimeException("STOREAIFIELD: unable to find field: " + fieldName);
@@ -359,10 +359,10 @@ public abstract class IInstruction {
             int offset = argIdx - 6;
             offset *= 8;
 
-            builder.append("movq " + source + ", " + offset + "(%rsp)\n");
+            builder.append("\tmovq " + source + ", " + offset + "(%rsp)\n");
          }
          else {
-            builder.append("movq " + source + ", " + argRegisters.get(argIdx) + "\n");
+            builder.append("\tmovq " + source + ", " + argRegisters.get(argIdx) + "\n");
          }
          return builder.toString();
       }
@@ -376,7 +376,7 @@ public abstract class IInstruction {
       }
 
       public String getX86(ILOCGenerator.CFG cfg) {
-         return "movq " + source + ", " + globalName + "(%rip)\n";
+         return "\tmovq " + source + ", " + globalName + "(%rip)\n";
       }
    }
 
@@ -387,7 +387,7 @@ public abstract class IInstruction {
       }
 
       public String getX86(ILOCGenerator.CFG cfg) {
-         return "movq " + source + ", $rax\n";
+         return "\tmovq " + source + ", $rax\n";
       }
    }
 
