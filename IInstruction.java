@@ -97,7 +97,7 @@ public abstract class IInstruction {
          builder.append("\tmovq " + sourceA + ", %rdx\n");
          builder.append("\tsarq $63, %rdx\n");
          builder.append("\tidivq " + sourceB + "\n");
-         builder.append("\tmovq %rax, " + dest);
+         builder.append("\tmovq %rax, " + dest + "\n");
          return builder.toString();
       }
    }
@@ -620,6 +620,7 @@ public abstract class IInstruction {
 
          builder.append("\tmovq $" + PRINT_STRING_LABEL + ", %rdi\n");
          builder.append("\tmovq " + source + ", %rsi\n");
+         builder.append("\tcall printf");
          return builder.toString();
       }
    }
@@ -637,6 +638,7 @@ public abstract class IInstruction {
 
          builder.append("\tmovq $" + PRINTLN_STRING_LABEL + ", %rdi\n");
          builder.append("\tmovq " + source + ", %rsi\n");
+         builder.append("\tcall printf");
          return builder.toString();
       }
    }
@@ -654,6 +656,7 @@ public abstract class IInstruction {
 
          builder.append("\tmovq $" + READ_STRING_LABEL + ", %rdi\n");
          builder.append("\tmovq " + dest + ", %rsi\n");
+         builder.append("\tcall scanf");
          return builder.toString();
       }
    }
