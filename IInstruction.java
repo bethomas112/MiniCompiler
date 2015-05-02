@@ -147,6 +147,10 @@ public abstract class IInstruction {
       public String getText() {
          return "computeglobaladdress " + globalName + ", " + dest;
       }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         return "movq $" + globalName + ", " + dest + "\n"; 
+      }
    }
 
    /* Stores */
@@ -172,6 +176,10 @@ public abstract class IInstruction {
       public String getText() {
          return "storeglobal " + source + ", " + globalName;
       }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         return "movq " + source + ", " + globalName + "(%rip)\n";
+      }
    }
 
    public static class STORERET extends IInstruction {
@@ -179,13 +187,21 @@ public abstract class IInstruction {
       public String getText() {
          return "storeret " + source;
       }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         return "movq " + source + ", $rax\n";
+      }
    }
 
    /* Moves */
    public static class MOV extends IInstruction {
       public Register source, dest;
       public String getText() {
-         return "mov " + source + ", "+ dest;
+         return "mov " + source + ", "+ dest + "\n";
+      }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         return "movq " + sourceA + ", " + sourceB + "\n";
       }
    }
 
@@ -195,6 +211,10 @@ public abstract class IInstruction {
       public String getText() {
          return "moveq " + immediate + ", "+ dest;
       }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         return "cmovgeq " + sourceA + ", " + sourceB + "\n";
+      }
    }
 
    public static class MOVGE extends IInstruction {
@@ -202,6 +222,10 @@ public abstract class IInstruction {
       public Register dest;
       public String getText() {
          return "movge " + immediate + ", "+ dest;
+      }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         return "cmovgeq " + sourceA + ", " + sourceB + "\n";
       }
    }
 
@@ -211,6 +235,10 @@ public abstract class IInstruction {
       public String getText() {
          return "movgt " + immediate + ", "+ dest;
       }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         return "cmovgq " + sourceA + ", " + sourceB + "\n";
+      }
    }
 
    public static class MOVLE extends IInstruction {
@@ -218,6 +246,10 @@ public abstract class IInstruction {
       public Register dest;
       public String getText() {
          return "movle " + immediate + ", "+ dest;
+      }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         return "cmovleq " + sourceA + ", " + sourceB + "\n";
       }
    }
 
@@ -227,6 +259,10 @@ public abstract class IInstruction {
       public String getText() {
          return "movlt " + immediate + ", "+ dest;
       }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         return "cmovlq " + sourceA + ", " + sourceB + "\n";
+      }
    }
 
    public static class MOVNE extends IInstruction {
@@ -234,6 +270,10 @@ public abstract class IInstruction {
       public Register dest;
       public String getText() {
          return "movne " + immediate + ", "+ dest;
+      }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         return "cmovneq " + sourceA + ", " + sourceB + "\n";
       }
    }
 
@@ -244,6 +284,10 @@ public abstract class IInstruction {
       public String getText() {
          return "comp " + sourceA + ", " + sourceB;
       }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         return "cmpq " + sourceA + ", " + sourceB + "\n";
+      }
    }
 
    public static class COMPI extends IInstruction {
@@ -253,6 +297,10 @@ public abstract class IInstruction {
       public String getText() {
          return "compi " + source + ", " + immediate;
       }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         return "cmpq $" + immediate + ", " + source + "\n";
+      }
    }
 
    public static class CBREQ extends IInstruction {
@@ -260,6 +308,14 @@ public abstract class IInstruction {
 
       public String getText() {
          return "cbreq " + labelA + ", " + labelB;
+      }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         StringBuilder builder = new StringBuilder();
+
+         builder.append("je " + labelA + "\n");
+         builder.append("jmp " + labelB + "\n");
+         return builder.toString();
       }
    }
 
@@ -269,6 +325,14 @@ public abstract class IInstruction {
       public String getText() {
          return "cbrge " + labelA + ", " + labelB;
       }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         StringBuilder builder = new StringBuilder();
+
+         builder.append("jge " + labelA + "\n");
+         builder.append("jmp " + labelB + "\n");
+         return builder.toString();
+      }
    }
 
    public static class CBRGT extends IInstruction {
@@ -276,6 +340,14 @@ public abstract class IInstruction {
 
       public String getText() {
          return "cbrgt " + labelA + ", " + labelB;
+      }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         StringBuilder builder = new StringBuilder();
+
+         builder.append("jg " + labelA + "\n");
+         builder.append("jmp " + labelB + "\n");
+         return builder.toString();
       }
    }
 
@@ -285,6 +357,14 @@ public abstract class IInstruction {
       public String getText() {
          return "cbrle " + labelA + ", " + labelB;
       }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         StringBuilder builder = new StringBuilder();
+
+         builder.append("jle " + labelA + "\n");
+         builder.append("jmp " + labelB + "\n");
+         return builder.toString();
+      }
    }
 
    public static class CBRLT extends IInstruction {
@@ -292,6 +372,14 @@ public abstract class IInstruction {
 
       public String getText() {
          return "cbrlt " + labelA + ", " + labelB;
+      }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         StringBuilder builder = new StringBuilder();
+
+         builder.append("jl " + labelA + "\n");
+         builder.append("jmp " + labelB + "\n");
+         return builder.toString();
       }
    }
 
@@ -301,6 +389,14 @@ public abstract class IInstruction {
       public String getText() {
          return "cbrne " + labelA + ", " + labelB;
       }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         StringBuilder builder = new StringBuilder();
+
+         builder.append("jne " + labelA + "\n");
+         builder.append("jmp " + labelB + "\n");
+         return builder.toString();
+      }
    }
 
    public static class JUMPI extends IInstruction {
@@ -309,30 +405,64 @@ public abstract class IInstruction {
       public String getText() {
          return "jumpi " + label;
       }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         StringBuilder builder = new StringBuilder();
+
+         builder.append("jmp " + label + "\n");
+         return builder.toString();
+      }
    }
 
    /* I/O */
    public static class PRINT extends IInstruction {
+      public static final String PRINT_STRING_LABEL = ".PRINTSTRING"
       public Register source;
 
       public String getText() {
          return "print " + source;
       }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         StringBuilder builder = new StringBuilder();
+
+         builder.append("movq $" + PRINT_STRING_LABEL + ", %rdi\n");
+         builder.append("movq " + dest + ", %rsi\n");
+         return builder.toString();
+      }
    }
 
    public static class PRINTLN extends IInstruction {
+      public static final String PRINTLN_STRING_LABEL = ".PRINTLNSTRING"
       public Register source;
 
       public String getText() {
          return "println " + source;
       }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         StringBuilder builder = new StringBuilder();
+
+         builder.append("movq $" + PRINTLN_STRING_LABEL + ", %rdi\n");
+         builder.append("movq " + dest + ", %rsi\n");
+         return builder.toString();
+      }
    }
 
    public static class READ extends IInstruction {
+      public static final String READ_STRING_LABEL = ".READSTRING"
       public Register dest;
 
       public String getText() {
          return "read " + dest;
+      }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         StringBuilder builder = new StringBuilder();
+
+         builder.append("movq $" + READ_STRING_LABEL + ", %rdi\n");
+         builder.append("movq " + dest + ", %rsi\n");
+         return builder.toString();
       }
    }
 
@@ -343,6 +473,10 @@ public abstract class IInstruction {
 
       public String getText() {
          return "call " + label;
+      }
+
+      public String getX86(ILOCGenerator.CFG cfg) {
+         return "call " + label + "\n";
       }
    }
 
@@ -356,7 +490,12 @@ public abstract class IInstruction {
          int localCount = cfg.localsOrdered.size();
          int frameSize = (spillCount + localCount) * 8;
          StringBuilder builder = new StringBuilder();
-         return "";
+
+         builder.append("addq $" + frameSize + ", %rsp\n");
+         builder.append("movq %rbp, %rsp\n");
+         builder.append("popq %rbp\n");
+         builder.append("ret\n");
+         return builder.toString();
       }
    }
 
@@ -376,7 +515,7 @@ public abstract class IInstruction {
 
          builder.append("movl $" + byteSize + ", %edi\n");
          builder.append("call malloc\n");
-         builder.append("movq %rax, " + "%" + dest + "\n");
+         builder.append("movq %rax, " + dest + "\n");
          return builder.toString();
       }
    }
@@ -390,7 +529,7 @@ public abstract class IInstruction {
 
       public String getX86(ILOCGenerator.CFG cfg) {
          StringBuilder builder = new StringBuilder();
-         builder.append("movq %" + source + ", %rdi\n");
+         builder.append("movq " + source + ", %rdi\n");
          builder.append("call free\n");
          return builder.toString();
       }

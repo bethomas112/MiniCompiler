@@ -405,7 +405,6 @@ read[CFG cfg, BasicBlock block]
             IInstruction.READ read = new IInstruction.READ();
             read.dest = addistruct.dest;
             block.addInstruction(read);
-            System.out.println("ADDISTRUCT with structType: " + $l.structType);
          }
          else {
             IInstruction.ADDILOCAL addilocal = new IInstruction.ADDILOCAL();
