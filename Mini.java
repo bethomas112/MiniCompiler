@@ -28,8 +28,8 @@ public class Mini
       else if (!parser.hasErrors())
       {
          TypeChecker typeChecker = typeCheck(tree, tokens);
-         ILOCGenerator.ILOCResult result = generateILOC(tree, tokens, typeChecker);
-         generateX86(result);
+         ILOCGenerator generator = generateILOC(tree, tokens, typeChecker);
+         generateX86(generator.getResult(), generator.getGlobalTypes());
       }
    }
 
@@ -106,7 +106,7 @@ public class Mini
       return null;
    }
 
-   private static ILOCGenerator.ILOCResult generateILOC(CommonTree tree, CommonTokenStream tokens, TypeChecker typeChecker) {
+   private static ILOCGenerator generateILOC(CommonTree tree, CommonTokenStream tokens, TypeChecker typeChecker) {
       CommonTreeNodeStream nodes = new CommonTreeNodeStream(tree);
       nodes.setTokenStream(tokens);
       ILOCGenerator igen = new ILOCGenerator(nodes);
@@ -119,11 +119,11 @@ public class Mini
       catch (org.antlr.runtime.RecognitionException e) {
          error(e.getMessage());
       }
-      return igen.getResult();
+      return igen;
    }
 
-   private static void generateX86(ILOCGenerator.ILOCResult result) {
-      X86Mapper generator = new X86Mapper(result);
+   private static void generateX86(ILOCGenerator.ILOCResult result, HashMap<String, MiniType> globalTypes) {
+      X86Mapper generator = new X86Mapper(result, globalTypes);
       generator.process(new File(_inputFile.split("\\.")[0] + ".s"));
    }
 

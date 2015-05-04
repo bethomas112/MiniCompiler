@@ -131,7 +131,11 @@ options
    public void setGlobalTypes(HashMap<String, MiniType> globalTypes) {
       this.globalTypes = globalTypes;
    }
-
+   
+   public HashMap<String, MiniType> getGlobalTypes() {
+      return globalTypes;
+   }
+   
 }
 
 
