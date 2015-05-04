@@ -47,15 +47,15 @@ public abstract class IInstruction {
       public String getX86(ILOCGenerator.CFG cfg) {
          StringBuilder builder = new StringBuilder();
          int offset = cfg.localsOrdered.indexOf(localName);
-         if (offset == -1) {
+         if (offset != -1) {
             offset = 8 * offset + 8;
             // Because the locals are below the %rbp
             offset *= -1;
             builder.append("\tmovq %rbp, " + dest + "\n");
-            builder.append("\taddq $" + offset + ", " + dest);
+            builder.append("\taddq $" + offset + ", " + dest + "\n");
          }
          else {
-            throw new RuntimeException("ADDILOCAL: Could not find local");
+            throw new RuntimeException("ADDILOCAL: Could not find local: " + localName);
          }
          return builder.toString();
       }
@@ -620,7 +620,8 @@ public abstract class IInstruction {
 
          builder.append("\tmovq $" + PRINT_STRING_LABEL + ", %rdi\n");
          builder.append("\tmovq " + source + ", %rsi\n");
-         builder.append("\tcall printf");
+         builder.append("\tmovq $0, %rax\n");
+         builder.append("\tcall printf\n");
          return builder.toString();
       }
    }
@@ -638,7 +639,8 @@ public abstract class IInstruction {
 
          builder.append("\tmovq $" + PRINTLN_STRING_LABEL + ", %rdi\n");
          builder.append("\tmovq " + source + ", %rsi\n");
-         builder.append("\tcall printf");
+         builder.append("\tmovq $0, %rax\n");
+         builder.append("\tcall printf\n");
          return builder.toString();
       }
    }
@@ -656,7 +658,8 @@ public abstract class IInstruction {
 
          builder.append("\tmovq $" + READ_STRING_LABEL + ", %rdi\n");
          builder.append("\tmovq " + dest + ", %rsi\n");
-         builder.append("\tcall scanf");
+         builder.append("\tmovq $0, %rax\n");
+         builder.append("\tcall scanf\n");
          return builder.toString();
       }
    }
