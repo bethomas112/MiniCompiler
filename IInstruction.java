@@ -16,6 +16,14 @@ public abstract class IInstruction {
          builder.append("\taddq " + sourceB + ", " + dest + "\n");
          return builder.toString();
       }
+
+      public Set<Register> getSource() {
+         return new HashSet<Register>(Arrays.asList(sourceA, sourceB));
+      }
+
+      public Set<Register> getDest() {
+         return Collections.singleton(dest);
+      }
    }
 
    public static class ADDI extends IInstruction {
@@ -30,6 +38,14 @@ public abstract class IInstruction {
          builder.append("\tmovq " + source + ", " + dest + "\n");
          builder.append("\taddq $" + immediate + ", " + dest + "\n");
          return builder.toString();
+      }
+
+      public Set<Register> getSource() {
+         return Collections.singleton(source);
+      }
+
+      public Set<Register> getDest() {
+         return Collections.singleton(dest);
       }
    }
  
@@ -56,6 +72,14 @@ public abstract class IInstruction {
          }
          return builder.toString();
       }
+
+      public Set<Register> getSource() {
+         return Collections.EmptySet();
+      }
+
+      public Set<Register> getDest() {
+         return Collections.singleton(dest);
+      }
    }
 
    /* Address of the field of the struct */
@@ -80,6 +104,14 @@ public abstract class IInstruction {
          }
          return builder.toString();
       }
+
+      public Set<Register> getSource() {
+         return Collections.singleton(source);
+      }
+
+      public Set<Register> getDest() {
+         return Collections.singleton(dest);
+      }
    }
 
    public static class DIV extends IInstruction {
@@ -97,6 +129,14 @@ public abstract class IInstruction {
          builder.append("\tmovq %rax, " + dest + "\n");
          return builder.toString();
       }
+
+      public Set<Register> getSource() {
+         return new HashSet<Register>(Arrays.asList(sourceA, sourceB));
+      }
+
+      public Set<Register> getDest() {
+         return Collections.singleton(dest);
+      }
    }
 
    public static class MULT extends IInstruction {
@@ -111,6 +151,14 @@ public abstract class IInstruction {
          builder.append("\timulq " + sourceB + ", " + dest + "\n");
          return builder.toString();
       }
+
+      public Set<Register> getSource() {
+         return new HashSet<Register>(Arrays.asList(sourceA, sourceB));
+      }
+
+      public Set<Register> getDest() {
+         return Collections.singleton(dest);
+      }
    }
 
    public static class SUB extends IInstruction {
@@ -124,6 +172,14 @@ public abstract class IInstruction {
          builder.append("\tmovq " + sourceA + ", " + dest + "\n");
          builder.append("\tsubq " + sourceB + ", " + dest + "\n");
          return builder.toString();
+      }
+
+      public Set<Register> getSource() {
+         return new HashSet<Register>(Arrays.asList(sourceA, sourceB));
+      }
+
+      public Set<Register> getDest() {
+         return Collections.singleton(dest);
       }
    }
 
@@ -140,6 +196,14 @@ public abstract class IInstruction {
          builder.append("\tsubq $" + immediate + ", " + dest + "\n");
          return builder.toString();
       }
+
+      public Set<Register> getSource() {
+         return Collections.singleton(source);
+      }
+
+      public Set<Register> getDest() {
+         return Collections.singleton(dest);
+      }
    }
 
    /* Boolean */
@@ -155,6 +219,14 @@ public abstract class IInstruction {
          builder.append("\tandq " + sourceB + ", " + dest + "\n");
          return builder.toString();
       }
+
+      public Set<Register> getSource() {
+         return new HashSet<Register>(Arrays.asList(sourceA, sourceB));
+      }
+
+      public Set<Register> getDest() {
+         return Collections.singleton(dest);
+      }
    }
 
    public static class OR extends IInstruction {
@@ -168,6 +240,14 @@ public abstract class IInstruction {
          builder.append("\tmovq " + sourceA + ", " + dest + "\n");
          builder.append("\torq " + sourceB + ", " + dest + "\n");
          return builder.toString();
+      }
+
+      public Set<Register> getSource() {
+         return new HashSet<Register>(Arrays.asList(sourceA, sourceB));
+      }
+
+      public Set<Register> getDest() {
+         return Collections.singleton(dest);
       }
    }
 
@@ -185,6 +265,14 @@ public abstract class IInstruction {
 
          return builder.toString();
       }
+
+      public Set<Register> getSource() {
+         return Collections.singleton(source);
+      }
+
+      public Set<Register> getDest() {
+         return Collections.singleton(dest);
+      }
    }
 
    /* Loads */
@@ -197,6 +285,14 @@ public abstract class IInstruction {
 
       public String getX86(CFG cfg) {
          return "\tmovq $" + immediate + ", " + dest + "\n";
+      }
+
+      public Set<Register> getSource() {
+         return Collections.emptySet();
+      }
+
+      public Set<Register> getDest() {
+         return Collections.singleton(dest);
       }
    }
 
@@ -223,6 +319,14 @@ public abstract class IInstruction {
          }
          return builder.toString();
       }
+
+      public Set<Register> getSource() {
+         return Collections.singleton(source);
+      }
+
+      public Set<Register> getDest() {
+         return Collections.singleton(dest);
+      }
    }
 
    /* Loads the local from the stack into the destination register */
@@ -248,6 +352,14 @@ public abstract class IInstruction {
          }
          return builder.toString();
       }
+
+      public Set<Register> getSource() {
+         return Collections.emptySet();
+      }
+
+      public Set<Register> getDest() {
+         return Collections.singleton(dest);
+      }
    }
 
    public static class LOADINARGUMENT extends IInstruction {
@@ -255,7 +367,7 @@ public abstract class IInstruction {
       public int argIdx;
       public Register dest;
 
-      public List<String> argRegisters = Arrays.asList("%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9");
+      public List<Register> argRegisters = Arrays.asList(Register.RDI, Register.RSI, Register.RDX, Register.RCX, Register.R8, Register.R9);
 
       public String getText() {
          return "loadinargument " + variable + ", " + argIdx + ", " + dest;
@@ -274,6 +386,19 @@ public abstract class IInstruction {
          }
          return builder.toString();
       }
+
+      public Set<Register> getSource() {
+         if (argIdx >= 6) {
+            return Collections.emptySet();
+         }
+         else {
+            return Collectins.singleton(argRegisters.get(argIdx));
+         }
+      }
+
+      public Set<Register> getDest() {
+         return Collections.singleton(dest);
+      }
    }
 
    public static class LOADGLOBAL extends IInstruction {
@@ -287,6 +412,14 @@ public abstract class IInstruction {
          StringBuilder builder = new StringBuilder();
          builder.append("\tmovq " + globalName + "(%rip), " + dest + "\n");
          return builder.toString();
+      }
+
+      public Set<Register> getSource() {
+         return Collections.emptySet();
+      }
+
+      public Set<Register> getDest() {
+         return Collections.singleton(dest);
       }
       
    }
@@ -302,6 +435,14 @@ public abstract class IInstruction {
          builder.append("\tmovq %rax, " + dest + "\n");
          return builder.toString();
       }
+
+      public Set<Register> getSource() {
+         return Collections.emptySet();
+      }
+
+      public Set<Register> getDest() {
+         return Collections.singleton(dest);
+      }
    }
 
    public static class COMPUTEGLOBALADDRESS extends IInstruction {
@@ -313,6 +454,14 @@ public abstract class IInstruction {
 
       public String getX86(CFG cfg) {
          return "\tmovq $" + globalName + ", " + dest + "\n"; 
+      }
+
+      public Set<Register> getSource() {
+         return Collections.emptySet();
+      }
+
+      public Set<Register> getDest() {
+         return Collections.singleton(dest);
       }
    }
 
@@ -338,12 +487,20 @@ public abstract class IInstruction {
          }
          return builder.toString();
       } 
+
+      public Set<Register> getSource() {
+         return Collections.singleton(source);
+      }
+
+      public Set<Register> getDest() {
+         return Collections.singleton(dest);
+      }
    }
 
    public static class STOREOUTARGUMENT extends IInstruction {
       public Register source;
       public int argIdx;
-      public List<String> argRegisters = Arrays.asList("%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9");
+      public List<Register> argRegisters = Arrays.asList(Register.RDI, Register.RSI, Register.RDX, Register.RCX, Register.R8, Register.R9);
 
       public String getText() {
          return "storeoutargument " + source + ", " + argIdx;
@@ -363,6 +520,19 @@ public abstract class IInstruction {
          }
          return builder.toString();
       }
+
+      public Set<Register> getSource() {
+         return Collections.singleton(source);
+      }
+
+      public Set<Register> getDest() {
+         if (argIdx >= 6) {
+            return Collections.emptySet();
+         }
+         else {
+            return Collections.singleton(argRegisters.get(argIdx));
+         }
+      }
    }
 
    public static class STOREGLOBAL extends IInstruction {
@@ -375,6 +545,14 @@ public abstract class IInstruction {
       public String getX86(CFG cfg) {
          return "\tmovq " + source + ", " + globalName + "(%rip)\n";
       }
+
+      public Set<Register> getSource() {
+         return Collections.singleton(source);
+      }
+
+      public Set<Register> getDest() {
+         return Collections.emptySet();
+      }
    }
 
    public static class STORERET extends IInstruction {
@@ -385,6 +563,14 @@ public abstract class IInstruction {
 
       public String getX86(CFG cfg) {
          return "\tmovq " + source + ", $rax\n";
+      }
+
+      public Set<Register> getSource() {
+         return Collections.singleton(source);
+      }
+
+      public Set<Register> getDest() {
+         return Collections.singleton(Register.RAX);
       }
    }
 
@@ -397,6 +583,14 @@ public abstract class IInstruction {
 
       public String getX86(CFG cfg) {
          return "\tmovq " + source + ", " + dest + "\n";
+      }
+
+      public Set<Register> getSource() {
+         return Collections.singleton(source);
+      }
+
+      public Set<Register> getDest() {
+         return Collections.singleton(dest);
       }
    }
 
