@@ -23,11 +23,11 @@ public class X86Mapper {
          writer.write("\t.string \"%ld\\n\"\n");
          writer.write(IInstruction.READ.READ_STRING_LABEL + ":\n");
          writer.write("\t.string \"%ld\"\n");
-         for (ILOCGenerator.CFG cfg : ilocResult.cfgs) {
+         for (CFG cfg : ilocResult.cfgs) {
             writer.write("\t.text\n");
             writer.write(".global " + cfg.entryBlock.label + "\n");
             writer.write("\t.type\t" + cfg.entryBlock.label + ", @function\n");           
-            for (ILOCGenerator.BasicBlock block : cfg.bfsBlocks()) {
+            for (BasicBlock block : cfg.bfsBlocks()) {
                writer.write(block.getX86(cfg));
             }
             writer.write("\t.size\t" + cfg.entryBlock.label + ", .-" + cfg.entryBlock.label + "\n");            

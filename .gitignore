@@ -4,3 +4,5 @@ ToJSON.java
 Mini.tokens
 ToJSON.tokens
 *.class
+*.il
+*.s

@@ -27,80 +27,6 @@ options
       public List<CFG> cfgs;
    }
 
-   public static class CFG {
-      public BasicBlock entryBlock;
-      public BasicBlock exitBlock;
-      public HashMap<String, Register> locals;
-      public HashMap<String, MiniType> localTypes;
-      public List<String> localsOrdered;
-      public HashMap<String, Integer> params;
-      public HashMap<String, MiniType.StructType> structTypes;
-      public CFG(HashMap<String, MiniType.StructType> structTypes) {
-         this.locals = new HashMap<>();
-         this.localsOrdered = new ArrayList<>();
-         this.params = new HashMap<>();
-         this.structTypes = structTypes;
-      }
-
-      public List<BasicBlock> bfsBlocks() {
-         HashSet<BasicBlock> visited = new HashSet<>();
-         LinkedList<BasicBlock> queue = new LinkedList<>();
-         List<BasicBlock> result = new ArrayList<>();
-
-         queue.add(entryBlock);
-         while(!queue.isEmpty()) {
-            BasicBlock block = queue.poll();
-            if (!visited.contains(block)) {
-               result.add(block);
-               visited.add(block);
-               for (BasicBlock nextBlock : block.next) {               
-                  queue.add(nextBlock);     
-               }
-            }
-         }
-         return result;
-      }
-   }
-
-   public static class BasicBlock {
-      public List<BasicBlock> prev;
-      public List<BasicBlock> next;      
-      public String label;
-
-      private List<IInstruction> instructions;
-      public BasicBlock() {
-         prev = new ArrayList<>();
-         next = new ArrayList<>();
-         instructions = new ArrayList<>();
-      }
-
-      public List<IInstruction> getILOC() { 
-         return instructions; 
-      }
-
-      public void addInstruction(IInstruction instruction) {
-         instructions.add(instruction);
-      }
-
-      public String toString() {
-         StringBuilder sb = new StringBuilder();
-         sb.append(label + ":\n");
-         for (IInstruction instruction : instructions) {
-            sb.append("\t" + instruction.getText() + "\n");
-         }
-         return sb.toString();
-      }
-
-      public String getX86(CFG cfg) {
-         StringBuilder sb = new StringBuilder();
-         sb.append(label + ":\n");
-         for (IInstruction instruction : instructions) {
-            sb.append(instruction.getX86(cfg));
-         }
-         return sb.toString();
-      }
-   }
-
    private static int labelCount = 0;
    private static String getNextLabel() {
       return "L" + labelCount++;
@@ -301,7 +227,7 @@ parameters[CFG cfg]
          loadinargument.variable = $p.paramId;
          loadinargument.argIdx = paramNum;
          loadinargument.dest = paramReg;
-         block.instructions.add(loadinargument);
+         block.addInstruction(loadinargument);
          paramNum++;
       })*)
       { 

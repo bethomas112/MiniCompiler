@@ -12,7 +12,7 @@ public abstract class IInstruction {
          return "add " + sourceA + ", " + sourceB + ", " + dest;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          StringBuilder builder = new StringBuilder();
          builder.append("\tmovq " + sourceA + ", " + dest + "\n");
          builder.append("\taddq " + sourceB + ", " + dest + "\n");
@@ -28,7 +28,7 @@ public abstract class IInstruction {
          return "addi " + source + ", " + immediate + ", " + dest;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          StringBuilder builder = new StringBuilder();
          builder.append("\tmovq " + source + ", " + dest + "\n");
          builder.append("\taddq $" + immediate + ", " + dest + "\n");
@@ -44,7 +44,7 @@ public abstract class IInstruction {
          return "addi rarp, " + localName + ", " + dest;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          StringBuilder builder = new StringBuilder();
          int offset = cfg.localsOrdered.indexOf(localName);
          if (offset != -1) {
@@ -70,7 +70,7 @@ public abstract class IInstruction {
          return "addi " + source + ", " + fieldName + ", " + dest;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          StringBuilder builder = new StringBuilder();
          int offset = structType.fieldsOrdered.indexOf(fieldName);
          if (offset != -1) {
@@ -91,7 +91,7 @@ public abstract class IInstruction {
          return "div " + sourceA + ", " + sourceB + ", " + dest;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          StringBuilder builder = new StringBuilder();
          builder.append("\tmovq " + sourceA + ", %rax\n");
          builder.append("\tmovq " + sourceA + ", %rdx\n");
@@ -108,7 +108,7 @@ public abstract class IInstruction {
          return "mult " + sourceA + ", " + sourceB + ", " + dest;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          StringBuilder builder = new StringBuilder();
          builder.append("\tmovq " + sourceA + ", " + dest + "\n");
          builder.append("\timulq " + sourceB + ", " + dest + "\n");
@@ -122,7 +122,7 @@ public abstract class IInstruction {
          return "sub " + sourceA + ", " + sourceB + ", " + dest;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          StringBuilder builder = new StringBuilder();
          builder.append("\tmovq " + sourceA + ", " + dest + "\n");
          builder.append("\tsubq " + sourceB + ", " + dest + "\n");
@@ -137,7 +137,7 @@ public abstract class IInstruction {
          return "subi " + source + ", " + immediate + ", " + dest;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          StringBuilder builder = new StringBuilder();
          builder.append("\tmovq " + source + ", " + dest + "\n");
          builder.append("\tsubq $" + immediate + ", " + dest + "\n");
@@ -152,7 +152,7 @@ public abstract class IInstruction {
          return "and " + sourceA + ", " + sourceB + ", " + dest;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          StringBuilder builder = new StringBuilder();
          builder.append("\tmovq " + sourceA + ", " + dest + "\n");
          builder.append("\tandq " + sourceB + ", " + dest + "\n");
@@ -166,7 +166,7 @@ public abstract class IInstruction {
          return "or " + sourceA + ", " + sourceB + ", " + dest;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          StringBuilder builder = new StringBuilder();
          builder.append("\tmovq " + sourceA + ", " + dest + "\n");
          builder.append("\torq " + sourceB + ", " + dest + "\n");
@@ -181,7 +181,7 @@ public abstract class IInstruction {
          return "xori " + source + ", " + immediate + ", " + dest;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          StringBuilder builder = new StringBuilder();
          builder.append("\tmovq " + source + ", " + dest + "\n");
          builder.append("\txorq $" + immediate + ", " + dest + "\n");
@@ -198,7 +198,7 @@ public abstract class IInstruction {
          return "loadi " + immediate + ", " + dest;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          return "\tmovq $" + immediate + ", " + dest + "\n";
       }
    }
@@ -212,7 +212,7 @@ public abstract class IInstruction {
          return "loadai " + source + ", " + fieldName + ", " + dest;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          StringBuilder builder = new StringBuilder();
          int offset = structType.fieldsOrdered.indexOf(fieldName);
 
@@ -236,7 +236,7 @@ public abstract class IInstruction {
          return "loadai rarp, " + localName + ", " + dest;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          StringBuilder builder = new StringBuilder();
          int offset = cfg.localsOrdered.indexOf(localName);
 
@@ -264,7 +264,7 @@ public abstract class IInstruction {
          return "loadinargument " + variable + ", " + argIdx + ", " + dest;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          StringBuilder builder = new StringBuilder();
 
          if (argIdx >= 6) {
@@ -286,7 +286,7 @@ public abstract class IInstruction {
          return "loadglobal " + globalName + ", " + dest;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          StringBuilder builder = new StringBuilder();
          builder.append("\tmovq " + globalName + "(%rip), " + dest + "\n");
          return builder.toString();
@@ -300,7 +300,7 @@ public abstract class IInstruction {
          return "loadret " + dest;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          StringBuilder builder = new StringBuilder();
          builder.append("\tmovq %rax, " + dest + "\n");
          return builder.toString();
@@ -314,7 +314,7 @@ public abstract class IInstruction {
          return "computeglobaladdress " + globalName + ", " + dest;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          return "\tmovq $" + globalName + ", " + dest + "\n"; 
       }
    }
@@ -328,7 +328,7 @@ public abstract class IInstruction {
          return "storeai " + source + ", " + dest + ", " + fieldName;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          StringBuilder builder = new StringBuilder();
          int offset = structType.fieldsOrdered.indexOf(fieldName);
 
@@ -352,7 +352,7 @@ public abstract class IInstruction {
          return "storeoutargument " + source + ", " + argIdx;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          StringBuilder builder = new StringBuilder();
 
          if (argIdx >= 6) {
@@ -375,7 +375,7 @@ public abstract class IInstruction {
          return "storeglobal " + source + ", " + globalName;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          return "\tmovq " + source + ", " + globalName + "(%rip)\n";
       }
    }
@@ -386,7 +386,7 @@ public abstract class IInstruction {
          return "storeret " + source;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          return "\tmovq " + source + ", $rax\n";
       }
    }
@@ -398,7 +398,7 @@ public abstract class IInstruction {
          return "mov " + source + ", "+ dest + "\n";
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          return "\tmovq " + source + ", " + dest + "\n";
       }
    }
@@ -409,7 +409,7 @@ public abstract class IInstruction {
          return "moveq " + source + ", "+ dest;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          return "\tcmovgeq " + source + ", " + dest + "\n";
       }
    }
@@ -420,7 +420,7 @@ public abstract class IInstruction {
          return "movge " + source + ", "+ dest;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          return "\tcmovgeq " + source + ", " + dest + "\n";
       }
    }
@@ -431,7 +431,7 @@ public abstract class IInstruction {
          return "movgt " + source + ", "+ dest;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          return "\tcmovgq " + source + ", " + dest + "\n";
       }
    }
@@ -442,7 +442,7 @@ public abstract class IInstruction {
          return "movle " + source + ", "+ dest;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          return "\tcmovleq " + source + ", " + dest + "\n";
       }
    }
@@ -453,7 +453,7 @@ public abstract class IInstruction {
          return "movlt " + source + ", "+ dest;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          return "\tcmovlq " + source + ", " + dest + "\n";
       }
    }
@@ -464,7 +464,7 @@ public abstract class IInstruction {
          return "movne " + source + ", "+ dest;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          return "\tcmovneq " + source + ", " + dest + "\n";
       }
    }
@@ -477,7 +477,7 @@ public abstract class IInstruction {
          return "comp " + sourceA + ", " + sourceB;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          return "\tcmpq " + sourceA + ", " + sourceB + "\n";
       }
    }
@@ -490,7 +490,7 @@ public abstract class IInstruction {
          return "compi " + source + ", " + immediate;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          return "\tcmpq $" + immediate + ", " + source + "\n";
       }
    }
@@ -502,7 +502,7 @@ public abstract class IInstruction {
          return "cbreq " + labelA + ", " + labelB;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          StringBuilder builder = new StringBuilder();
 
          builder.append("\tje " + labelA + "\n");
@@ -518,7 +518,7 @@ public abstract class IInstruction {
          return "cbrge " + labelA + ", " + labelB;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          StringBuilder builder = new StringBuilder();
 
          builder.append("\tjge " + labelA + "\n");
@@ -534,7 +534,7 @@ public abstract class IInstruction {
          return "cbrgt " + labelA + ", " + labelB;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          StringBuilder builder = new StringBuilder();
 
          builder.append("\tjg " + labelA + "\n");
@@ -550,7 +550,7 @@ public abstract class IInstruction {
          return "cbrle " + labelA + ", " + labelB;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          StringBuilder builder = new StringBuilder();
 
          builder.append("\tjle " + labelA + "\n");
@@ -566,7 +566,7 @@ public abstract class IInstruction {
          return "cbrlt " + labelA + ", " + labelB;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          StringBuilder builder = new StringBuilder();
 
          builder.append("\tjl " + labelA + "\n");
@@ -582,7 +582,7 @@ public abstract class IInstruction {
          return "cbrne " + labelA + ", " + labelB;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          StringBuilder builder = new StringBuilder();
 
          builder.append("\tjne " + labelA + "\n");
@@ -598,7 +598,7 @@ public abstract class IInstruction {
          return "jumpi " + label;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          StringBuilder builder = new StringBuilder();
 
          builder.append("\tjmp " + label + "\n");
@@ -615,7 +615,7 @@ public abstract class IInstruction {
          return "print " + source;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          StringBuilder builder = new StringBuilder();
 
          builder.append("\tmovq $" + PRINT_STRING_LABEL + ", %rdi\n");
@@ -634,7 +634,7 @@ public abstract class IInstruction {
          return "println " + source;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          StringBuilder builder = new StringBuilder();
 
          builder.append("\tmovq $" + PRINTLN_STRING_LABEL + ", %rdi\n");
@@ -653,7 +653,7 @@ public abstract class IInstruction {
          return "read " + dest;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          StringBuilder builder = new StringBuilder();
 
          builder.append("\tmovq $" + READ_STRING_LABEL + ", %rdi\n");
@@ -673,7 +673,7 @@ public abstract class IInstruction {
          return "call " + label;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          return "\tcall " + label + "\n";
       }
    }
@@ -683,7 +683,7 @@ public abstract class IInstruction {
          return "ret";
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          int spillCount = cfg.params.size() > SPILL_THRESHOLD ? cfg.params.size() - SPILL_THRESHOLD : 0;
          int localCount = cfg.localsOrdered.size();
          int frameSize = (spillCount + localCount) * 8;
@@ -707,7 +707,7 @@ public abstract class IInstruction {
          return "\tnew " + struct.name + ", " + struct.fieldsOrdered + ", " + dest;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          int byteSize = struct.fieldsOrdered.size() * 8;
          StringBuilder builder = new StringBuilder();
 
@@ -725,7 +725,7 @@ public abstract class IInstruction {
          return "del " + source;
       }
 
-      public String getX86(ILOCGenerator.CFG cfg) {
+      public String getX86(CFG cfg) {
          StringBuilder builder = new StringBuilder();
          builder.append("\tmovq " + source + ", %rdi\n");
          builder.append("\tcall free\n");
@@ -734,5 +734,5 @@ public abstract class IInstruction {
    }
 
    public abstract String getText();
-   public abstract String getX86(ILOCGenerator.CFG cfg);
+   public abstract String getX86(CFG cfg);
 }
