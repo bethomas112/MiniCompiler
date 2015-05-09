@@ -409,6 +409,14 @@ public abstract class IInstruction {
       public String getX86(CFG cfg) {
          return "\tcmovgeq " + source + ", " + dest + "\n";
       }
+
+      public Set<Register> getSource() {
+         return new HashSet<Register>(Arrays.<Register>asList(source, dest));
+      }
+
+      public Set<Register> getDest() {
+         return Collections.singleton(dest);
+      }
    }
 
    public static class MOVGE extends IInstruction {
@@ -419,6 +427,14 @@ public abstract class IInstruction {
 
       public String getX86(CFG cfg) {
          return "\tcmovgeq " + source + ", " + dest + "\n";
+      }
+
+      public Set<Register> getSource() {
+         return new HashSet<Register>(Arrays.<Register>asList(source, dest));
+      }
+
+      public Set<Register> getDest() {
+         return Collections.singleton(dest);
       }
    }
 
@@ -431,6 +447,14 @@ public abstract class IInstruction {
       public String getX86(CFG cfg) {
          return "\tcmovgq " + source + ", " + dest + "\n";
       }
+
+      public Set<Register> getSource() {
+         return new HashSet<Register>(Arrays.<Register>asList(source, dest));
+      }
+
+      public Set<Register> getDest() {
+         return Collections.singleton(dest);
+      }
    }
 
    public static class MOVLE extends IInstruction {
@@ -441,6 +465,14 @@ public abstract class IInstruction {
 
       public String getX86(CFG cfg) {
          return "\tcmovleq " + source + ", " + dest + "\n";
+      }
+
+      public Set<Register> getSource() {
+         return new HashSet<Register>(Arrays.<Register>asList(source, dest));
+      }
+
+      public Set<Register> getDest() {
+         return Collections.singleton(dest);
       }
    }
 
@@ -453,6 +485,14 @@ public abstract class IInstruction {
       public String getX86(CFG cfg) {
          return "\tcmovlq " + source + ", " + dest + "\n";
       }
+
+      public Set<Register> getSource() {
+         return new HashSet<Register>(Arrays.<Register>asList(source, dest));
+      }
+
+      public Set<Register> getDest() {
+         return Collections.singleton(dest);
+      }
    }
 
    public static class MOVNE extends IInstruction {
@@ -463,6 +503,14 @@ public abstract class IInstruction {
 
       public String getX86(CFG cfg) {
          return "\tcmovneq " + source + ", " + dest + "\n";
+      }
+
+      public Set<Register> getSource() {
+         return new HashSet<Register>(Arrays.<Register>asList(source, dest));
+      }
+
+      public Set<Register> getDest() {
+         return Collections.singleton(dest);
       }
    }
 
@@ -477,6 +525,14 @@ public abstract class IInstruction {
       public String getX86(CFG cfg) {
          return "\tcmpq " + sourceA + ", " + sourceB + "\n";
       }
+
+      public Set<Register> getSource() {
+         return new HashSet<Register>(Arrays.<Register>asList(sourceA, sourceB));
+      }
+
+      public Set<Register> getDest() {
+         return Collections.<Register>emptySet();
+      }
    }
 
    public static class COMPI extends IInstruction {
@@ -489,6 +545,14 @@ public abstract class IInstruction {
 
       public String getX86(CFG cfg) {
          return "\tcmpq $" + immediate + ", " + source + "\n";
+      }
+
+      public Set<Register> getSource() {
+         return Collections.singleton(source);
+      }
+
+      public Set<Register> getDest() {
+         return Collections.<Register>emptySet();
       }
    }
 
@@ -506,6 +570,14 @@ public abstract class IInstruction {
          builder.append("\tjmp " + labelB + "\n");
          return builder.toString();
       }
+
+      public Set<Register> getSource() {
+         return Collections.<Register>emptySet();
+      }
+
+      public Set<Register> getDest() {
+         return Collections.<Register>emptySet();
+      }
    }
 
    public static class CBRGE extends IInstruction {
@@ -521,6 +593,14 @@ public abstract class IInstruction {
          builder.append("\tjge " + labelA + "\n");
          builder.append("\tjmp " + labelB + "\n");
          return builder.toString();
+      }
+
+      public Set<Register> getSource() {
+         return Collections.<Register>emptySet();
+      }
+
+      public Set<Register> getDest() {
+         return Collections.<Register>emptySet();
       }
    }
 
@@ -538,6 +618,14 @@ public abstract class IInstruction {
          builder.append("\tjmp " + labelB + "\n");
          return builder.toString();
       }
+
+      public Set<Register> getSource() {
+         return Collections.<Register>emptySet();
+      }
+
+      public Set<Register> getDest() {
+         return Collections.<Register>emptySet();
+      }
    }
 
    public static class CBRLE extends IInstruction {
@@ -553,6 +641,14 @@ public abstract class IInstruction {
          builder.append("\tjle " + labelA + "\n");
          builder.append("\tjmp " + labelB + "\n");
          return builder.toString();
+      }
+
+      public Set<Register> getSource() {
+         return Collections.<Register>emptySet();
+      }
+
+      public Set<Register> getDest() {
+         return Collections.<Register>emptySet();
       }
    }
 
@@ -570,6 +666,14 @@ public abstract class IInstruction {
          builder.append("\tjmp " + labelB + "\n");
          return builder.toString();
       }
+
+      public Set<Register> getSource() {
+         return Collections.<Register>emptySet();
+      }
+
+      public Set<Register> getDest() {
+         return Collections.<Register>emptySet();
+      }
    }
 
    public static class CBRNE extends IInstruction {
@@ -586,6 +690,14 @@ public abstract class IInstruction {
          builder.append("\tjmp " + labelB + "\n");
          return builder.toString();
       }
+
+      public Set<Register> getSource() {
+         return Collections.<Register>emptySet();
+      }
+
+      public Set<Register> getDest() {
+         return Collections.<Register>emptySet();
+      }
    }
 
    public static class JUMPI extends IInstruction {
@@ -600,6 +712,14 @@ public abstract class IInstruction {
 
          builder.append("\tjmp " + label + "\n");
          return builder.toString();
+      }
+
+      public Set<Register> getSource() {
+         return Collections.<Register>emptySet();
+      }
+
+      public Set<Register> getDest() {
+         return Collections.<Register>emptySet();
       }
    }
 
@@ -621,6 +741,14 @@ public abstract class IInstruction {
          builder.append("\tcall printf\n");
          return builder.toString();
       }
+
+      public Set<Register> getSource() {
+         return Collections.singleton(source);
+      }
+
+      public Set<Register> getDest() {
+         return Collections.<Register>emptySet();
+      }
    }
 
    public static class PRINTLN extends IInstruction {
@@ -639,6 +767,14 @@ public abstract class IInstruction {
          builder.append("\tmovq $0, %rax\n");
          builder.append("\tcall printf\n");
          return builder.toString();
+      }
+
+      public Set<Register> getSource() {
+         return Collections.singleton(source);
+      }
+
+      public Set<Register> getDest() {
+         return Collections.<Register>emptySet();
       }
    }
 
@@ -659,6 +795,14 @@ public abstract class IInstruction {
          builder.append("\tcall scanf\n");
          return builder.toString();
       }
+
+      public Set<Register> getSource() {
+         return Collections.singleton(dest);
+      }
+
+      public Set<Register> getDest() {
+         return Collections.<Register>emptySet();
+      }
    }
 
    /* Invocation */
@@ -672,6 +816,14 @@ public abstract class IInstruction {
 
       public String getX86(CFG cfg) {
          return "\tcall " + label + "\n";
+      }
+
+      public Set<Register> getSource() {
+         return Collections.<Register>emptySet();
+      }
+
+      public Set<Register> getDest() {
+         return Collections.<Register>emptySet();
       }
    }
 
@@ -691,6 +843,14 @@ public abstract class IInstruction {
          builder.append("\tpopq %rbp\n");
          builder.append("\tret\n");
          return builder.toString();
+      }
+
+      public Set<Register> getSource() {
+         return Collections.<Register>emptySet();
+      }
+
+      public Set<Register> getDest() {
+         return Collections.<Register>emptySet();
       }
    }
 
@@ -712,6 +872,14 @@ public abstract class IInstruction {
          builder.append("\tcall malloc\n");
          builder.append("\tmovq %rax, " + dest + "\n");
          return builder.toString();
+      }
+
+      public Set<Register> getSource() {
+         return Collections.<Register>emptySet();
+      }
+
+      public Set<Register> getDest() {
+         return Collections.singleton(dest);
       }
    }
 
