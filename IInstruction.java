@@ -1,7 +1,5 @@
 
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public abstract class IInstruction {  
    private static final int SPILL_THRESHOLD = 6;
@@ -18,7 +16,6 @@ public abstract class IInstruction {
          builder.append("\taddq " + sourceB + ", " + dest + "\n");
          return builder.toString();
       }
-
    }
 
    public static class ADDI extends IInstruction {
@@ -731,8 +728,24 @@ public abstract class IInstruction {
          builder.append("\tcall free\n");
          return builder.toString();
       }
+
+      public Set<Register> getSource() {
+         return Collections.singleton(source);
+      }
+
+      public Set<Register> getDest() {
+         return Collections.<Register>emptySet();
+      }
    }
 
    public abstract String getText();
    public abstract String getX86(CFG cfg);
+   public abstract Set<Register> getSource();
+   public abstract Set<Register> getDest();
+   public boolean hasSource() {
+      return getSource().size() > 0;
+   }
+   public boolean hasDest() {
+      return getDest().size() > 0;
+   }
 }
