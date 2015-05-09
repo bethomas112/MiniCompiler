@@ -74,7 +74,7 @@ public abstract class IInstruction {
       }
 
       public Set<Register> getSource() {
-         return Collections.EmptySet();
+         return Collections.<Register>emptySet();
       }
 
       public Set<Register> getDest() {
@@ -392,7 +392,7 @@ public abstract class IInstruction {
             return Collections.emptySet();
          }
          else {
-            return Collectins.singleton(argRegisters.get(argIdx));
+            return Collections.singleton(argRegisters.get(argIdx));
          }
       }
 
