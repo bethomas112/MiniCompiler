@@ -1,4 +1,4 @@
-FILES=Mini.java MiniType.java IInstruction.java Register.java X86Mapper.java
+FILES=Mini.java MiniType.java IInstruction.java Register.java X86Mapper.java RegisterAllocator.java CFG.java BasicBlock.java
 
 Mini.class : antlr.generated ${FILES}
 	javac *.java
@@ -23,4 +23,4 @@ antlr.generated.iloc : ILOCGenerator.g
 	touch antlr.generated.iloc
 
 clean:
-	\rm *generated* MiniParser.java MiniLexer.java ToJSON.java Mini.tokens ToJSON.tokens TypeChecker.java ILOCGenerator.java *.class TypeChecker.tokens ILOCGenerator.tokens 
+	\rm -r *generated* MiniParser.java MiniLexer.java ToJSON.java Mini.tokens ToJSON.tokens TypeChecker.java ILOCGenerator.java *.class TypeChecker.tokens ILOCGenerator.tokens *.il *.s tests/*.il tests/*.s

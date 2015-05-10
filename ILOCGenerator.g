@@ -222,7 +222,6 @@ parameters[CFG cfg]
          Register paramReg = Register.newRegister();
          cfg.params.put($p.paramId, paramNum);
          cfg.locals.put($p.paramId, paramReg);         
-         //TODO: Generate code for setting up params.
          IInstruction.LOADINARGUMENT loadinargument = new IInstruction.LOADINARGUMENT();
          loadinargument.variable = $p.paramId;
          loadinargument.argIdx = paramNum;
