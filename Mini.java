@@ -29,16 +29,22 @@ public class Mini
       {
          TypeChecker typeChecker = typeCheck(tree, tokens);
          ILOCGenerator generator = generateILOC(tree, tokens, typeChecker);
-         generateX86(generator.getResult(), generator.getGlobalTypes());
+         ILOCGenerator.ILOCResult result = generator.getResult();
+         if (!_noAlloc) {
+            result = allocateRegisters(result);
+         }
+         generateX86(result, generator.getGlobalTypes());
       }
    }
 
    private static final String DISPLAYAST = "-displayAST";
    private static final String DUMPILOC = "-dumpIL";
+   private static final String NOALLOC = "-noAlloc";
 
    private static String _inputFile = null;
    private static boolean _displayAST = false;
    private static boolean _dumpIL = false;
+   private static boolean _noAlloc = false;
    
    private static void parseParameters(String [] args)
    {
@@ -51,6 +57,10 @@ public class Mini
          else if (args[i].equals(DUMPILOC))
          {
             _dumpIL = true;
+         }
+         else if (args[i].equals(NOALLOC))
+         {
+            _noAlloc = true;
          }
          else if (args[i].charAt(0) == '-')
          {
@@ -110,7 +120,9 @@ public class Mini
       CommonTreeNodeStream nodes = new CommonTreeNodeStream(tree);
       nodes.setTokenStream(tokens);
       ILOCGenerator igen = new ILOCGenerator(nodes);
-      igen.setOutputFile(new File(_inputFile.split("\\.")[0] + ".il"));
+      if (_dumpIL) {
+         igen.setOutputFile(new File(_inputFile.split("\\.")[0] + ".il"));   
+      }      
       igen.setFunctionTypeinfo(typeChecker.functionDefs);
       igen.setGlobalTypes(typeChecker.globalTypeEnv);
       try {         
@@ -125,6 +137,12 @@ public class Mini
    private static void generateX86(ILOCGenerator.ILOCResult result, HashMap<String, MiniType> globalTypes) {
       X86Mapper generator = new X86Mapper(result, globalTypes);
       generator.process(new File(_inputFile.split("\\.")[0] + ".s"));
+   }
+
+   private static ILOCGenerator.ILOCResult allocateRegisters(ILOCGenerator.ILOCResult result) {
+      RegisterAllocator allocator = new RegisterAllocator(result);
+
+      return allocator.allocate();
    }
 
    private static JsonValue translate(CommonTree tree, CommonTokenStream tokens)
