@@ -1,4 +1,4 @@
-FILES=Mini.java MiniType.java IInstruction.java Register.java X86Mapper.java RegisterAllocator.java CFG.java BasicBlock.java
+FILES=Mini.java MiniType.java IInstruction.java Register.java X86Mapper.java RegisterAllocator.java CFG.java BasicBlock.java RegisterAllocaterTester.java Node.java
 
 Mini.class : antlr.generated ${FILES}
 	javac *.java

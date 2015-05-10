@@ -1105,9 +1105,9 @@ public abstract class IInstruction {
    public abstract Set<Register> getSource();
    public abstract Set<Register> getDest();
    public boolean hasSource() {
-      return getSource().size() > 0;
+      return !getSource().isEmpty();
    }
    public boolean hasDest() {
-      return getDest().size() > 0;
+      return !getDest().isEmpty();
    }
 }
