@@ -131,11 +131,11 @@ public abstract class IInstruction {
       }
 
       public Set<Register> getSource() {
-         return new HashSet<Register>(Arrays.asList(sourceA, sourceB));
+         return new HashSet<Register>(Arrays.asList(sourceA, sourceB, Register.RAX));
       }
 
       public Set<Register> getDest() {
-         return Collections.singleton(dest);
+         return new HashSet<Register>(Arrays.asList(dest, Register.RAX, Register.RDX));
       }
    }
 
