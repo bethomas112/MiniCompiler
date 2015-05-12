@@ -1,3 +1,5 @@
+import java.util.*;
+
 public class RegisterAllocator {
    private ILOCGenerator.ILOCResult result;
    public RegisterAllocator(ILOCGenerator.ILOCResult result) {
@@ -5,25 +7,34 @@ public class RegisterAllocator {
    }
 
    public ILOCGenerator.ILOCResult allocate() {
-      RegisterAllocaterTester tst = new RegisterAllocaterTester();
-
-      for (CFG cfg : tst.getCFG()) {
+      for (CFG cfg : result.cfgs) {
          cfg.calculateLiveOut();
-         System.out.println("CFG: " + cfg.entryBlock.label);
-         for (BasicBlock block : cfg.bfsBlocks()) {
-            System.out.println("\tBlock: " + block.label);
-            System.out.println("\tGen:");
-            System.out.println("\t\t" + block.getGenSet());
-            System.out.println("\tKill:");
-            System.out.println("\t\t" + block.getKillSet());
-            System.out.println("\tLiveOut:");
-            System.out.println("\t\t" + block.getLiveOut());
-            System.out.println("\tInterference:");
-            for (Node<Register> node : block.getInterference().values()) {
-               System.out.println(node);
-            }            
-         }
+         allocateCFG(cfg);
       }
       return result;
+   }
+
+   public void allocateCFG(CFG cfg) {
+      List<Node> stack = new LinkedList<>();
+
+   }
+
+   public void debugPrint(CFG cfg) {
+      RegisterAllocaterTester tst = new RegisterAllocaterTester();
+      cfg.calculateLiveOut();
+      System.out.println("CFG: " + cfg.entryBlock.label);
+      for (BasicBlock block : cfg.bfsBlocks()) {
+         System.out.println("\tBlock: " + block.label);
+         System.out.println("\tGen:");
+         System.out.println("\t\t" + block.getGenSet());
+         System.out.println("\tKill:");
+         System.out.println("\t\t" + block.getKillSet());
+         System.out.println("\tLiveOut:");
+         System.out.println("\t\t" + block.getLiveOut());    
+      }
+      System.out.println("\tInterference:");
+      for (Node<Register> node : cfg.getInterference().getNodes()) {
+         System.out.println(node);
+      }
    }
 }

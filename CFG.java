@@ -34,6 +34,14 @@
       return result;
    }
 
+   public InterferenceGraph getInterference() {
+      InterferenceGraph interference = new InterferenceGraph();
+      for (BasicBlock block : bfsBlocks()) {
+         block.getInterference(interference);
+      }
+      return interference;
+   }
+
    public void calculateLiveOut() {
       List<BasicBlock> blocks = bfsBlocks();
       boolean changed = true;

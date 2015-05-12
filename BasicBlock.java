@@ -6,7 +6,6 @@ public class BasicBlock {
    private List<IInstruction> instructions;
    private LazyValue<LiveSets> liveSets;
    private HashSet<Register> liveOut;
-   private LazyValue<Map<Register, Node<Register>>> interference;
 
    private class LiveSets {
       public HashSet<Register> gen = new HashSet<>();
@@ -33,29 +32,23 @@ public class BasicBlock {
          }
       };
       liveOut = new HashSet<>();
-      interference = new LazyValue<Map<Register, Node<Register>>>() {
-         public Map<Register, Node<Register>> createValue() {
-            return generateInterference();
-         }
-      };
    }
 
-   private HashMap<Register, Node<Register>> generateInterference() {
-      HashMap<Register, Node<Register>> interference = new HashMap<>();
+   public InterferenceGraph getInterference(InterferenceGraph interference) {
       HashSet<Register> liveNow = new HashSet<>(liveOut);
       List<IInstruction> reversed = new ArrayList<>(instructions);
       Collections.reverse(reversed);
       for (IInstruction instr : reversed) {
          for (Register dest : instr.getDest()) {
-            if (!interference.containsKey(dest)) {
-               interference.put(dest, new Node<Register>(dest));
+            if (!interference.containsRegister(dest)) {
+               interference.addNode(new Node<Register>(dest));
             }
             for (Register register : liveNow) {
                if (!register.equals(dest)) {
-                  if (!interference.containsKey(register)) {
-                     interference.put(register, new Node<Register>(register));
+                  if (!interference.containsRegister(register)) {
+                     interference.addNode(new Node<Register>(register));
                   }
-                  interference.get(dest).connect(interference.get(register));
+                  interference.getNode(dest).connect(interference.getNode(register));
                }
             }
             liveNow.remove(dest);
@@ -63,10 +56,6 @@ public class BasicBlock {
          }
       }
       return interference;
-   }
-
-   public Map<Register, Node<Register>> getInterference() {
-      return interference.get();
    }
 
    public boolean genLiveOut() {
