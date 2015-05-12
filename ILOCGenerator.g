@@ -195,13 +195,13 @@ function
          })
       {
          if (!hasStatements) {
-            cfg.entryBlock.next.add(exitBlock);
+            cfg.entryBlock.addNext(exitBlock);
             IInstruction.JUMPI jumpi = new IInstruction.JUMPI();
             jumpi.label = exitBlock.label;
             cfg.entryBlock.addInstruction(jumpi);
          }
-         else if ($s.resultBlock != null && $s.resultBlock.next.isEmpty()) {
-            $s.resultBlock.next.add(exitBlock);
+         else if ($s.resultBlock != null && $s.resultBlock.isNextEmpty()) {
+            $s.resultBlock.addNext(exitBlock);
             IInstruction.JUMPI jumpi = new IInstruction.JUMPI();
             jumpi.label = exitBlock.label;
             $s.resultBlock.addInstruction(jumpi);
@@ -384,8 +384,8 @@ conditional[CFG cfg, BasicBlock block]
          }
       )?)      
       {
-         block.next.add(guardBlock);
-         guardBlock.next.add(thenBlock);
+         block.addNext(guardBlock);
+         guardBlock.addNext(thenBlock);
          
          IInstruction.COMPI compi = new IInstruction.COMPI();
          compi.source = $g.resultRegister;
@@ -397,16 +397,16 @@ conditional[CFG cfg, BasicBlock block]
          cbreq.labelB = hasElseBlock ? elseBlock.label : afterBlock.label;
          guardBlock.addInstruction(cbreq);
          if ($t.resultBlock != null) {
-            $t.resultBlock.next.add(afterBlock);
+            $t.resultBlock.addNext(afterBlock);
             
             IInstruction.JUMPI jumpi = new IInstruction.JUMPI();
             jumpi.label = afterBlock.label;
             $t.resultBlock.addInstruction(jumpi);
          }
          if (hasElseBlock) {
-            guardBlock.next.add(elseBlock);   
+            guardBlock.addNext(elseBlock);   
             if ($e.resultBlock != null) {
-               $e.resultBlock.next.add(afterBlock);
+               $e.resultBlock.addNext(afterBlock);
 
                IInstruction.JUMPI jumpi = new IInstruction.JUMPI();
                jumpi.label = afterBlock.label;
@@ -430,9 +430,9 @@ loop[CFG cfg, BasicBlock block]
    }
    :  ^(ast=WHILE e=expression[cfg, guardBlock] b=block[cfg, bodyBlock] expression[cfg, new BasicBlock()])
       {
-         block.next.add(guardBlock);
-         guardBlock.next.add(bodyBlock);
-         guardBlock.next.add(afterBlock);
+         block.addNext(guardBlock);
+         guardBlock.addNext(bodyBlock);
+         guardBlock.addNext(afterBlock);
 
          IInstruction.COMPI compi = new IInstruction.COMPI();
          compi.source = $e.resultRegister;
@@ -444,7 +444,7 @@ loop[CFG cfg, BasicBlock block]
          cbreq.labelB = afterBlock.label;
          guardBlock.addInstruction(cbreq);
          if ($b.resultBlock != null) {
-            $b.resultBlock.next.add(guardBlock);
+            $b.resultBlock.addNext(guardBlock);
 
             IInstruction.JUMPI jumpi = new IInstruction.JUMPI();
             jumpi.label = guardBlock.label;
@@ -478,7 +478,7 @@ return_stmt[CFG cfg, BasicBlock block]
             storeret.source = $e.resultRegister;
             block.addInstruction(storeret);            
          }
-         block.next.add(cfg.exitBlock);
+         block.addNext(cfg.exitBlock);
          IInstruction.JUMPI jumpi = new IInstruction.JUMPI();
          jumpi.label = cfg.exitBlock.label;
          block.addInstruction(jumpi);

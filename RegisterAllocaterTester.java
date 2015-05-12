@@ -1,24 +1,26 @@
-public class RegisterAllocatorTester {
+import java.util.*;
+public class RegisterAllocaterTester {
 
 	private CFG test;
 
-	public RegisterAllocatorTester() {
+	public RegisterAllocaterTester() {
 		test = genCFG();
 
 	}
 
 	private CFG genCFG() {
 		CFG toRet = new CFG(null);
-
+		Register.resetRegisters();
 		IInstruction.ADD add;
 		IInstruction.MOV mov;
 
-		Register r0, r1, r2, r3, r4;
+		Register r0, r1, r2, r3, r4, r5;
 		r0 = Register.newRegister();
 		r1 = Register.newRegister();
 		r2 = Register.newRegister();
 		r3 = Register.newRegister();
 		r4 = Register.newRegister();
+		r5 = Register.newRegister();
 
 		/* StartBlock */
 		BasicBlock startBlock = new BasicBlock();
@@ -61,7 +63,7 @@ public class RegisterAllocatorTester {
 		instr6.sourceB = r3;
 		instr6.dest = r4;
 		block1.addInstruction(instr6);
-		startBlock.next.add(block1);
+		startBlock.addNext(block1);
 
 		/*Block 2 */
 		BasicBlock block2 = new BasicBlock();
@@ -73,7 +75,7 @@ public class RegisterAllocatorTester {
 		add.dest = r1;
 		block2.addInstruction(add);
 
-		add = IInstruction.ADD();
+		add = new IInstruction.ADD();
 		add.sourceA = r1;
 		add.sourceB = r3;
 		add.dest = r2;
@@ -84,29 +86,29 @@ public class RegisterAllocatorTester {
 		add.sourceB = r2;
 		add.dest = r4;
 		block2.addInstruction(add);
-		startBlock.next.add(block2);
+		startBlock.addNext(block2);
 
 		/*Block 3*/
 		BasicBlock block3 = new BasicBlock();
 		block3.label = "L3";
 
-		mov = IInstruction.MOV();
+		mov = new IInstruction.MOV();
 		mov.source = r1;
 		mov.dest = r3;
 		block3.addInstruction(mov);
 
-		block1.next.add(block3);
+		block1.addNext(block3);
 
 		/*Block 4*/
 		BasicBlock block4 = new BasicBlock();
 		block4.label = "L4";
 
-		mov = IInstruction.MOV();
+		mov = new IInstruction.MOV();
 		mov.source = r2;
 		mov.dest = r3;
 		block4.addInstruction(mov);
 
-		block1.next.add(block4);
+		block1.addNext(block4);
 
 		/*Block 5*/
 		BasicBlock block5 = new BasicBlock();
@@ -123,11 +125,11 @@ public class RegisterAllocatorTester {
 		add.sourceB = r1;
 		add.dest = r3;
 		block5.addInstruction(add);
-		block3.next.add(block5);
-		block4.next.add(block5);
+		block3.addNext(block5);
+		block4.addNext(block5);
 
 		/*Block6 */
-		BasicBlock block6 = BasicBlock();
+		BasicBlock block6 = new BasicBlock();
 		block6.label = "L6";
 
 		add = new IInstruction.ADD();
@@ -139,16 +141,19 @@ public class RegisterAllocatorTester {
 		mov = new IInstruction.MOV();
 		mov.source = r0;
 		mov.dest = r5;
-		block6.next.add(mov);
+		block6.addInstruction(mov);
 
-		block5.next.add(block6);
+		block5.addNext(block6);
+		block2.addNext(block6);
 		
 		toRet.exitBlock = block6;
 		toRet.entryBlock = startBlock;
+
+		return toRet;
 	}
 
-	public CFG getCFG() {
+	public List<CFG> getCFG() {
 
-		return test;
+		return Arrays.<CFG>asList(test);
 	}
 }

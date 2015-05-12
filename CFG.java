@@ -1,5 +1,5 @@
  import java.util.*;
- 
+
  public class CFG {
    public BasicBlock entryBlock;
    public BasicBlock exitBlock;
@@ -26,11 +26,22 @@
          if (!visited.contains(block)) {
             result.add(block);
             visited.add(block);
-            for (BasicBlock nextBlock : block.next) {               
+            for (BasicBlock nextBlock : block.getNext()) {               
                queue.add(nextBlock);     
             }
          }
       }
       return result;
+   }
+
+   public void calculateLiveOut() {
+      List<BasicBlock> blocks = bfsBlocks();
+      boolean changed = true;
+      while (changed) {
+         changed = false;
+         for (BasicBlock block : blocks) {
+            changed |= block.genLiveOut();
+         }
+      }
    }
 }
