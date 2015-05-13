@@ -437,7 +437,7 @@ public abstract class IInstruction {
       }
 
       public Set<Register> getSource() {
-         return Collections.emptySet();
+         return Collections.singleton(Register.RAX);
       }
 
       public Set<Register> getDest() {
@@ -941,7 +941,7 @@ public abstract class IInstruction {
       }
 
       public Set<Register> getDest() {
-         return Collections.<Register>emptySet();
+         return new HashSet<Register>(Arrays.asList(Register.RDI, Register.RSI, Register.RAX));
       }
    }
 
@@ -968,7 +968,7 @@ public abstract class IInstruction {
       }
 
       public Set<Register> getDest() {
-         return Collections.<Register>emptySet();
+         return new HashSet<Register>(Arrays.asList(Register.RDI, Register.RSI, Register.RAX));
       }
    }
 
@@ -995,7 +995,7 @@ public abstract class IInstruction {
       }
 
       public Set<Register> getDest() {
-         return Collections.<Register>emptySet();
+         return new HashSet<Register>(Arrays.asList(Register.RDI, Register.RSI, Register.RAX));
       }
    }
 
@@ -1040,11 +1040,11 @@ public abstract class IInstruction {
       }
 
       public Set<Register> getSource() {
-         return Collections.<Register>emptySet();
+         return Collections.singleton(Register.RBP);
       }
 
       public Set<Register> getDest() {
-         return Collections.<Register>emptySet();
+         return new HashSet<Register>(Arrays.asList(Register.RBP, Regsiter.RSP);
       }
    }
 
@@ -1069,11 +1069,11 @@ public abstract class IInstruction {
       }
 
       public Set<Register> getSource() {
-         return Collections.<Register>emptySet();
+         return Collections.singleton(Register.RAX);
       }
 
       public Set<Register> getDest() {
-         return Collections.singleton(dest);
+         return new HashSet<Register>(Arrays.asList(dest, Register.RDI));
       }
    }
 
@@ -1096,7 +1096,7 @@ public abstract class IInstruction {
       }
 
       public Set<Register> getDest() {
-         return Collections.<Register>emptySet();
+         return Collections.singleton(Register.RDI);
       }
    }
 
