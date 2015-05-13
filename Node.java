@@ -17,7 +17,7 @@ public class Node<T> {
       return adj;
    }
 
-   public Register setColor(Register color) {
+   public void setColor(Register color) {
       this.color = color;
    }
 

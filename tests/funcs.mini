@@ -23,6 +23,6 @@ fun main() int
    e = 5;
    d = a(e, true);
    b(1, 2, 3);
-   c();
+   e = c();
    return e;
 }

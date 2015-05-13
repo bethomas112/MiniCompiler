@@ -35,6 +35,7 @@ public class BasicBlock {
    }
 
    public InterferenceGraph getInterference(InterferenceGraph interference) {
+      System.out.println("LIVE OUT: " + liveOut);
       HashSet<Register> liveNow = new HashSet<>(liveOut);
       List<IInstruction> reversed = new ArrayList<>(instructions);
       Collections.reverse(reversed);
@@ -112,6 +113,16 @@ public class BasicBlock {
    public String getX86(CFG cfg) {
       StringBuilder sb = new StringBuilder();
       sb.append(label + ":\n");
+      if (this == cfg.entryBlock) {
+         int spillCount = cfg.params.size() > IInstruction.SPILL_THRESHOLD ? cfg.params.size() - IInstruction.SPILL_THRESHOLD : 0;
+         spillCount += cfg.spills.size();
+         int localCount = cfg.localsOrdered.size();
+         int frameSize = (spillCount + localCount) * 8;
+         sb.append("\tpushq %rbp\n");
+         sb.append("\tmovq %rsp, %rbp\n");
+         sb.append("\tsubq $" + frameSize + ", %rsp\n");      
+      }
+      
       for (IInstruction instruction : instructions) {
          sb.append(instruction.getX86(cfg));
       }
@@ -124,5 +135,14 @@ public class BasicBlock {
 
    public HashSet<Register> getKillSet() {
       return new HashSet<Register>(liveSets.get().kill);
+   }
+
+   public void resetSets() {
+      liveSets = new LazyValue<LiveSets>() {
+         public LiveSets createValue() {
+            return new LiveSets();
+         }
+      };
+      liveOut = new HashSet<>();
    }
 }

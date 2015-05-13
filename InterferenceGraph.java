@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.Map.Entry;
 public class InterferenceGraph {
    private HashMap<Register, Node<Register>> graph = new HashMap<>();
 
@@ -18,7 +19,21 @@ public class InterferenceGraph {
       return new HashSet<Node<Register>>(graph.values());
    }
 
-   public Node<Register> removeUnconstrainedNode() {
+   public Node<Register> removeNode() {
+      Node<Register> node;
+      if ((node = removeUnconstrainedNode()) != null) {
+         return node;
+      }
+      if ((node = removePossiblyConstrainedNode()) != null) {
+         return node;
+      }
+      if ((node = removeRequiredNode()) != null) {
+         return node;
+      }
+      return null;
+   }
+
+   private Node<Register> removeUnconstrainedNode() {
       for (Node<Register> node : graph.values()) {
          if (isUnconstrainedNode(node)) {
             for (Node<Register> adj : node.getAdj()) {
@@ -31,9 +46,9 @@ public class InterferenceGraph {
       return null;
    }
 
-   public Node<Register> removeConstrainedNode() {
+   private Node<Register> removePossiblyConstrainedNode() {
       for (Node<Register> node : graph.values()) {
-         if (isConstrainedNode(node)) {
+         if (!isUnconstrainedNode(node) && !isRequiredRegister(node.getData())) {
             for (Node<Register> adj : node.getAdj()) {
                adj.disconnectFrom(node);
             }
@@ -44,7 +59,7 @@ public class InterferenceGraph {
       return null;
    }
 
-   public Node<Register> removeRequiredNode() {
+   private Node<Register> removeRequiredNode() {
       for (Node<Register> node : graph.values()) {
          if (isRequiredRegister(node.getData())) {
             for (Node<Register> adj : node.getAdj()) {
@@ -61,16 +76,24 @@ public class InterferenceGraph {
       return !isRequiredRegister(node.getData()) && node.degree() < Register.COLORING_REGISTERS.size();
    }
 
-   public static boolean isConstrainedNode(Node<Register> node) {
-      return !isRequiredRegister(node.getData()) && node.degree() >= Register.COLORING_REGISTERS.size();
+   public static HashSet<Register> getColorings(Node<Register> node) {
+      HashSet<Register> availableColors = new HashSet<>(Register.COLORING_REGISTERS);
+      for (Node<Register> adj : node.getAdj()) {
+         availableColors.remove(adj.getColor());
+      }
+      return availableColors;
    }
+
 
    public static boolean isRequiredRegister(Register register) {
       return Register.REQUIRED_REGISTERS.contains(register);
    }
 
-   
-
-
-
+   public String toString() {
+      StringBuilder sb = new StringBuilder();
+      for (Entry<Register, Node<Register>> entry : graph.entrySet()) {
+         sb.append(entry.getValue());
+      }
+      return sb.toString();
+   }
 }

@@ -1,5 +1,5 @@
 import java.util.*;
-
+import java.io.*;
 public class RegisterAllocator {
    private ILOCGenerator.ILOCResult result;
    public RegisterAllocator(ILOCGenerator.ILOCResult result) {
@@ -9,55 +9,83 @@ public class RegisterAllocator {
    public ILOCGenerator.ILOCResult allocate() {
       for (CFG cfg : result.cfgs) {
          cfg.calculateLiveOut();
-         allocateCFG(cfg);
+         while (!allocateCFG(cfg)) {
+            writeILOC(cfg);         
+            cfg.resetLiveAnalysis();
+            cfg.calculateLiveOut();
+         }
       }
       return result;
    }
 
-   public void allocateCFG(CFG cfg) {
+   public boolean allocateCFG(CFG cfg) {
       Stack<Node<Register>> stack = new Stack<>();
       Node<Register> node;
       InterferenceGraph interference = cfg.getInterference();
-
-      while ((node = interference.removeUnconstrainedNode()) != null) {
+      //System.out.println("Interference: \n" + interference);
+      while ((node = interference.removeNode()) != null) {
          stack.push(node);
       }
-      while ((node = interference.removeConstrainedNode()) != null) {
-         stack.push(node);
-      }
-      while ((node = interference.removeRequiredNode()) != null) {
-         stack.push(node);
-      }
-      
 
       HashMap<Register, Register> colorings = new HashMap<>();
       while (!stack.isEmpty()) {
-         Node<Register> node = stack.pop();
+         node = stack.pop();
          if (InterferenceGraph.isRequiredRegister(node.getData())) {
             node.setColor(node.getData());
             colorings.put(node.getData(), node.getData());
          }
-         else if (InterferenceGraph.isConstrainedNode(node)) {
-
-         }
-         else if (InterferenceGraph.isUnconstrainedNode(node)) {
-            HashSet<Register> availableColors = new HashSet<>(Register.COLORING_REGISTERS);
-            
-            for (Node<Register> adj : node.getAdj()) {
-               availableColors.remove(adj.getColor());
-            }
-
-            Register color = availableColors.iterator().next();
+         else if (InterferenceGraph.isUnconstrainedNode(node)) {            
+            Register color = InterferenceGraph.getColorings(node).iterator().next();
             node.setColor(color);
-            colorings.put(node.getData(), color)
+            colorings.put(node.getData(), color);
          }
          else {
-            throw new RuntimeException("Uncategorized register" + node);
+            HashSet<Register> colors = InterferenceGraph.getColorings(node);
+            if (colors.isEmpty()) {
+               spillRegister(cfg, node.getData());               
+               return false;
+            }
+            else {
+               Register color = colors.iterator().next();
+               node.setColor(color);
+               colorings.put(node.getData(), color);
+            }
          }
       }
       
-      
+      System.out.println(colorings);
+      for (BasicBlock block : cfg.bfsBlocks()) {
+         for (IInstruction instruction : block.getILOC()) {
+            instruction.applyColoring(colorings);
+         }
+      }
 
+      return true;
+   }
+
+   private void spillRegister(CFG cfg, Register register) {
+      System.out.println("Spilling register: " + register);      
+      for (BasicBlock block : cfg.bfsBlocks()) {
+         List<IInstruction> instructions = block.getILOC();
+         for (int idx = 0; idx < instructions.size(); idx++) {
+            Integer rspOffset = cfg.allocateSpill(register);
+            IInstruction instruction = instructions.get(idx);
+            if (instruction.getSource().contains(register)) {
+               IInstruction.LOADAISPILL loadaispill = new IInstruction.LOADAISPILL();
+               loadaispill.dest = register;
+               loadaispill.offset = rspOffset;
+               instructions.add(idx, loadaispill);
+               idx++;
+            }
+            if (instruction.getDest().contains(register)) {
+               IInstruction.STOREAISPILL storeaispill = new IInstruction.STOREAISPILL();
+               storeaispill.source = register;
+               storeaispill.offset = rspOffset;
+               instructions.add(idx + 1, storeaispill);
+               idx++;
+            }
+         }
+      }
    }
 
    public void debugPrint(CFG cfg) {
@@ -77,5 +105,23 @@ public class RegisterAllocator {
       for (Node<Register> node : cfg.getInterference().getNodes()) {
          System.out.println(node);
       }
+   }
+
+   public void writeILOC(CFG cfg) {
+      StringBuilder sb = new StringBuilder();
+      List<BasicBlock> blocks = cfg.bfsBlocks();
+      
+      for (BasicBlock block : blocks) {            
+         sb.append(block);               
+      }           
+      try {
+         FileWriter writer = new FileWriter(new File("debug.il"));
+         writer.write(sb.toString());
+         writer.close();
+      }
+      catch (IOException e) {
+         System.err.println("Error writing .il file: " + e);
+      }
+      
    }
 }

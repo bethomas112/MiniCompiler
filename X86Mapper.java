@@ -26,7 +26,7 @@ public class X86Mapper {
          for (CFG cfg : ilocResult.cfgs) {
             writer.write("\t.text\n");
             writer.write(".global " + cfg.entryBlock.label + "\n");
-            writer.write("\t.type\t" + cfg.entryBlock.label + ", @function\n");           
+            writer.write("\t.type\t" + cfg.entryBlock.label + ", @function\n");            
             for (BasicBlock block : cfg.bfsBlocks()) {
                writer.write(block.getX86(cfg));
             }

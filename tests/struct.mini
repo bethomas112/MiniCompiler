@@ -6,11 +6,14 @@ struct J {
 fun main() int
 {
    struct J j;
-
    j = new J;
    j.b = new J;
+   print 2;
    j.b.b = new J;
+   print 3;
    j.b.b.a = 3;
+   print 4;
    j.a = 2;
-   return 1;
+   print 5;
+   return j.b.b.a;
 }

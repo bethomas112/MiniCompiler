@@ -48,4 +48,6 @@ public class Register {
 
    public static final Set<Register> REQUIRED_REGISTERS = Collections.unmodifiableSet(new HashSet<Register>(Arrays.asList(RDI, RSI, RDX, RCX, R8, R9, RSP, RBP, RAX)));
    public static final Set<Register> COLORING_REGISTERS = Collections.unmodifiableSet(new HashSet<Register>(Arrays.asList(RDI, RSI, RDX, RCX, R8, R9, R10, R11, R12, R13, R14, R15, RBX)));
+   public static final Set<Register> CALLER_SAVED = Collections.unmodifiableSet(new HashSet<Register>(Arrays.asList(RAX, RCX, RDX, RSI, RDI, R8, R9, R10, R11)));
+   public static final Set<Register> CALLEE_SAVED = Collections.unmodifiableSet(new HashSet<Register>(Arrays.asList(RBX, RSP, RBP, R12, R13, R14, R15)));
 }

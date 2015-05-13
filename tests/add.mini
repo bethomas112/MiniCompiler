@@ -3,5 +3,5 @@ fun main() int
    int i, j;
    i = 1;
    j = 2;
-   return (i + 3) * j / 4 - 1;
+   return i + j;
 }

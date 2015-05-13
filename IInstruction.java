@@ -2,7 +2,7 @@
 import java.util.*;
 
 public abstract class IInstruction {  
-   private static final int SPILL_THRESHOLD = 6;
+   public static final int SPILL_THRESHOLD = 6;
    /* Arithmetic*/
    public static class ADD extends IInstruction {
       public Register sourceA, sourceB, dest;
@@ -18,7 +18,7 @@ public abstract class IInstruction {
       }
 
       public Set<Register> getSource() {
-         return new HashSet<Register>(Arrays.asList(sourceA, sourceB));
+         return new HashSet<Register>(Arrays.asList(sourceA, sourceB, dest));
       }
 
       public Set<Register> getDest() {
@@ -47,7 +47,7 @@ public abstract class IInstruction {
       }
 
       public Set<Register> getSource() {
-         return Collections.singleton(source);
+         return new HashSet<Register>(Arrays.asList(source, dest));
       }
 
       public Set<Register> getDest() {
@@ -55,7 +55,7 @@ public abstract class IInstruction {
       }
 
       public void applyColoring(HashMap<Register, Register> coloring) {
-         source = coloring.get(sourceA);
+         source = coloring.get(source);
          dest = coloring.get(dest);
       }
    }
@@ -129,7 +129,7 @@ public abstract class IInstruction {
       }
 
       public void applyColoring(HashMap<Register, Register> coloring) {
-         source = coloring.get(sourceA);
+         source = coloring.get(source);
          dest = coloring.get(dest);
       }
    }
@@ -179,7 +179,7 @@ public abstract class IInstruction {
       }
 
       public Set<Register> getSource() {
-         return new HashSet<Register>(Arrays.asList(sourceA, sourceB));
+         return new HashSet<Register>(Arrays.asList(sourceA, sourceB, dest));
       }
 
       public Set<Register> getDest() {
@@ -207,7 +207,7 @@ public abstract class IInstruction {
       }
 
       public Set<Register> getSource() {
-         return new HashSet<Register>(Arrays.asList(sourceA, sourceB));
+         return new HashSet<Register>(Arrays.asList(sourceA, sourceB, dest));
       }
 
       public Set<Register> getDest() {
@@ -244,7 +244,7 @@ public abstract class IInstruction {
       }
 
       public void applyColoring(HashMap<Register, Register> coloring) {
-         source = coloring.get(sourceA);
+         source = coloring.get(source);
          dest = coloring.get(dest);
       }
    }
@@ -264,7 +264,7 @@ public abstract class IInstruction {
       }
 
       public Set<Register> getSource() {
-         return new HashSet<Register>(Arrays.asList(sourceA, sourceB));
+         return new HashSet<Register>(Arrays.asList(sourceA, sourceB, dest));
       }
 
       public Set<Register> getDest() {
@@ -292,7 +292,7 @@ public abstract class IInstruction {
       }
 
       public Set<Register> getSource() {
-         return new HashSet<Register>(Arrays.asList(sourceA, sourceB));
+         return new HashSet<Register>(Arrays.asList(sourceA, sourceB, dest));
       }
 
       public Set<Register> getDest() {
@@ -330,7 +330,7 @@ public abstract class IInstruction {
       }
 
       public void applyColoring(HashMap<Register, Register> coloring) {
-         source = coloring.get(sourceA);
+         source = coloring.get(source);
          dest = coloring.get(dest);
       }
    }
@@ -358,6 +358,33 @@ public abstract class IInstruction {
       public void applyColoring(HashMap<Register, Register> coloring) {
          dest = coloring.get(dest);
       }
+   }
+
+   public static class LOADAISPILL extends IInstruction {
+      public Register dest;
+      public int offset;
+      public String getText() {
+         return "loadai rarp, " + offset + ", " + dest;
+      }
+
+      public Set<Register> getSource() {
+         return Collections.singleton(Register.RSP);
+      }
+
+      public Set<Register> getDest() {
+         return Collections.singleton(dest);
+      }
+
+      public String getX86(CFG cfg) {
+         StringBuilder builder = new StringBuilder();
+         builder.append("\tmovq " + offset + "(%rsp), " + dest + "\n");
+         return builder.toString();
+      }
+
+      public void applyColoring(HashMap<Register, Register> coloring) {
+         dest = coloring.get(dest);
+      }
+
    }
 
    /* Loads the field at the address in source into dest*/
@@ -393,7 +420,7 @@ public abstract class IInstruction {
       }
 
       public void applyColoring(HashMap<Register, Register> coloring) {
-         source = coloring.get(sourceA);
+         source = coloring.get(source);
          dest = coloring.get(dest);
       }
    }
@@ -553,6 +580,30 @@ public abstract class IInstruction {
       }
    }
 
+   public static class STOREAISPILL extends IInstruction {
+      public Register source;
+      public int offset;
+      public String getText() {
+         return "storeai " + source + ", " + "rarp" + ", " + offset;
+      }
+
+      public Set<Register> getSource() {
+         return Collections.singleton(source);
+      }
+
+      public Set<Register> getDest() {
+         return new HashSet<Register>(Arrays.<Register>asList(Register.RSP));
+      }
+
+      public String getX86(CFG cfg) {
+         return "\tmovq " + source + ", " + offset + "(%rsp)\n";
+      }
+
+      public void applyColoring(HashMap<Register, Register> coloring) {
+         source = coloring.get(source);
+      }
+   }
+
    /* Stores */
    public static class STOREAIFIELD extends IInstruction {
       public Register source, dest;
@@ -663,7 +714,7 @@ public abstract class IInstruction {
       }
 
       public String getX86(CFG cfg) {
-         return "\tmovq " + source + ", $rax\n";
+         return "\tmovq " + source + ", %rax\n";
       }
 
       public Set<Register> getSource() {
@@ -711,7 +762,7 @@ public abstract class IInstruction {
       }
 
       public String getX86(CFG cfg) {
-         return "\tcmovgeq " + source + ", " + dest + "\n";
+         return "\tcmoveq " + source + ", " + dest + "\n";
       }
 
       public Set<Register> getSource() {
@@ -1189,6 +1240,7 @@ public abstract class IInstruction {
 
       public String getX86(CFG cfg) {
          int spillCount = cfg.params.size() > SPILL_THRESHOLD ? cfg.params.size() - SPILL_THRESHOLD : 0;
+         spillCount += cfg.spills.size();
          int localCount = cfg.localsOrdered.size();
          int frameSize = (spillCount + localCount) * 8;
          StringBuilder builder = new StringBuilder();
