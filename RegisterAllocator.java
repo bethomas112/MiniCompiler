@@ -15,8 +15,17 @@ public class RegisterAllocator {
    }
 
    public void allocateCFG(CFG cfg) {
-      List<Node> stack = new LinkedList<>();
-
+      List<Node<Register>> stack = new LinkedList<>();
+      Node<Register> node;
+      while ((node = removeUnconstrainedNode()) != null) {
+         stack.add(node);
+      }
+      while ((node = removeConstrainedNode()) != null) {
+         stack.add(node);
+      }
+      while ((node = removeRequiredNode()) != null) {
+         stack.add(node);
+      }
    }
 
    public void debugPrint(CFG cfg) {

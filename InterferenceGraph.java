@@ -20,6 +20,55 @@ public class InterferenceGraph {
    }
 
    public Node<Register> removeUnconstrainedNode() {
-
+      for (Node node : graph.values()) {
+         if (isUnconstrainedNode(node)) {
+            for (Node<Register> adj : node.getAdj()) {
+               adj.disconnectFrom(node);
+            }
+            return node;
+         }
+      }
+      return null;
    }
+
+   public Node<Register> removeConstrainedNode() {
+      for (Node node : graph.values()) {
+         if (isConstrainedNode(node)) {
+            for (Node<Register> adj : node.getAdj()) {
+               adj.disconnectFrom(node);
+            }
+            return node;
+         }
+      }
+      return null;
+   }
+
+   public Node<Register> removeRequiredNode() {
+      for (Node node : graph.values()) {
+         if (isRequiredRegister(node.getData())) {
+            for (Node<Register> adj : node.getAdj()) {
+               adj.disconnectFrom(node);
+            }
+            return node;
+         }
+      }
+      return null;
+   }
+
+   public boolean isUnconstrainedNode(Node<Register> node) {
+      return !isRequiredRegister(node.getData()) && node.degree < Register.COLORING_REGISTERS.size();
+   }
+
+   public boolean isConstrainedNode(Node<Register> node) {
+      return !isRequiredRegister(node.getData()) && node.degree >= Register.COLORING_REGISTERS.size();
+   }
+
+   public boolean isRequiredRegister(Register register) {
+      return Register.REQUIRED_REGISTERS.contains(register);
+   }
+
+   
+
+
+
 }

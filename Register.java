@@ -41,6 +41,7 @@ public class Register {
 
    /* Return value Register */
    public static final Register RAX = new Register("%rax");
-
+   
+   public static final Set<Register> REQUIRED_REGISTERS = Collections.unmodifiableSet(new HashSet<Register>(Arrays.asList(RAX, RDX, RDI, RSI, RDX, RCX, R8, R9)));
    public static final Set<Register> COLORING_REGISTERS = Collections.unmodifiableSet(new HashSet<Register>(Arrays.asList(RDI, RSI, RDX, RCX, R8, R9, R10, R11, R12, R13, R14, R15, RBX)));
 }

@@ -21,8 +21,8 @@ public class Node<T> {
       other.adj.add(this);
    }
 
-   public void disconnect(Node<T> other) {
-      
+   public void disconnectFrom(Node<T> other) {
+      adj.remove(other);
    }
 
    public int degree() {
