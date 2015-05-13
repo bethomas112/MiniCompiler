@@ -399,6 +399,10 @@ public abstract class IInstruction {
       public Set<Register> getDest() {
          return Collections.singleton(dest);
       }
+
+      public void applyColoring(HashMap<Register, Register> coloring) {
+         dest = coloring.get(dest);
+      }
    }
 
    public static class LOADGLOBAL extends IInstruction {
@@ -422,6 +426,9 @@ public abstract class IInstruction {
          return Collections.singleton(dest);
       }
       
+      public void applyColoring(HashMap<Register, Register> coloring) {
+         dest = coloring.get(dest);
+      }
    }
 
    public static class LOADRET extends IInstruction {
@@ -443,6 +450,10 @@ public abstract class IInstruction {
       public Set<Register> getDest() {
          return Collections.singleton(dest);
       }
+
+      public void applyColoring(HashMap<Register, Register> coloring) {
+         dest = coloring.get(dest);
+      }
    }
 
    public static class COMPUTEGLOBALADDRESS extends IInstruction {
@@ -462,6 +473,10 @@ public abstract class IInstruction {
 
       public Set<Register> getDest() {
          return Collections.singleton(dest);
+      }
+
+      public void applyColoring(HashMap<Register, Register> coloring) {
+         dest = coloring.get(dest);
       }
    }
 
@@ -494,6 +509,11 @@ public abstract class IInstruction {
 
       public Set<Register> getDest() {
          return Collections.singleton(dest);
+      }
+
+      public void applyColoring(HashMap<Register, Register> coloring) {
+         source = coloring.get(source);
+         dest = coloring.get(dest);
       }
    }
 
@@ -533,6 +553,10 @@ public abstract class IInstruction {
             return Collections.singleton(argRegisters.get(argIdx));
          }
       }
+
+      public void applyColoring(HashMap<Register, Register> coloring) {
+         source = coloring.get(source);
+      }
    }
 
    public static class STOREGLOBAL extends IInstruction {
@@ -553,6 +577,10 @@ public abstract class IInstruction {
       public Set<Register> getDest() {
          return Collections.emptySet();
       }
+
+      public void applyColoring(HashMap<Register, Register> coloring) {
+         source = coloring.get(source);
+      }
    }
 
    public static class STORERET extends IInstruction {
@@ -571,6 +599,10 @@ public abstract class IInstruction {
 
       public Set<Register> getDest() {
          return Collections.singleton(Register.RAX);
+      }
+
+      public void applyColoring(HashMap<Register, Register> coloring) {
+         source = coloring.get(source);
       }
    }
 
@@ -592,6 +624,11 @@ public abstract class IInstruction {
       public Set<Register> getDest() {
          return Collections.singleton(dest);
       }
+
+      public void applyColoring(HashMap<Register, Register> coloring) {
+         source = coloring.get(source);
+         dest = coloring.get(dest);
+      }
    }
 
    public static class MOVEQ extends IInstruction {
@@ -610,6 +647,11 @@ public abstract class IInstruction {
 
       public Set<Register> getDest() {
          return Collections.singleton(dest);
+      }
+
+      public void applyColoring(HashMap<Register, Register> coloring) {
+         source = coloring.get(source);
+         dest = coloring.get(dest);
       }
    }
 
@@ -630,6 +672,11 @@ public abstract class IInstruction {
       public Set<Register> getDest() {
          return Collections.singleton(dest);
       }
+
+      public void applyColoring(HashMap<Register, Register> coloring) {
+         source = coloring.get(source);
+         dest = coloring.get(dest);
+      }
    }
 
    public static class MOVGT extends IInstruction {
@@ -648,6 +695,11 @@ public abstract class IInstruction {
 
       public Set<Register> getDest() {
          return Collections.singleton(dest);
+      }
+
+      public void applyColoring(HashMap<Register, Register> coloring) {
+         source = coloring.get(source);
+         dest = coloring.get(dest);
       }
    }
 
@@ -668,6 +720,11 @@ public abstract class IInstruction {
       public Set<Register> getDest() {
          return Collections.singleton(dest);
       }
+
+      public void applyColoring(HashMap<Register, Register> coloring) {
+         source = coloring.get(source);
+         dest = coloring.get(dest);
+      }
    }
 
    public static class MOVLT extends IInstruction {
@@ -687,6 +744,11 @@ public abstract class IInstruction {
       public Set<Register> getDest() {
          return Collections.singleton(dest);
       }
+
+      public void applyColoring(HashMap<Register, Register> coloring) {
+         source = coloring.get(source);
+         dest = coloring.get(dest);
+      }
    }
 
    public static class MOVNE extends IInstruction {
@@ -705,6 +767,11 @@ public abstract class IInstruction {
 
       public Set<Register> getDest() {
          return Collections.singleton(dest);
+      }
+
+      public void applyColoring(HashMap<Register, Register> coloring) {
+         source = coloring.get(source);
+         dest = coloring.get(dest);
       }
    }
 
@@ -727,6 +794,11 @@ public abstract class IInstruction {
       public Set<Register> getDest() {
          return Collections.<Register>emptySet();
       }
+
+      public void applyColoring(HashMap<Register, Register> coloring) {
+         sourceA = coloring.get(sourceA);
+         sourceB = coloring.get(sourceB);
+      }
    }
 
    public static class COMPI extends IInstruction {
@@ -747,6 +819,10 @@ public abstract class IInstruction {
 
       public Set<Register> getDest() {
          return Collections.<Register>emptySet();
+      }
+
+      public void applyColoring(HashMap<Register, Register> coloring) {
+         source = coloring.get(source);
       }
    }
 
@@ -943,6 +1019,10 @@ public abstract class IInstruction {
       public Set<Register> getDest() {
          return new HashSet<Register>(Arrays.asList(Register.RDI, Register.RSI, Register.RAX));
       }
+
+      public void applyColoring(HashMap<Register, Register> coloring) {
+         source = coloring.get(source);
+      }
    }
 
    public static class PRINTLN extends IInstruction {
@@ -970,6 +1050,10 @@ public abstract class IInstruction {
       public Set<Register> getDest() {
          return new HashSet<Register>(Arrays.asList(Register.RDI, Register.RSI, Register.RAX));
       }
+
+      public void applyColoring(HashMap<Register, Register> coloring) {
+         source = coloring.get(source);
+      }
    }
 
    public static class READ extends IInstruction {
@@ -996,6 +1080,10 @@ public abstract class IInstruction {
 
       public Set<Register> getDest() {
          return new HashSet<Register>(Arrays.asList(Register.RDI, Register.RSI, Register.RAX));
+      }
+
+      public void applyColoring(HashMap<Register, Register> coloring) {
+         dest = coloring.get(dest);
       }
    }
 
@@ -1075,6 +1163,10 @@ public abstract class IInstruction {
       public Set<Register> getDest() {
          return new HashSet<Register>(Arrays.asList(dest, Register.RDI));
       }
+
+      public void applyColoring(HashMap<Register, Register> coloring) {
+         dest = coloring.get(dest);
+      }
    }
 
    public static class DEL extends IInstruction {
@@ -1098,18 +1190,25 @@ public abstract class IInstruction {
       public Set<Register> getDest() {
          return Collections.singleton(Register.RDI);
       }
+
+      public void applyColoring(HashMap<Register, Register> coloring) {
+         source = coloring.get(source);
+      }
    }
 
    public abstract String getText();
    public abstract String getX86(CFG cfg);
    public abstract Set<Register> getSource();
    public abstract Set<Register> getDest();
+
    public void applyColoring(HashMap<Register, Register> coloring) {
-      
+
    }
+
    public boolean hasSource() {
       return !getSource().isEmpty();
    }
+
    public boolean hasDest() {
       return !getDest().isEmpty();
    }
