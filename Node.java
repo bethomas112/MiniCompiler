@@ -2,6 +2,7 @@ import java.util.*;
 public class Node<T> {
    private T t;
    private HashSet<Node<T>> adj;
+   private Register color;
 
    public Node(T t) {
       this.t = t;
@@ -12,8 +13,19 @@ public class Node<T> {
       return t;
    }
 
-   public List<Node<T>> getAdj() {
-      return new ArrayList<Node<T>>(adj);
+   public HashSet<Node<T>> getAdj() {
+      return adj;
+   }
+
+   public Register setColor(Register color) {
+      this.color = color;
+   }
+
+   public Register getColor() {
+      if (color == null) {
+         throw new RuntimeException("Node is not colored");
+      }
+      return color;
    }
 
    public void connect(Node<T> other) {

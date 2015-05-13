@@ -1044,7 +1044,7 @@ public abstract class IInstruction {
       }
 
       public Set<Register> getDest() {
-         return new HashSet<Register>(Arrays.asList(Register.RBP, Regsiter.RSP);
+         return new HashSet<Register>(Arrays.asList(Register.RBP, Register.RSP));
       }
    }
 
@@ -1104,6 +1104,9 @@ public abstract class IInstruction {
    public abstract String getX86(CFG cfg);
    public abstract Set<Register> getSource();
    public abstract Set<Register> getDest();
+   public void applyColoring(HashMap<Register, Register> coloring) {
+      
+   }
    public boolean hasSource() {
       return !getSource().isEmpty();
    }

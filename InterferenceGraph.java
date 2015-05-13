@@ -1,7 +1,6 @@
 import java.util.*;
 public class InterferenceGraph {
    private HashMap<Register, Node<Register>> graph = new HashMap<>();
-   private HashSet<Register> visited;
 
    public void addNode(Node<Register> node) {
       graph.put(node.getData(), node);
@@ -20,11 +19,12 @@ public class InterferenceGraph {
    }
 
    public Node<Register> removeUnconstrainedNode() {
-      for (Node node : graph.values()) {
+      for (Node<Register> node : graph.values()) {
          if (isUnconstrainedNode(node)) {
             for (Node<Register> adj : node.getAdj()) {
                adj.disconnectFrom(node);
             }
+            graph.remove(node.getData());
             return node;
          }
       }
@@ -32,11 +32,12 @@ public class InterferenceGraph {
    }
 
    public Node<Register> removeConstrainedNode() {
-      for (Node node : graph.values()) {
+      for (Node<Register> node : graph.values()) {
          if (isConstrainedNode(node)) {
             for (Node<Register> adj : node.getAdj()) {
                adj.disconnectFrom(node);
             }
+            graph.remove(node.getData());
             return node;
          }
       }
@@ -44,26 +45,27 @@ public class InterferenceGraph {
    }
 
    public Node<Register> removeRequiredNode() {
-      for (Node node : graph.values()) {
+      for (Node<Register> node : graph.values()) {
          if (isRequiredRegister(node.getData())) {
             for (Node<Register> adj : node.getAdj()) {
                adj.disconnectFrom(node);
             }
+            graph.remove(node.getData());
             return node;
          }
       }
       return null;
    }
 
-   public boolean isUnconstrainedNode(Node<Register> node) {
-      return !isRequiredRegister(node.getData()) && node.degree < Register.COLORING_REGISTERS.size();
+   public static boolean isUnconstrainedNode(Node<Register> node) {
+      return !isRequiredRegister(node.getData()) && node.degree() < Register.COLORING_REGISTERS.size();
    }
 
-   public boolean isConstrainedNode(Node<Register> node) {
-      return !isRequiredRegister(node.getData()) && node.degree >= Register.COLORING_REGISTERS.size();
+   public static boolean isConstrainedNode(Node<Register> node) {
+      return !isRequiredRegister(node.getData()) && node.degree() >= Register.COLORING_REGISTERS.size();
    }
 
-   public boolean isRequiredRegister(Register register) {
+   public static boolean isRequiredRegister(Register register) {
       return Register.REQUIRED_REGISTERS.contains(register);
    }
 
