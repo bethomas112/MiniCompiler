@@ -21,6 +21,14 @@ public class Node<T> {
       other.adj.add(this);
    }
 
+   public void disconnect(Node<T> other) {
+      
+   }
+
+   public int degree() {
+      return adj.size();
+   }
+
    public String toString() {
       StringBuilder sb = new StringBuilder();
       sb.append(((Object)t).toString() + "\n");
