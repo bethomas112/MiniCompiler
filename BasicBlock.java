@@ -18,6 +18,9 @@ public class BasicBlock {
                }               
             }
             kill.addAll(instruction.getDest());
+            System.out.println("Instruction: "  + instruction.getText());
+            System.out.println("\tGen: "  + gen);
+            System.out.println("\tKill: "  + kill);
          }         
       }
    }
@@ -35,7 +38,6 @@ public class BasicBlock {
    }
 
    public InterferenceGraph getInterference(InterferenceGraph interference) {
-      System.out.println("LIVE OUT: " + liveOut);
       HashSet<Register> liveNow = new HashSet<>(liveOut);
       List<IInstruction> reversed = new ArrayList<>(instructions);
       Collections.reverse(reversed);
@@ -55,6 +57,7 @@ public class BasicBlock {
             liveNow.remove(dest);
             liveNow.addAll(instr.getSource());
          }
+         System.out.println(instr.getText() + "\tLiveNow: " + liveNow);
       }
       return interference;
    }
@@ -69,6 +72,7 @@ public class BasicBlock {
       }
       boolean changed = !newLiveOut.equals(liveOut);
       liveOut = newLiveOut;
+      System.out.println("LiveOut for block " + label + ": " + liveOut);
       return changed;
    }
 

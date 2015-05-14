@@ -6,3 +6,4 @@ ToJSON.tokens
 *.class
 *.il
 *.s
+.idea/
