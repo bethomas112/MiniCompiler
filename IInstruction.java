@@ -908,7 +908,7 @@ public abstract class IInstruction {
       }
 
       public String getX86(CFG cfg) {
-         return "\tcmpq " + sourceA + ", " + sourceB + "\n";
+         return "\tcmpq " + sourceB + ", " + sourceA + "\n";
       }
 
       public Set<Register> getSource() {
@@ -1141,7 +1141,7 @@ public abstract class IInstruction {
       }
 
       public Set<Register> getDest() {
-         return new HashSet<Register>(Arrays.asList(Register.RDI, Register.RSI, Register.RAX));
+         return Register.CALLER_SAVED;
       }
 
       public void applyColoring(HashMap<Register, Register> coloring) {
@@ -1172,7 +1172,7 @@ public abstract class IInstruction {
       }
 
       public Set<Register> getDest() {
-         return new HashSet<Register>(Arrays.asList(Register.RDI, Register.RSI, Register.RAX));
+         return Register.CALLER_SAVED;
       }
 
       public void applyColoring(HashMap<Register, Register> coloring) {
@@ -1203,7 +1203,7 @@ public abstract class IInstruction {
       }
 
       public Set<Register> getDest() {
-         return new HashSet<Register>(Arrays.asList(Register.RDI, Register.RSI, Register.RAX));
+         return Register.CALLER_SAVED;
       }
 
       public void applyColoring(HashMap<Register, Register> coloring) {
@@ -1229,7 +1229,7 @@ public abstract class IInstruction {
       }
 
       public Set<Register> getDest() {
-         return Collections.<Register>emptySet();
+         return Register.CALLER_SAVED;
       }
    }
 
@@ -1286,7 +1286,9 @@ public abstract class IInstruction {
       }
 
       public Set<Register> getDest() {
-         return new HashSet<Register>(Arrays.asList(dest, Register.RDI));
+         HashSet<Register> registers = new HashSet<>(Arrays.asList(dest));
+         registers.addAll(Register.CALLER_SAVED);
+         return registers;
       }
 
       public void applyColoring(HashMap<Register, Register> coloring) {
@@ -1313,7 +1315,7 @@ public abstract class IInstruction {
       }
 
       public Set<Register> getDest() {
-         return Collections.singleton(Register.RDI);
+         return Register.CALLER_SAVED;
       }
 
       public void applyColoring(HashMap<Register, Register> coloring) {

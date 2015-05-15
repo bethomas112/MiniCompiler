@@ -1,0 +1,13 @@
+struct J {
+   int a;
+   struct J b;
+};
+
+fun main() int
+{
+   struct J j;
+   j = new J;
+   print 2;
+   j = new J;
+   return 1;
+}
