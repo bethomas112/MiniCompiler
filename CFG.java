@@ -41,6 +41,7 @@
       for (BasicBlock block : bfsBlocks()) {
          block.getInterference(interference);
       }
+       System.out.println("INTERFERENCE: " + interference);
       return interference;
    }
 

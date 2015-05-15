@@ -734,7 +734,7 @@ public abstract class IInstruction {
    public static class MOV extends IInstruction {
       public Register source, dest;
       public String getText() {
-         return "mov " + source + ", "+ dest + "\n";
+         return "mov " + source + ", "+ dest;
       }
 
       public String getX86(CFG cfg) {

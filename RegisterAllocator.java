@@ -13,6 +13,8 @@ public class RegisterAllocator {
             writeILOC(cfg);         
             cfg.resetLiveAnalysis();
             cfg.calculateLiveOut();
+            allocateCFG(cfg);
+            System.exit(0);
          }
       }
       return result;
@@ -34,7 +36,7 @@ public class RegisterAllocator {
             node.setColor(node.getData());
             colorings.put(node.getData(), node.getData());
          }
-         else if (InterferenceGraph.isUnconstrainedNode(node)) {            
+         else if (InterferenceGraph.isUnconstrainedNode(node)) {
             Register color = InterferenceGraph.getColorings(node).iterator().next();
             node.setColor(color);
             colorings.put(node.getData(), color);
@@ -42,7 +44,7 @@ public class RegisterAllocator {
          else {
             HashSet<Register> colors = InterferenceGraph.getColorings(node);
             if (colors.isEmpty()) {
-               spillRegister(cfg, node.getData());               
+               spillRegister(cfg, node.getData());
                return false;
             }
             else {
@@ -70,6 +72,7 @@ public class RegisterAllocator {
          for (int idx = 0; idx < instructions.size(); idx++) {
             Integer rspOffset = cfg.allocateSpill(register);
             IInstruction instruction = instructions.get(idx);
+
             if (instruction.getSource().contains(register)) {
                IInstruction.LOADAISPILL loadaispill = new IInstruction.LOADAISPILL();
                loadaispill.dest = register;
@@ -77,6 +80,7 @@ public class RegisterAllocator {
                instructions.add(idx, loadaispill);
                idx++;
             }
+
             if (instruction.getDest().contains(register)) {
                IInstruction.STOREAISPILL storeaispill = new IInstruction.STOREAISPILL();
                storeaispill.source = register;
