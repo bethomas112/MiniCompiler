@@ -1,0 +1,18 @@
+cd benchmarks
+dirlist=$(ls)
+for dir in $dirlist
+do 
+pushd $dir 
+echo "=================== Running test" $dir "==================="
+curTest=$(ls *.mini)
+java ../../Mini -dumpIL $curTest
+rc=$?
+if [[ $rc != 0 ]]; then echo "Failed to compile" $curTest; exit $rc; fi
+curEx=$(ls *.s)
+gcc $curEx
+rc=$?
+if [[ $rc != 0 ]]; then echo "gcc failed to compile" $curEx; exit $rc; fi
+./a.out < input > testOut
+diff testOut output 
+popd
+done
