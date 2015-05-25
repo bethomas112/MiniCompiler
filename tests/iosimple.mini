@@ -1,0 +1,19 @@
+int global;
+fun main() int
+{
+   int local;
+
+   local = 1;
+   global = 2;
+
+   print local;
+   print global;
+
+   read local;
+   read global;
+
+   print local;
+   print global;
+
+   return local;
+}

@@ -37,7 +37,7 @@
    }
 
    public InterferenceGraph getInterference() {
-      InterferenceGraph interference = new InterferenceGraph();
+      InterferenceGraph interference = new InterferenceGraph(this);
       for (BasicBlock block : bfsBlocks()) {
          block.getInterference(interference);
       }
@@ -54,6 +54,10 @@
             changed |= block.genLiveOut();
          }
       }
+   }
+
+   public boolean isSpilled(Register register) {
+      return spills.containsKey(register);
    }
 
    public Integer allocateSpill(Register register) {

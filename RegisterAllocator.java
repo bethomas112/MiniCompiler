@@ -13,8 +13,6 @@ public class RegisterAllocator {
             writeILOC(cfg);         
             cfg.resetLiveAnalysis();
             cfg.calculateLiveOut();
-            allocateCFG(cfg);
-            System.exit(0);
          }
       }
       return result;

@@ -2,6 +2,11 @@ import java.util.*;
 import java.util.Map.Entry;
 public class InterferenceGraph {
    private HashMap<Register, Node<Register>> graph = new HashMap<>();
+   private CFG cfg;
+
+   public InterferenceGraph(CFG cfg) {
+      this.cfg = cfg;
+   }
 
    public void addNode(Node<Register> node) {
       graph.put(node.getData(), node);
@@ -30,12 +35,15 @@ public class InterferenceGraph {
       if ((node = removeRequiredNode()) != null) {
          return node;
       }
+      if ((node = removeSpilledNode()) != null) {
+         return node;
+      }
       return null;
    }
 
    private Node<Register> removeUnconstrainedNode() {
       for (Node<Register> node : graph.values()) {
-         if (isUnconstrainedNode(node)) {
+         if (isUnconstrainedNode(node) && !cfg.isSpilled(node.getData())) {
             for (Node<Register> adj : node.getAdj()) {
                adj.disconnectFrom(node);
             }
@@ -48,7 +56,7 @@ public class InterferenceGraph {
 
    private Node<Register> removePossiblyConstrainedNode() {
       for (Node<Register> node : graph.values()) {
-         if (!isUnconstrainedNode(node) && !isRequiredRegister(node.getData())) {
+         if (!isUnconstrainedNode(node) && !isRequiredRegister(node.getData()) && !cfg.isSpilled(node.getData())) {
             for (Node<Register> adj : node.getAdj()) {
                adj.disconnectFrom(node);
             }
@@ -61,7 +69,20 @@ public class InterferenceGraph {
 
    private Node<Register> removeRequiredNode() {
       for (Node<Register> node : graph.values()) {
-         if (isRequiredRegister(node.getData())) {
+         if (isRequiredRegister(node.getData()) && !cfg.isSpilled(node.getData())) {
+            for (Node<Register> adj : node.getAdj()) {
+               adj.disconnectFrom(node);
+            }
+            graph.remove(node.getData());
+            return node;
+         }
+      }
+      return null;
+   }
+
+   private Node<Register> removeSpilledNode() {
+      for (Node<Register> node : graph.values()) {
+         if (cfg.isSpilled(node.getData())) {
             for (Node<Register> adj : node.getAdj()) {
                adj.disconnectFrom(node);
             }

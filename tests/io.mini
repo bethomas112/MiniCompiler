@@ -21,9 +21,13 @@ fun main() int
    print j.a;
    
    b = new B;
+   b.b = new B;
+   b.b.j = new J;
    read b.b.j.a;
    print b.b.j.a;
    
+   delete b.b.j;
+
    read local;
    print local;
 
