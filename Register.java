@@ -20,7 +20,25 @@ public class Register {
 
    public String toString() {
       return name;
-   }      
+   }
+
+   @Override
+   public boolean equals(Object other) {
+      if (other == null) {
+         return false;
+      }
+      if (!(other.getClass() == this.getClass())) {
+         return false;
+      }
+      else {
+         return name.equals(((Register)other).name);
+      }
+   }  
+
+   @Override
+   public int hashCode() {
+      return name.hashCode();
+   }
 
    /* Argument Registers */
    public static final Register RDI = new Register("%rdi");

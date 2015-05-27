@@ -1,24 +1,27 @@
 fun main() int
 {
    int a;
+   int b;
+   int c;
 
    a = 5;
+   a = a + 3;
    while (a > 0) {
       a = a - 1;
    }
 
+   b = a;
    if (true) {
-      a = 1;
+      b = 1;   
    }
    else {
-      a = 2;
+      b = 2;
    }
 
-   if (a <= 2) {
+   if (b <= 2) {
       return 0;
    }
    else {
-      return 1;
+      return b;
    }
-   return a;
 }

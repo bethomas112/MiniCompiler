@@ -8,6 +8,7 @@ public class RegisterAllocator {
 
    public ILOCGenerator.ILOCResult allocate() {
       for (CFG cfg : result.cfgs) {
+         cfg.resetLiveAnalysis();
          cfg.calculateLiveOut();
          while (!allocateCFG(cfg)) {
             writeILOC(cfg);         
@@ -53,7 +54,7 @@ public class RegisterAllocator {
          }
       }
       
-      System.out.println(colorings);
+      //System.out.println(colorings);
       for (BasicBlock block : cfg.bfsBlocks()) {
          for (IInstruction instruction : block.getILOC()) {
             instruction.applyColoring(colorings);
@@ -64,7 +65,7 @@ public class RegisterAllocator {
    }
 
    private void spillRegister(CFG cfg, Register register) {
-      System.out.println("Spilling register: " + register);      
+      //System.out.println("Spilling register: " + register);      
       for (BasicBlock block : cfg.bfsBlocks()) {
          List<IInstruction> instructions = block.getILOC();
          for (int idx = 0; idx < instructions.size(); idx++) {
