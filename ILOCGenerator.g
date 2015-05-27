@@ -35,13 +35,9 @@ options
    private HashMap<String, MiniType.StructType> structTypes = new HashMap<>();
    private List<CFG> cfgs = new ArrayList<>();
    private ILOCResult result = new ILOCResult();
-   private File outputFile;
    private HashMap<String, HashMap<String, MiniType>> functionLocalTypes = new HashMap<>();
    private HashMap<String, MiniType> globalTypes = new HashMap<>();
    private HashMap<String, MiniType> functionReturnTypes = new HashMap<>();
-   public void setOutputFile(File file) {
-      this.outputFile = file;
-   }
 
    public ILOCResult getResult() {
       return result;
@@ -142,26 +138,8 @@ functions
    returns []
    @init{  }
    :  ^(FUNCS (f=function {  })*)
-      { 
-         StringBuilder sb = new StringBuilder();
-         result.cfgs = new ArrayList<>(cfgs);
-         for (CFG cfg : cfgs) {
-            List<BasicBlock> blocks = cfg.bfsBlocks();
-            
-            for (BasicBlock block : blocks) {            
-               sb.append(block);               
-            }           
-         } 
-         if (outputFile != null) {
-            try {
-               FileWriter writer = new FileWriter(outputFile);
-               writer.write(sb.toString());
-               writer.close();
-            }
-            catch (IOException e) {
-               System.err.println("Error writing .il file: " + e);
-            }
-         }
+      {
+         result.cfgs = new ArrayList<>(cfgs);          
       }
    |  {  }
    ;

@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.Vector;
 import java.util.HashMap;
 import java.util.Arrays;
+import java.util.List;
 import javax.json.JsonValue;
 import javax.json.Json;
 
@@ -30,6 +31,15 @@ public class Mini
          TypeChecker typeChecker = typeCheck(tree, tokens);
          ILOCGenerator generator = generateILOC(tree, tokens, typeChecker);
          ILOCGenerator.ILOCResult result = generator.getResult();
+         if (_oCopy) {
+            result = runCopyPropagation(result);
+         }
+         if (_oRemoveUseless) {
+            result = runUselessCodeRemoval(result);
+         }
+         if (_dumpIL) {
+            writeILOC(result);
+         }
          if (!_noAlloc) {
             result = allocateRegisters(result);
          }
@@ -40,11 +50,15 @@ public class Mini
    private static final String DISPLAYAST = "-displayAST";
    private static final String DUMPILOC = "-dumpIL";
    private static final String NOALLOC = "-noAlloc";
+   private static final String OCOPY = "-Ocopy";
+   private static final String OREMOVEUSELESS = "-OremoveUseless";
 
    private static String _inputFile = null;
    private static boolean _displayAST = false;
    private static boolean _dumpIL = false;
    private static boolean _noAlloc = false;
+   private static boolean _oCopy = false;
+   private static boolean _oRemoveUseless = false;
    
    private static void parseParameters(String [] args)
    {
@@ -61,6 +75,14 @@ public class Mini
          else if (args[i].equals(NOALLOC))
          {
             _noAlloc = true;
+         }
+         else if (args[i].equals(OCOPY))
+         {
+            _oCopy = true;
+         }
+         else if (args[i].equals(OREMOVEUSELESS))
+         {
+            _oRemoveUseless = true;
          }
          else if (args[i].charAt(0) == '-')
          {
@@ -119,10 +141,7 @@ public class Mini
    private static ILOCGenerator generateILOC(CommonTree tree, CommonTokenStream tokens, TypeChecker typeChecker) {
       CommonTreeNodeStream nodes = new CommonTreeNodeStream(tree);
       nodes.setTokenStream(tokens);
-      ILOCGenerator igen = new ILOCGenerator(nodes);
-      if (_dumpIL) {
-         igen.setOutputFile(new File(_inputFile.split("\\.")[0] + ".il"));   
-      }      
+      ILOCGenerator igen = new ILOCGenerator(nodes);      
       igen.setFunctionTypeinfo(typeChecker.functionDefs);
       igen.setGlobalTypes(typeChecker.globalTypeEnv);
       try {         
@@ -132,6 +151,42 @@ public class Mini
          error(e.getMessage());
       }
       return igen;
+   }
+
+   private static void writeILOC(ILOCGenerator.ILOCResult result) {
+      File outputFile = new File(_inputFile.split("\\.")[0] + ".il");
+      StringBuilder sb = new StringBuilder();
+      
+      for (CFG cfg : result.cfgs) {
+         List<BasicBlock> blocks = cfg.bfsBlocks();
+         for (BasicBlock block : blocks) {            
+            sb.append(block);               
+         }           
+      } 
+      if (outputFile != null) {
+         try {
+            FileWriter writer = new FileWriter(outputFile);
+            writer.write(sb.toString());
+            writer.close();
+         }
+         catch (IOException e) {
+            System.err.println("Error writing .il file: " + e);
+         }
+      }
+   }
+
+   private static ILOCGenerator.ILOCResult runCopyPropagation(ILOCGenerator.ILOCResult result) {
+      for (CFG cfg : result.cfgs) {
+         cfg.runCopyPropagation();
+      }
+      return result;
+   }
+
+   private static ILOCGenerator.ILOCResult runUselessCodeRemoval(ILOCGenerator.ILOCResult result) {
+      for (CFG cfg : result.cfgs) {
+         cfg.removeUselessInstructions();
+      }
+      return result;
    }
 
    private static void generateX86(ILOCGenerator.ILOCResult result, HashMap<String, MiniType> globalTypes) {

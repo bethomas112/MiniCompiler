@@ -25,9 +25,10 @@ public abstract class IInstruction {
          return Collections.singleton(dest);
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
          sourceA = coloring.get(sourceA);
          sourceB = coloring.get(sourceB);
+         if (!sourceOnly)
          dest = coloring.get(dest);
       }
    }
@@ -54,8 +55,9 @@ public abstract class IInstruction {
          return Collections.singleton(dest);
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
          source = coloring.get(source);
+         if (!sourceOnly)
          dest = coloring.get(dest);
       }
    }
@@ -92,7 +94,8 @@ public abstract class IInstruction {
          return Collections.singleton(dest);
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
+         if (!sourceOnly)
          dest = coloring.get(dest);
       }
    }
@@ -128,8 +131,9 @@ public abstract class IInstruction {
          return Collections.singleton(dest);
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
          source = coloring.get(source);
+         if (!sourceOnly)
          dest = coloring.get(dest);
       }
    }
@@ -158,9 +162,10 @@ public abstract class IInstruction {
          return new HashSet<Register>(Arrays.asList(dest, Register.RAX, Register.RDX));
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
          sourceA = coloring.get(sourceA);
          sourceB = coloring.get(sourceB);
+         if (!sourceOnly)
          dest = coloring.get(dest);
       }
    }
@@ -186,9 +191,10 @@ public abstract class IInstruction {
          return Collections.singleton(dest);
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
          sourceA = coloring.get(sourceA);
          sourceB = coloring.get(sourceB);
+         if (!sourceOnly)
          dest = coloring.get(dest);
       }
    }
@@ -214,9 +220,10 @@ public abstract class IInstruction {
          return Collections.singleton(dest);
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
          sourceA = coloring.get(sourceA);
          sourceB = coloring.get(sourceB);
+         if (!sourceOnly)
          dest = coloring.get(dest);
       }
    }
@@ -243,8 +250,9 @@ public abstract class IInstruction {
          return Collections.singleton(dest);
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
          source = coloring.get(source);
+         if (!sourceOnly)
          dest = coloring.get(dest);
       }
    }
@@ -271,9 +279,10 @@ public abstract class IInstruction {
          return Collections.singleton(dest);
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
          sourceA = coloring.get(sourceA);
          sourceB = coloring.get(sourceB);
+         if (!sourceOnly)
          dest = coloring.get(dest);
       }
    }
@@ -299,9 +308,10 @@ public abstract class IInstruction {
          return Collections.singleton(dest);
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
          sourceA = coloring.get(sourceA);
          sourceB = coloring.get(sourceB);
+         if (!sourceOnly)
          dest = coloring.get(dest);
       }
    }
@@ -329,8 +339,9 @@ public abstract class IInstruction {
          return Collections.singleton(dest);
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
          source = coloring.get(source);
+         if (!sourceOnly)
          dest = coloring.get(dest);
       }
    }
@@ -355,7 +366,8 @@ public abstract class IInstruction {
          return Collections.singleton(dest);
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
+         if (!sourceOnly)
          dest = coloring.get(dest);
       }
    }
@@ -381,7 +393,8 @@ public abstract class IInstruction {
          return builder.toString();
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
+         if (!sourceOnly)
          dest = coloring.get(dest);
       }
 
@@ -419,8 +432,9 @@ public abstract class IInstruction {
          return Collections.singleton(dest);
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
          source = coloring.get(source);
+         if (!sourceOnly)
          dest = coloring.get(dest);
       }
    }
@@ -457,7 +471,8 @@ public abstract class IInstruction {
          return Collections.singleton(dest);
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
+         if (!sourceOnly)
          dest = coloring.get(dest);
       }
    }
@@ -500,7 +515,8 @@ public abstract class IInstruction {
          return Collections.singleton(dest);
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
+         if (!sourceOnly)
          dest = coloring.get(dest);
       }
    }
@@ -526,7 +542,8 @@ public abstract class IInstruction {
          return Collections.singleton(dest);
       }
       
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
+         if (!sourceOnly)
          dest = coloring.get(dest);
       }
    }
@@ -551,7 +568,8 @@ public abstract class IInstruction {
          return Collections.singleton(dest);
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
+         if (!sourceOnly)
          dest = coloring.get(dest);
       }
    }
@@ -575,7 +593,8 @@ public abstract class IInstruction {
          return Collections.singleton(dest);
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
+         if (!sourceOnly)
          dest = coloring.get(dest);
       }
    }
@@ -599,7 +618,7 @@ public abstract class IInstruction {
          return "\tmovq " + source + ", " + offset + "(%rsp)\n";
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
          source = coloring.get(source);
       }
    }
@@ -628,16 +647,21 @@ public abstract class IInstruction {
       } 
 
       public Set<Register> getSource() {
-         return Collections.singleton(source);
+         return new HashSet<Register>(Arrays.<Register>asList(source, dest));
       }
 
       public Set<Register> getDest() {
          return Collections.singleton(dest);
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
          source = coloring.get(source);
+         if (!sourceOnly)
          dest = coloring.get(dest);
+      }
+
+      public boolean removable() {
+         return false;
       }
    }
 
@@ -678,8 +702,12 @@ public abstract class IInstruction {
          }
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
          source = coloring.get(source);
+      }
+
+      public boolean removable() {
+         return false;
       }
    }
 
@@ -702,8 +730,12 @@ public abstract class IInstruction {
          return Collections.emptySet();
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
          source = coloring.get(source);
+      }
+
+      public boolean removable() {
+         return false;
       }
    }
 
@@ -725,8 +757,12 @@ public abstract class IInstruction {
          return Collections.singleton(Register.RAX);
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
          source = coloring.get(source);
+      }
+
+      public boolean removable() {
+         return false;
       }
    }
 
@@ -749,9 +785,14 @@ public abstract class IInstruction {
          return Collections.singleton(dest);
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
          source = coloring.get(source);
+         if (!sourceOnly)
          dest = coloring.get(dest);
+      }
+
+      public boolean isCopy() {
+         return true;
       }
    }
 
@@ -773,8 +814,9 @@ public abstract class IInstruction {
          return Collections.singleton(dest);
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
          source = coloring.get(source);
+         if (!sourceOnly)
          dest = coloring.get(dest);
       }
    }
@@ -797,8 +839,9 @@ public abstract class IInstruction {
          return Collections.singleton(dest);
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
          source = coloring.get(source);
+         if (!sourceOnly)
          dest = coloring.get(dest);
       }
    }
@@ -821,8 +864,9 @@ public abstract class IInstruction {
          return Collections.singleton(dest);
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
          source = coloring.get(source);
+         if (!sourceOnly)
          dest = coloring.get(dest);
       }
    }
@@ -845,8 +889,9 @@ public abstract class IInstruction {
          return Collections.singleton(dest);
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
          source = coloring.get(source);
+         if (!sourceOnly)
          dest = coloring.get(dest);
       }
    }
@@ -869,8 +914,9 @@ public abstract class IInstruction {
          return Collections.singleton(dest);
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
          source = coloring.get(source);
+         if (!sourceOnly)
          dest = coloring.get(dest);
       }
    }
@@ -893,8 +939,9 @@ public abstract class IInstruction {
          return Collections.singleton(dest);
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
          source = coloring.get(source);
+         if (!sourceOnly)
          dest = coloring.get(dest);
       }
    }
@@ -919,9 +966,13 @@ public abstract class IInstruction {
          return Collections.<Register>emptySet();
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
          sourceA = coloring.get(sourceA);
          sourceB = coloring.get(sourceB);
+      }
+
+      public boolean removable() {
+         return false;
       }
    }
 
@@ -945,8 +996,12 @@ public abstract class IInstruction {
          return Collections.<Register>emptySet();
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
          source = coloring.get(source);
+      }
+
+      public boolean removable() {
+         return false;
       }
    }
 
@@ -972,6 +1027,10 @@ public abstract class IInstruction {
       public Set<Register> getDest() {
          return Collections.<Register>emptySet();
       }
+
+      public boolean removable() {
+         return false;
+      }
    }
 
    public static class CBRGE extends IInstruction {
@@ -995,6 +1054,10 @@ public abstract class IInstruction {
 
       public Set<Register> getDest() {
          return Collections.<Register>emptySet();
+      }
+
+      public boolean removable() {
+         return false;
       }
    }
 
@@ -1020,6 +1083,10 @@ public abstract class IInstruction {
       public Set<Register> getDest() {
          return Collections.<Register>emptySet();
       }
+
+      public boolean removable() {
+         return false;
+      }
    }
 
    public static class CBRLE extends IInstruction {
@@ -1043,6 +1110,10 @@ public abstract class IInstruction {
 
       public Set<Register> getDest() {
          return Collections.<Register>emptySet();
+      }
+
+      public boolean removable() {
+         return false;
       }
    }
 
@@ -1068,6 +1139,10 @@ public abstract class IInstruction {
       public Set<Register> getDest() {
          return Collections.<Register>emptySet();
       }
+
+      public boolean removable() {
+         return false;
+      }
    }
 
    public static class CBRNE extends IInstruction {
@@ -1092,6 +1167,10 @@ public abstract class IInstruction {
       public Set<Register> getDest() {
          return Collections.<Register>emptySet();
       }
+
+      public boolean removable() {
+         return false;
+      }
    }
 
    public static class JUMPI extends IInstruction {
@@ -1114,6 +1193,10 @@ public abstract class IInstruction {
 
       public Set<Register> getDest() {
          return Collections.<Register>emptySet();
+      }
+
+      public boolean removable() {
+         return false;
       }
    }
 
@@ -1144,8 +1227,12 @@ public abstract class IInstruction {
          return Register.CALLER_SAVED;
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
          source = coloring.get(source);
+      }
+
+      public boolean removable() {
+         return false;
       }
    }
 
@@ -1175,8 +1262,12 @@ public abstract class IInstruction {
          return Register.CALLER_SAVED;
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
          source = coloring.get(source);
+      }
+
+      public boolean removable() {
+         return false;
       }
    }
 
@@ -1206,8 +1297,13 @@ public abstract class IInstruction {
          return Register.CALLER_SAVED;
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
+         if (!sourceOnly)
          dest = coloring.get(dest);
+      }
+
+      public boolean removable() {
+         return false;
       }
    }
 
@@ -1231,6 +1327,10 @@ public abstract class IInstruction {
       public Set<Register> getDest() {
          return Register.CALLER_SAVED;
       }
+
+      public boolean removable() {
+         return false;
+      }
    }
 
    public static class RET extends IInstruction {
@@ -1252,6 +1352,10 @@ public abstract class IInstruction {
          return builder.toString();
       }
 
+      public boolean removable() {
+         return false;
+      }
+
       public Set<Register> getSource() {
          return Collections.singleton(Register.RBP);
       }
@@ -1268,7 +1372,7 @@ public abstract class IInstruction {
       public Register dest;
 
       public String getText() {
-         return "\tnew " + struct.name + ", " + struct.fieldsOrdered + ", " + dest;
+         return "new " + struct.name + ", " + struct.fieldsOrdered + ", " + dest;
       }
 
       public String getX86(CFG cfg) {
@@ -1291,7 +1395,8 @@ public abstract class IInstruction {
          return registers;
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
+         if (!sourceOnly)
          dest = coloring.get(dest);
       }
    }
@@ -1318,7 +1423,7 @@ public abstract class IInstruction {
          return Register.CALLER_SAVED;
       }
 
-      public void applyColoring(HashMap<Register, Register> coloring) {
+      public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {         
          source = coloring.get(source);
       }
    }
@@ -1329,7 +1434,19 @@ public abstract class IInstruction {
    public abstract Set<Register> getDest();
 
    public void applyColoring(HashMap<Register, Register> coloring) {
+      applyColoring(coloring, false);
+   }
 
+   public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
+
+   }
+
+   public boolean removable() {
+      return true;
+   }
+
+   public boolean isCopy() {
+      return false;
    }
 
    public boolean hasSource() {

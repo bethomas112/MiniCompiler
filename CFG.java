@@ -41,7 +41,7 @@
       for (BasicBlock block : bfsBlocks()) {
          block.getInterference(interference);
       }
-       System.out.println("INTERFERENCE: " + interference);
+      //System.out.println("INTERFERENCE: " + interference);
       return interference;
    }
 
@@ -72,5 +72,49 @@
       for (BasicBlock block : blocks) {
          block.resetSets();
       }
+   }
+
+   public void removeUselessInstructions() {
+      resetLiveAnalysis();
+      calculateLiveOut();
+      List<BasicBlock> blocks = bfsBlocks();
+      for (BasicBlock block : blocks) {
+         block.removeUselessInstructions();
+      }
+   }
+
+   public void runCopyPropagation() {
+      List<BasicBlock> blocks = bfsBlocks();
+
+      boolean changed = true;
+      while (changed) {
+         changed = false;
+         for (BasicBlock block : blocks) {
+            changed |= block.genCPIN();
+         }
+      }
+
+      for (BasicBlock block : blocks) {
+         block.substituteCopies();
+      }
+   }
+
+   public void debugPrint() {
+      resetLiveAnalysis();
+      calculateLiveOut();
+      System.out.println("CFG: " + entryBlock.label);
+      for (BasicBlock block : bfsBlocks()) {
+         System.out.println("\tBlock: " + block.label);
+         System.out.println("\tGen:");
+         System.out.println("\t\t" + block.getGenSet());
+         System.out.println("\tKill:");
+         System.out.println("\t\t" + block.getKillSet());
+         System.out.println("\tLiveOut:");
+         System.out.println("\t\t" + block.getLiveOut());    
+      }
+      //System.out.println("\tInterference:");
+      //for (Node<Register> node : getInterference().getNodes()) {
+         //System.out.println(node);
+      //}
    }
 }
