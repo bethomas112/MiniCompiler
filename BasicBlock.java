@@ -136,10 +136,10 @@ public class BasicBlock {
                   }
                   interference.getNode(dest).connect(interference.getNode(register));
                }
-            }
-            liveNow.remove(dest);
-            liveNow.addAll(instr.getSource());
+            }                     
          }
+         liveNow.removeAll(instr.getDest()); 
+         liveNow.addAll(instr.getSource());
       }
       return interference;
    }
@@ -199,13 +199,17 @@ public class BasicBlock {
       StringBuilder sb = new StringBuilder();
       sb.append(label + ":\n");
       if (this == cfg.entryBlock) {
+         List<Register> usedCalleeRegs = cfg.getUsedCalleeRegisters();
          int spillCount = cfg.params.size() > IInstruction.SPILL_THRESHOLD ? cfg.params.size() - IInstruction.SPILL_THRESHOLD : 0;
          spillCount += cfg.spills.size();
          int localCount = cfg.localsOrdered.size();
-         int frameSize = (spillCount + localCount) * 8;
+         int frameSize = (spillCount + localCount) * 8;      
          sb.append("\tpushq %rbp\n");
          sb.append("\tmovq %rsp, %rbp\n");
-         sb.append("\tsubq $" + frameSize + ", %rsp\n");      
+         for (Register register : usedCalleeRegs) {
+            sb.append("\tpushq " + register + "\n");
+         }
+         sb.append("\tsubq $" + frameSize + ", %rsp\n");         
       }
       
       for (IInstruction instruction : instructions) {

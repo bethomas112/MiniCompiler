@@ -291,13 +291,21 @@ assignment[CFG cfg, BasicBlock block]
 
 print[CFG cfg, BasicBlock block]
    returns [BasicBlock resultBlock = null]
-   @init {  }
-   :  ^(ast=PRINT e=expression[cfg, block] (ENDL {  })?)
+   @init { boolean hasEndl = false; }
+   :  ^(ast=PRINT e=expression[cfg, block] (ENDL { hasEndl = true; })?)
       {
-         $resultBlock = block;
-         IInstruction.PRINTLN println = new IInstruction.PRINTLN();
-         println.source = $e.resultRegister;
-         block.addInstruction(println);
+         if (hasEndl) {
+            $resultBlock = block;
+            IInstruction.PRINTLN println = new IInstruction.PRINTLN();
+            println.source = $e.resultRegister;
+            block.addInstruction(println);
+         }
+         else {
+            $resultBlock = block;
+            IInstruction.PRINT print = new IInstruction.PRINT();
+            print.source = $e.resultRegister;
+            block.addInstruction(print);
+         }
       }
    ;
 
@@ -374,15 +382,16 @@ conditional[CFG cfg, BasicBlock block]
          cbreq.labelA = thenBlock.label;
          cbreq.labelB = hasElseBlock ? elseBlock.label : afterBlock.label;
          guardBlock.addInstruction(cbreq);
-         if ($t.resultBlock != null) {
-            $t.resultBlock.addNext(afterBlock);
-            
-            IInstruction.JUMPI jumpi = new IInstruction.JUMPI();
-            jumpi.label = afterBlock.label;
-            $t.resultBlock.addInstruction(jumpi);
-         }
+
          if (hasElseBlock) {
-            guardBlock.addNext(elseBlock);   
+            guardBlock.addNext(elseBlock);
+            if ($t.resultBlock != null) {
+               $t.resultBlock.addNext(afterBlock);
+               
+               IInstruction.JUMPI jumpi = new IInstruction.JUMPI();
+               jumpi.label = afterBlock.label;
+               $t.resultBlock.addInstruction(jumpi);
+            }
             if ($e.resultBlock != null) {
                $e.resultBlock.addNext(afterBlock);
 
@@ -390,6 +399,16 @@ conditional[CFG cfg, BasicBlock block]
                jumpi.label = afterBlock.label;
                $e.resultBlock.addInstruction(jumpi);
             }
+         }
+         else {
+            if ($t.resultBlock != null) {
+               $t.resultBlock.addNext(afterBlock);
+               
+               IInstruction.JUMPI jumpi = new IInstruction.JUMPI();
+               jumpi.label = afterBlock.label;
+               $t.resultBlock.addInstruction(jumpi);
+            }
+            guardBlock.addNext(afterBlock);
          }
          $resultBlock = afterBlock;
       }
@@ -704,7 +723,7 @@ expression[CFG cfg, BasicBlock block]
          IInstruction.MULT mult = new IInstruction.MULT();
          mult.sourceA = $e.resultRegister;
          mult.sourceB = loadi.dest;
-         mult.dest = loadi.dest;
+         mult.dest = Register.newRegister();
          block.addInstruction(mult);
          $resultRegister = mult.dest;
       }

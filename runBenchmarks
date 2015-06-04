@@ -6,7 +6,7 @@ do
 pushd $dir 
 echo "=================== Running test" $dir "==================="
 curTest=$(ls *.mini)
-java Mini -dumpIL $curTest 
+java Mini -dumpIL -Ocopy -OremoveUseless $curTest 
 rc=$?
 if [[ $rc != 0 ]]; then echo "Failed to compile" $curTest; exit $rc; fi
 curEx=$(ls *.s)

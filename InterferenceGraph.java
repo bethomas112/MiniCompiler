@@ -32,12 +32,12 @@ public class InterferenceGraph {
       if ((node = removePossiblyConstrainedNode()) != null) {
          return node;
       }
-      if ((node = removeRequiredNode()) != null) {
-         return node;
-      }
       if ((node = removeSpilledNode()) != null) {
          return node;
       }
+      if ((node = removeRequiredNode()) != null) {
+         return node;
+      }      
       return null;
    }
 

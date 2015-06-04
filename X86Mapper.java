@@ -18,7 +18,7 @@ public class X86Mapper {
          }
          writer.write("\t.section\t.rodata\n");
          writer.write(IInstruction.PRINT.PRINT_STRING_LABEL + ":\n");
-         writer.write("\t.string \"%ld\"\n");
+         writer.write("\t.string \"%ld \"\n");
          writer.write(IInstruction.PRINTLN.PRINTLN_STRING_LABEL + ":\n");
          writer.write("\t.string \"%ld\\n\"\n");
          writer.write(IInstruction.READ.READ_STRING_LABEL + ":\n");
@@ -27,7 +27,7 @@ public class X86Mapper {
             writer.write("\t.text\n");
             writer.write(".global " + cfg.entryBlock.label + "\n");
             writer.write("\t.type\t" + cfg.entryBlock.label + ", @function\n");            
-            for (BasicBlock block : cfg.bfsBlocks()) {
+            for (BasicBlock block : cfg.dfsBlocks()) {
                writer.write(block.getX86(cfg));
             }
             writer.write("\t.size\t" + cfg.entryBlock.label + ", .-" + cfg.entryBlock.label + "\n");            

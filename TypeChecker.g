@@ -310,8 +310,10 @@ return_stmt[FunctionPrototype proto, HashMap<String, MiniType> typeEnv]
             // Case where there is no return expression and the function returns void
          }
          else if ($e.miniType != proto.returnType) {
-            throw new TypeException("Return type mismatch: Expected " 
-               + proto.returnType.name + ", found " + $e.miniType.name);
+            if (!($e.miniType == MiniType.NULL && proto.returnType instanceof MiniType.StructType)) {
+               throw new TypeException("Return type mismatch: Expected " 
+                  + proto.returnType.name + ", found " + $e.miniType.name);
+            }
          }
       }
    ;
@@ -392,7 +394,34 @@ expression[HashMap<String, MiniType> typeEnv]
          }
       }
    //Comparisons
-   |  ^((ast=EQ | ast=LT | ast=GT | ast=NE | ast=LE | ast=GE)
+   |  ^((ast=EQ | ast=NE)
+         lft=expression[typeEnv] rht=expression[typeEnv])
+      {
+         //Great programming style incoming
+         if ($lft.miniType == MiniType.INT && $rht.miniType == MiniType.INT) {
+            
+         }
+         else if ($lft.miniType instanceof MiniType.StructType && $rht.miniType instanceof MiniType.StructType) {
+            
+         }
+         else if ($lft.miniType == MiniType.NULL && $rht.miniType instanceof MiniType.StructType) {
+            
+         }
+         else if ($lft.miniType instanceof MiniType.StructType && $rht.miniType == MiniType.NULL) {
+            
+         }
+         else if ($lft.miniType == MiniType.NULL && $rht.miniType == MiniType.NULL) {
+            
+         }
+         else if ($lft.miniType == MiniType.BOOL && $rht.miniType == MiniType.BOOL) {
+            
+         }
+         else {
+            throw new TypeException("Type Error: " + $ast.text + " expects INT INT");
+         }
+         $miniType = MiniType.BOOL;
+      }
+   |  ^((ast=LT | ast=GT | ast=LE | ast=GE)
          lft=expression[typeEnv] rht=expression[typeEnv])
       {
          if ($lft.miniType == MiniType.INT && $rht.miniType == MiniType.INT) {
