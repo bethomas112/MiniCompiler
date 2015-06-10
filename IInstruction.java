@@ -155,7 +155,7 @@ public abstract class IInstruction {
       }
 
       public Set<Register> getSource() {
-         return new HashSet<Register>(Arrays.asList(sourceA, sourceB, Register.RAX));
+         return new HashSet<Register>(Arrays.asList(sourceA, sourceB, Register.RAX, Register.RDX));
       }
 
       public Set<Register> getDest() {
@@ -1220,7 +1220,9 @@ public abstract class IInstruction {
       }
 
       public Set<Register> getSource() {
-         return Collections.singleton(source);
+         HashSet<Register> result = new HashSet<>(Register.CALLER_SAVED);
+         result.add(source);
+         return result;
       }
 
       public Set<Register> getDest() {
@@ -1255,7 +1257,9 @@ public abstract class IInstruction {
       }
 
       public Set<Register> getSource() {
-         return Collections.singleton(source);
+         HashSet<Register> result = new HashSet<>(Register.CALLER_SAVED);
+         result.add(source);
+         return result;
       }
 
       public Set<Register> getDest() {
@@ -1290,11 +1294,15 @@ public abstract class IInstruction {
       }
 
       public Set<Register> getSource() {
+         HashSet<Register> result = new HashSet<>(Register.CALLER_SAVED);
+         result.add(dest);
          return Collections.singleton(dest);
       }
 
       public Set<Register> getDest() {
-         return Register.CALLER_SAVED;
+         HashSet<Register> result = new HashSet<>(Register.CALLER_SAVED);
+         result.add(dest);
+         return Collections.singleton(dest);
       }
 
       public void applyColoring(HashMap<Register, Register> coloring, boolean sourceOnly) {
@@ -1321,7 +1329,7 @@ public abstract class IInstruction {
       }
 
       public Set<Register> getSource() {
-         return Collections.<Register>emptySet();
+         return Register.CALLER_SAVED;
       }
 
       public Set<Register> getDest() {
@@ -1339,6 +1347,7 @@ public abstract class IInstruction {
       }
 
       public String getX86(CFG cfg) {
+         List<Register> usedCalleeRegs = new ArrayList<Register>(cfg.getUsedCalleeRegisters());
          int spillCount = cfg.params.size() > SPILL_THRESHOLD ? cfg.params.size() - SPILL_THRESHOLD : 0;
          spillCount += cfg.spills.size();
          int localCount = cfg.localsOrdered.size();
@@ -1346,8 +1355,13 @@ public abstract class IInstruction {
          StringBuilder builder = new StringBuilder();
 
          builder.append("\taddq $" + frameSize + ", %rsp\n");
-         builder.append("\tmovq %rbp, %rsp\n");
+         Collections.reverse(usedCalleeRegs);
+         for (Register register : usedCalleeRegs) {
+            builder.append("\tpopq " + register + "\n");
+         }
+         builder.append("\tmovq %rbp, %rsp\n");        
          builder.append("\tpopq %rbp\n");
+
          builder.append("\tret\n");
          return builder.toString();
       }
@@ -1386,7 +1400,9 @@ public abstract class IInstruction {
       }
 
       public Set<Register> getSource() {
-         return Collections.singleton(Register.RAX);
+         HashSet<Register> result = new HashSet<>(Register.CALLER_SAVED);
+         result.add(Register.RAX);
+         return result;
       }
 
       public Set<Register> getDest() {
@@ -1416,7 +1432,9 @@ public abstract class IInstruction {
       }
 
       public Set<Register> getSource() {
-         return Collections.singleton(source);
+         HashSet<Register> result = new HashSet<>(Register.CALLER_SAVED);
+         result.add(source);
+         return result;
       }
 
       public Set<Register> getDest() {

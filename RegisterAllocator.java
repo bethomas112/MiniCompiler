@@ -53,7 +53,10 @@ public class RegisterAllocator {
             }
          }
       }
-      
+      // BasicBlock l11 = cfg.entryBlock.getNext().get(0);
+      //System.out.println(cfg.entryBlock.label);
+      //System.out.println("Interference: \n" + cfg.getInterference());
+      // System.out.println(l11.label + " LiveOut: " + l11.getLiveOut());
       //System.out.println(colorings);
       for (BasicBlock block : cfg.bfsBlocks()) {
          for (IInstruction instruction : block.getILOC()) {

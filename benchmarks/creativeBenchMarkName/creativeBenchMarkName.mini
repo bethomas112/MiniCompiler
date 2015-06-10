@@ -32,6 +32,8 @@ fun buildList() struct node {
    n4.next = n5;
    n5.next = null;
    
+   print 1337;
+
    return n0;
 }
 

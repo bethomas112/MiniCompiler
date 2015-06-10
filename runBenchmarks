@@ -6,7 +6,7 @@ do
 pushd $dir 
 echo "=================== Running test" $dir "==================="
 curTest=$(ls *.mini)
-java Mini -dumpIL $curTest 
+java Mini -dumpIL -Ocopy -OremoveUseless $curTest 
 rc=$?
 if [[ $rc != 0 ]]; then echo "Failed to compile" $curTest; fi
 curEx=$(ls *.s)
@@ -14,6 +14,8 @@ gcc $curEx
 rc=$?
 if [[ $rc != 0 ]]; then echo "gcc failed to compile" $curEx; fi
 ./a.out < input > testOut
-diff testOut output 
+diff testOut output > diffOut
+rc=$?
+if [[ $rc != 0 ]]; then echo "diff failed" $curEx; fi
 popd
 done
