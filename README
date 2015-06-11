@@ -1,0 +1,12 @@
+Building the source
+Our project is buildable by just using make
+
+Running the Mini Compiler
+In order to run the MiniCompiler use: 
+java Mini <sourceFile.mini> 
+
+available command line options:
+-dumpIL          This dumps out the ILOC for the mini source
+-noAlloc		 This will not run register allocation
+-Ocopy 			 This will run the copy propagation optimization
+-OremoveUseless  This will run useless code removal optimization
